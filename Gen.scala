@@ -14,54 +14,6 @@ extension (text : String) {
 
 case class Data(name: String, subtype: String, fields : Seq[Field] = Nil) derives ReadWriter {
   
-  def asOpenApi = {
-    s"""paths:
-  /data/${name.camelCase}/{id}:
-    get:
-      summary: Get $name by ID
-      description: Retrieve $name by the ID.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The $name ID.
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/${name.titleCase}'
-        '404':
-          description: ${name} not found
-components:
-  schemas:
-    Employee:
-      type: object
-      properties:
-        companyId:
-          type: string
-        details:
-          $ref: '#/components/schemas/Person'
-    Person:
-      type: object
-      properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
-        age:
-          type: integer
-          minimum: 19  # Ensuring age is greater than 18
-        email:
-          type: string
-          format: email
-          pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}
-
-    """
-  }
 }
 
 /**
@@ -82,7 +34,7 @@ components:
 case class Field(name: String, `type`: String) derives upickle.default.ReadWriter {
   def resolvedType = FieldType.parse(`type`)
   def asOpenApi = {
-    upickle.Obj(name.camelCase -> resolvedType.asOpenApiType)
+    ujson.Obj(name.camelCase -> resolvedType.asOpenApiType)
   
 }
 
@@ -95,29 +47,29 @@ enum FieldType:
   case Object(data: Data)
 
   def asOpenApiType : upickle.Value = this match {
-    case String => upickle.Obj("type" -> upickle.Str("string"))
+    case String => ujson.Obj("type" -> upickle.Str("string"))
     case Email =>
-      upickle.Obj(
+      ujson.Obj(
         "type" -> upickle.Str("string"),
         "format" -> upickle.Str("email"),
         "pattern" -> upickle.Str("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
       )
-    case Price => upickle.Obj("type" -> upickle.Str("number"))
-    case Decimal => upickle.Obj("type" -> upickle.Str("number"))
-    case Boolean => upickle.Obj("type" -> upickle.Str("boolean"))
+    case Price => ujson.Obj("type" -> upickle.Str("number"))
+    case Decimal => ujson.Obj("type" -> upickle.Str("number"))
+    case Boolean => ujson.Obj("type" -> upickle.Str("boolean"))
     case Map(inner) =>
-        upickle.Obj("type" -> upickle.Str("object"),
-        "additionalProperties" -> upickle.Obj("type" -> inner.asOpenApiType))
+        ujson.Obj("type" -> upickle.Str("object"),
+        "additionalProperties" -> ujson.Obj("type" -> inner.asOpenApiType))
     case Optional(inner) =>
     case Array(inner) =>
-      upickle.Obj(
+      ujson.Obj(
         "type" -> upickle.Str("array"),
-        "items" -> upickle.Obj("type" -> inner.asOpenApiType)
+        "items" -> ujson.Obj("type" -> inner.asOpenApiType)
       )
     case Ref(inner) =>
-       upickle.Obj("$ref" -> upickle.Str(s"#/components/schemas/${inner.titleCase}"))
+       ujson.Obj("$ref" -> upickle.Str(s"#/components/schemas/${inner.titleCase}"))
     case Object(inner) =>
-      upickle.Obj("$ref" -> upickle.Str(s"#/components/schemas/${inner.name.titleCase}"))
+      ujson.Obj("$ref" -> upickle.Str(s"#/components/schemas/${inner.name.titleCase}"))
   }
 
 object FieldType:
