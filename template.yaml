@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: Employee API
+  description: API for retrieving employee details.
+  version: 1.0.0
+servers:
+  - url: http://api.example.com/v1
+paths:
+  /data/name/{id}:
+    get:
+      summary: Get employee by ID
+      description: Retrieve an employee's details by their ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the employee.
+      responses:
+        '200':
+          description: Successful response with employee details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Employee not found
+components:
+  schemas:
+    Employee:
+      type: object
+      properties:
+        companyId:
+          type: string
+        details:
+          $ref: '#/components/schemas/Person'
+    Person:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        age:
+          type: integer
+          minimum: 19  # Ensuring age is greater than 18
+        email:
+          type: string
+          format: email
+          pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
