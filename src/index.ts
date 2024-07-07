@@ -4,12 +4,14 @@ import { generateOpenApiSpec } from './generateOpenApi'
 import yaml from 'js-yaml'
 
 // Function to write the OpenAPI spec to a file
-const writeOpenApiSpecToFile = (spec: object) => {
+const writeOpenApiSpecToFile = async (spec: object) => {
   const yamlSpec = yaml.dump(spec)
   // fs.writeFileSync(filePath, yamlSpec)
+  const outputFilePath = 'output/openapi.yaml'
+  await fs.ensureDir('output')
 
-  fs.writeFileSync('openapi.json', JSON.stringify(spec, null, 2), 'utf8')
-  fs.writeFileSync('openapi.yaml', yamlSpec, 'utf8')
+  fs.writeFileSync(outputFilePath, JSON.stringify(spec, null, 2), 'utf8')
+  fs.writeFileSync('output/openapi.yaml', yamlSpec, 'utf8')
 }
 
 const getSchemaFileNameFromArgs = (): string => {

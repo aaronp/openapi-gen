@@ -8,3 +8,5 @@ format:
 	npm run format
 validate:
 	docker run --rm -v $(CURRENT_DIR)/openapi.yaml:/local/openapi.yaml openapitools/openapi-generator-cli validate -i /local/openapi.yaml
+build:
+	docker build -t openapi-generator .

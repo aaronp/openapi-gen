@@ -1,5 +1,6 @@
 export type Schema = {
   name: string
+  version? : string
   fields: Array<Field>
 }
 

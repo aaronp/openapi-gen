@@ -2,6 +2,11 @@
 
 This project exports a data schema based on field collections, and an openapi schema for those fields.
 
+# Usage
+
+```sh
+docker run -v $(pwd)/schema.json:/usr/src/app/schema.json -v $(pwd)/output:/usr/src/app/output openapi-generator
+```
 
 # Roadmap:
 
