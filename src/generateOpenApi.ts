@@ -31,6 +31,9 @@ const transformFieldsToProperties = (fields: Array<Field>): { [key: string]: any
   return fields.map(transformFieldToProperty).reduce((acc, prop) => ({ ...acc, ...prop }), {});
 };
 
+const asIdentifier = (input: string) => input.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
+
+
 // Function to generate the OpenAPI spec
 export const generateOpenApiSpec = (schema: Schema) => {
   const { name, fields } = schema;
@@ -43,7 +46,7 @@ export const generateOpenApiSpec = (schema: Schema) => {
       version: '1.0.0',
     },
     paths: {
-      [`/data/${name}/{id}`]: {
+      [`/data/${asIdentifier(name)}/{id}`]: {
         get: {
           summary: `Get ${name} by ID`,
           parameters: [

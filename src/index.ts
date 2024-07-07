@@ -19,7 +19,7 @@ const main = async () => {
     const schema: Schema = await fs.readJson(schemaFilePath);
     const openApiSpec = generateOpenApiSpec(schema);
     writeOpenApiSpecToFile(openApiSpec, outputFilePath);
-    console.log(openApiSpec)
+    console.log(JSON.stringify(openApiSpec, null, 2))
   } catch (error) {
     console.error('Error generating OpenAPI spec:', error)
   }
