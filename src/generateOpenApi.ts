@@ -1,22 +1,29 @@
 import { Schema, Field } from './types';
 import fs from 'fs-extra';
 
+const emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
+
+
 // Function to transform a single field to its OpenAPI representation
 const transformFieldToProperty = (field: Field): { [key: string]: any } => {
   let type: string;
   switch (field.type) {
     case 'string':
+        return { [field.name]: { type : 'string' } }
     case 'email':
+        return { [field.name]: { 
+            type : 'string',
+            format : 'email',
+            pattern : emailPattern
+         } }
     case 'ref':
-      type = 'string';
-      break;
+        return { [field.name]: { type : 'string' } }
     case 'date':
-      type = 'string';
-      break;
+        return { [field.name]: { type : 'string' } }
     default:
-      type = 'string';
+        return { [field.name]: { type : 'string' } }
   }
-  return { [field.name]: { type } };
+  
 };
 
 // Function to transform fields array to OpenAPI properties object
@@ -55,8 +62,7 @@ export const generateOpenApiSpec = (schema: Schema) => {
               content: {
                 'application/json': {
                   schema: {
-                    type: 'object',
-                    properties,
+                    '$ref': `#/components/schemas/${name}`
                   },
                 },
               },

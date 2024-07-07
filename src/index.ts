@@ -19,9 +19,9 @@ const main = async () => {
     const schema: Schema = await fs.readJson(schemaFilePath);
     const openApiSpec = generateOpenApiSpec(schema);
     writeOpenApiSpecToFile(openApiSpec, outputFilePath);
-    console.log(`OpenAPI spec has been written to ${outputFilePath}`);
+    console.log(openApiSpec)
   } catch (error) {
-    console.error('Error generating OpenAPI spec:', error);
+    console.error('Error generating OpenAPI spec:', error)
   }
 };
 
