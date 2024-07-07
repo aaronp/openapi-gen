@@ -1,5 +1,4 @@
 import { Schema, Field } from './types'
-import fs from 'fs-extra'
 
 const emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
 
@@ -100,9 +99,4 @@ export const generateOpenApiSpec = (schema: Schema) => {
   }
 
   return openApiSpec
-}
-
-// Function to write the OpenAPI spec to a file
-export const writeOpenApiSpecToFile = (spec: object, filePath: string) => {
-  fs.writeFileSync(filePath, JSON.stringify(spec, null, 2))
 }
