@@ -6,4 +6,5 @@ export type Schema = {
 export type Field = {
   name: string
   type: 'string' | 'date' | 'email' | 'ref'
+  required?: boolean
 }

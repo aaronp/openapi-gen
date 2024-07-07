@@ -40,6 +40,10 @@ const transformFieldsToProperties = (
     .reduce((acc, prop) => ({ ...acc, ...prop }), {})
 }
 
+const getRequiredFields = (fields: Array<Field>): string[] => {
+  return fields.filter((field) => field.required).map((field) => field.name)
+}
+
 const asIdentifier = (input: string) =>
   input.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
 
@@ -47,6 +51,7 @@ const asIdentifier = (input: string) =>
 export const generateOpenApiSpec = (schema: Schema) => {
   const { name, fields } = schema
   const properties = transformFieldsToProperties(fields)
+  const requiredFields = getRequiredFields(fields)
 
   const openApiSpec = {
     openapi: '3.0.0',
@@ -88,6 +93,7 @@ export const generateOpenApiSpec = (schema: Schema) => {
         [name]: {
           type: 'object',
           properties,
+          required: requiredFields.length > 0 ? requiredFields : undefined,
         },
       },
     },
