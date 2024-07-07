@@ -19,7 +19,10 @@ const transformFieldToProperty = (field: Field): { [key: string]: any } => {
     case 'ref':
         return { [field.name]: { type : 'string' } }
     case 'date':
-        return { [field.name]: { type : 'string' } }
+        return { [field.name]: { 
+            type : 'string',
+            format: 'date-time'
+        } }
     default:
         return { [field.name]: { type : 'string' } }
   }
