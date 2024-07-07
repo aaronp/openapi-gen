@@ -4,7 +4,7 @@ const emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
 
 // Function to transform a single field to its OpenAPI representation
 const transformFieldToProperty = (field: Field): { [key: string]: any } => {
-  let type: string
+  
   switch (field.type) {
     case 'string':
       return { [field.name]: { type: 'string' } }
@@ -16,8 +16,20 @@ const transformFieldToProperty = (field: Field): { [key: string]: any } => {
           pattern: emailPattern,
         },
       }
-    case 'ref':
-      return { [field.name]: { type: 'string' } }
+    case 'decimal':
+      return {
+        [field.name]: {
+          type: 'number',
+          format: 'double',
+        },
+      }
+    case 'int':
+      return {
+        [field.name]: {
+          type: 'integer',
+          format: 'int64',
+        },
+      }
     case 'date':
       return {
         [field.name]: {
@@ -26,7 +38,7 @@ const transformFieldToProperty = (field: Field): { [key: string]: any } => {
         },
       }
     default:
-      return { [field.name]: { type: 'string' } }
+      return { [field.name]: { type: field.type } }
   }
 }
 
@@ -46,56 +58,63 @@ const getRequiredFields = (fields: Array<Field>): string[] => {
 const asIdentifier = (input: string) =>
   input.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
 
-// Function to generate the OpenAPI spec
-export const generateOpenApiSpec = (schema: Schema) => {
-  const { name, fields } = schema
-  const properties = transformFieldsToProperties(fields)
-  const requiredFields = getRequiredFields(fields)
-
-  const openApiSpec = {
-    openapi: '3.0.0',
-    info: {
-      title: `${name} API`,
-      version: '1.0.0',
-    },
-    paths: {
-      [`/data/${asIdentifier(name)}/{id}`]: {
-        get: {
-          summary: `Get ${name} by ID`,
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
+function getRouteForName(name: string) {
+  return {
+    get: {
+      summary: `Get ${name} by ID`,
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
+      responses: {
+        '200': {
+          description: `A ${name}`,
+          content: {
+            'application/json': {
               schema: {
-                type: 'string',
-              },
-            },
-          ],
-          responses: {
-            '200': {
-              description: `A ${name}`,
-              content: {
-                'application/json': {
-                  schema: {
-                    $ref: `#/components/schemas/${name}`,
-                  },
-                },
+                $ref: `#/components/schemas/${name}`,
               },
             },
           },
         },
       },
     },
-    components: {
-      schemas: {
-        [name]: {
-          type: 'object',
-          properties,
-          required: requiredFields.length > 0 ? requiredFields : undefined,
-        },
-      },
+  }
+}
+
+// Function to generate the OpenAPI spec
+export const generateOpenApiSpec = (schemas: Schema[]) => {
+  const paths: { [key: string]: any } = {}
+  const components: { [key: string]: any } = { schemas: {} }
+
+  schemas.forEach((schema) => {
+    const { name, fields } = schema
+
+    paths[`/data/${asIdentifier(name)}/{id}`] = getRouteForName(name)
+
+    const properties = transformFieldsToProperties(fields)
+    const requiredFields = getRequiredFields(fields)
+    components.schemas[name] = {
+      type: 'object',
+      properties,
+      required: requiredFields.length > 0 ? requiredFields : undefined,
+    }
+  })
+
+  const openApiSpec = {
+    openapi: '3.0.0',
+    info: {
+      title: `API`,
+      version: '1.0.0',
     },
+    paths,
+    components,
   }
 
   return openApiSpec

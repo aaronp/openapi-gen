@@ -5,9 +5,8 @@ import yaml from 'js-yaml'
 
 // Function to write the OpenAPI spec to a file
 const writeOpenApiSpecToFile = (spec: object) => {
-
   const yamlSpec = yaml.dump(spec)
-// fs.writeFileSync(filePath, yamlSpec)
+  // fs.writeFileSync(filePath, yamlSpec)
 
   fs.writeFileSync('openapi.json', JSON.stringify(spec, null, 2), 'utf8')
   fs.writeFileSync('openapi.yaml', yamlSpec, 'utf8')
@@ -26,11 +25,10 @@ const getSchemaFileNameFromArgs = (): string => {
 const main = async () => {
   try {
     const schemaFilePath = getSchemaFileNameFromArgs()
-    const schema: Schema = await fs.readJson(schemaFilePath)
-    const openApiSpec = generateOpenApiSpec(schema)
+    const schemas: Schema[] = await fs.readJson(schemaFilePath)
+    const openApiSpec = generateOpenApiSpec(schemas)
     writeOpenApiSpecToFile(openApiSpec)
-    
-    
+
     // console.log(JSON.stringify(openApiSpec, null, 2))
     console.log(yaml.dump(openApiSpec))
   } catch (error) {
