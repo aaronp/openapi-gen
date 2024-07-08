@@ -17,4 +17,4 @@ COPY . .
 RUN npm run build
 
 # Specify the command to run the application
-CMD ["npx", "ts-node", "src/main.ts", "schema.json"]
+CMD ["npx", "ts-node", "src/index.ts", "schema.json"]
