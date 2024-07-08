@@ -10,7 +10,9 @@ const writeOpenApiSpecToFile = async (spec: object) => {
   const outputFilePath = 'output/openapi.yaml'
   await fs.ensureDir('output')
 
+  console.log('Writing OpenAPI spec to:', outputFilePath)
   fs.writeFileSync(outputFilePath, JSON.stringify(spec, null, 2), 'utf8')
+  console.log('Also Writing OpenAPI spec to output/openapi.yaml:', outputFilePath)
   fs.writeFileSync('output/openapi.yaml', yamlSpec, 'utf8')
 }
 
