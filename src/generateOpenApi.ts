@@ -4,12 +4,13 @@ const emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
 
 // Function to transform a single field to its OpenAPI representation
 const transformFieldToProperty = (field: Field): { [key: string]: any } => {
+  const fieldName = asIdentifier(field.name)
   switch (field.type) {
     case 'string':
-      return { [field.name]: { type: 'string' } }
+      return { [fieldName]: { type: 'string' } }
     case 'email':
       return {
-        [field.name]: {
+        [fieldName]: {
           type: 'string',
           format: 'email',
           pattern: emailPattern,
@@ -17,27 +18,27 @@ const transformFieldToProperty = (field: Field): { [key: string]: any } => {
       }
     case 'decimal':
       return {
-        [field.name]: {
+        [fieldName]: {
           type: 'number',
           format: 'double',
         },
       }
     case 'int':
       return {
-        [field.name]: {
+        [fieldName]: {
           type: 'integer',
           format: 'int64',
         },
       }
     case 'date':
       return {
-        [field.name]: {
+        [fieldName]: {
           type: 'string',
           format: 'date-time',
         },
       }
     default:
-      return { [field.name]: { type: field.type } }
+      return { [fieldName]: { type: field.type } }
   }
 }
 
@@ -51,11 +52,11 @@ const transformFieldsToProperties = (
 }
 
 const getRequiredFields = (fields: Array<Field>): string[] => {
-  return fields.filter((field) => field.required).map((field) => field.name)
+  return fields.filter((field) => field.required).map((field) => asIdentifier(field.name))
 }
 
 const getFieldNames = (fields: Array<Field>): string[] => {
-  return fields.map((field) => field.name)
+  return fields.map((field) => asIdentifier(field.name))
 }
 
 const asIdentifier = (input: string) =>
@@ -230,6 +231,7 @@ export const generateOpenApiSpec = (schemas: Schema[]) => {
     }
   })
 
+  // we have a single 'Operation' type for our query operations
   components.schemas[`Operation`] = {
     type: 'string',
     enum: ['contains', 'equal', 'gte', 'gt', 'lte', 'lt', 'notEqual', 'in'],

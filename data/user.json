@@ -1,9 +1,9 @@
 {
-  "name": "User",
+  "name": "Dave",
   "fields": [
     { "name": "id", "type": "string", "required": true },
-    { "name": "username", "type": "string", "required": true },
+    { "name": "User Name", "type": "string", "required": true },
     { "name": "email", "type": "email", "required": true },
-    { "name": "createdAt", "type": "date" }
+    { "name": "Created At", "type": "date" }
   ]
 }
