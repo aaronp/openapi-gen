@@ -13,6 +13,6 @@ server:
 build:
 	docker build -t $(IMAGE):latest .
 runDocker:
-	docker run --rm -v ./data:./data $(IMAGE):latest
+	docker run --rm -v $(CURRENT_DIR)/data:/data $(IMAGE):latest
 buildx:
 	docker buildx create --use & docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE):latest --push .
