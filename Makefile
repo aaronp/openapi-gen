@@ -1,5 +1,6 @@
 CURRENT_DIR := $(shell pwd)
 IMAGE:=kindservices/openapi-gen
+VERSION=1.0.0
 install:
 	npm install
 run: install
@@ -15,4 +16,4 @@ build:
 runDocker:
 	docker run --rm -v $(CURRENT_DIR)/data:/data $(IMAGE):latest
 buildx:
-	docker buildx create --use & docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE):latest --push .
+	docker buildx create --use & docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE):$(VERSION) -t $(IMAGE):latest --push .

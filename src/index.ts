@@ -11,12 +11,7 @@ const writeOpenApiSpecToFile = async (spec: object) => {
   const outputFilePath = 'output/openapi.yaml'
   await fs.ensureDir('output')
 
-  console.log('Writing OpenAPI spec to:', outputFilePath)
   fs.writeFileSync(outputFilePath, JSON.stringify(spec, null, 2), 'utf8')
-  console.log(
-    'Also Writing OpenAPI spec to output/openapi.yaml:',
-    outputFilePath,
-  )
   fs.writeFileSync('output/openapi.yaml', yamlSpec, 'utf8')
 }
 
@@ -39,7 +34,7 @@ const main = async () => {
     const dir = dirFromArgs()
     const schemas  = await getSchemaFileNameFromArgs(dir)
     const openApiSpec = generateOpenApiSpec(schemas)
-    writeOpenApiSpecToFile(openApiSpec)
+    // writeOpenApiSpecToFile(openApiSpec)
 
     console.log(yaml.dump(openApiSpec))
   } catch (error) {

@@ -2,9 +2,14 @@
 
 This project exports a data schema based on field collections, and an openapi schema for those fields.
 
-It takes as input [a basic json file](./data/example.json) (which adheres to [these types](./src/types.ts)): 
+## Usage:
+```sh
+docker run --rm -v `pwd`/data:/data kindservices/openapi-gen:latest 2>/dev/null > openapi.yml
 ```
-  [
+
+It takes as input [a directory containing json files](./data) (which adheres to [these types](./src/types.ts)): 
+```
+./data/user.json
     {
       "name": "User",
       "fields": [
@@ -13,7 +18,9 @@ It takes as input [a basic json file](./data/example.json) (which adheres to [th
         { "name": "email", "type": "email", "required": true },
         { "name": "createdAt", "type": "date" }
       ]
-    },
+    }
+
+./data/product.json
     {
       "name": "Product",
       "fields": [
@@ -24,7 +31,6 @@ It takes as input [a basic json file](./data/example.json) (which adheres to [th
         { "name": "createdAt", "type": "date" }
       ]
     }
-  ]
 ```
 
 And produces [an open-api spec](./data/example.yaml) for reading that data (getting it by ID, listing or querying it):
@@ -49,12 +55,4 @@ And produces [an open-api spec](./data/example.yaml) for reading that data (gett
               schema:
                 $ref: '#/components/schemas/User'
 ...
-```
-
-
-
-# Usage
-
-```sh
-docker run -v $(pwd)/schema.json:/usr/src/app/schema.json -v $(pwd)/output:/usr/src/app/output openapi-generator
 ```
