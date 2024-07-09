@@ -2,6 +2,11 @@
 
 This project exports a data schema based on field collections, and an openapi schema for those fields.
 
+## License
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) file for details.
+
+
 ## Usage:
 ```sh
 docker run --rm -v `pwd`/data:/data kindservices/openapi-gen:latest 2>/dev/null > openapi.yml
