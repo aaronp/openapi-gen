@@ -2,7 +2,7 @@
   "name": "Dave",
   "fields": [
     { "name": "id", "type": "string", "required": true },
-    { "name": "User Name", "type": "string", "required": true },
+    { "name": "User Name", "fieldName" : "uName", "type": "string", "required": true },
     { "name": "email", "type": "email", "required": true },
     { "name": "Created At", "type": "date" }
   ]

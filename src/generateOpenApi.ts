@@ -4,7 +4,7 @@ const emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
 
 // Function to transform a single field to its OpenAPI representation
 const transformFieldToProperty = (field: Field): { [key: string]: any } => {
-  const fieldName = asIdentifier(field.name)
+  const fieldName = asIdentifier(field)
   switch (field.type) {
     case 'string':
       return { [fieldName]: { type: 'string' } }
@@ -52,15 +52,31 @@ const transformFieldsToProperties = (
 }
 
 const getRequiredFields = (fields: Array<Field>): string[] => {
-  return fields.filter((field) => field.required).map((field) => asIdentifier(field.name))
+  return fields.filter((field) => field.required).map((field) => asIdentifier(field))
 }
 
 const getFieldNames = (fields: Array<Field>): string[] => {
-  return fields.map((field) => asIdentifier(field.name))
+  return fields.map((field) => asIdentifier(field))
 }
 
-const asIdentifier = (input: string) =>
-  input.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
+const toCamelCase = (input: string) : string => {
+  // Remove non-alphanumeric characters and split by space or underscore
+  let words = input.replace(/[^a-zA-Z0-9 ]/g, '').split(/[\s_]+/);
+
+  // Convert the first word to lowercase
+  let camelCaseString = words[0].toLowerCase();
+
+  // Capitalize the first letter of each subsequent word and append it to the result
+  for (let i = 1; i < words.length; i++) {
+      camelCaseString += words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase();
+  }
+
+  return camelCaseString;
+}
+
+const asIdentifier = (input: Field) => input?.fieldName ?? toCamelCase(input.name)
+  
+  // input.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
 
 const asTitleCase = (input: string) => input.replace(/[^a-zA-Z0-9]/g, '')
 
@@ -195,8 +211,8 @@ export const generateOpenApiSpec = (schemas: Schema[]) => {
     // const version = v ? `/${v}` : '0.0.1'
 
     // paths[`/data/${asIdentifier(name)}/${version}/{id}`] = getRouteForName(name)
-    paths[`/data/${asIdentifier(name)}/{id}`] = getRouteForName(name)
-    paths[`/data/${asIdentifier(name)}`] = queryRouteForName(name)
+    paths[`/data/${toCamelCase(name)}/{id}`] = getRouteForName(name)
+    paths[`/data/${toCamelCase(name)}`] = queryRouteForName(name)
 
     const properties = transformFieldsToProperties(fields)
 
