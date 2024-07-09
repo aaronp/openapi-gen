@@ -1,5 +1,5 @@
 # Use the official Node.js image as the base image
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -11,8 +11,12 @@ COPY package-lock.json ./
 # Install project dependencies
 RUN npm install
 
+RUN mkdir /data
+
 # Copy the rest of the project files
-COPY . .
+COPY src src
+COPY p*.json ./
 
 # Specify the command to run your project
-CMD ["node", "src/index.ts"]
+#CMD ["node", "src/index.ts"]
+CMD ["npx",  "ts-node", "src/index.ts", "/data"]
