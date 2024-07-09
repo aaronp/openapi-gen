@@ -55,8 +55,8 @@ const getRequiredFields = (fields: Array<Field>): string[] => {
 }
 
 const getFieldNames = (fields: Array<Field>): string[] => {
-    return fields.map((field) => field.name)
-  }
+  return fields.map((field) => field.name)
+}
 
 const asIdentifier = (input: string) =>
   input.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
@@ -96,7 +96,7 @@ function queryRouteForName(name: string) {
                 items: {
                   $ref: `#/components/schemas/${asTitleCase(name)}`,
                 },
-              }
+              },
             },
           },
         },
@@ -143,7 +143,7 @@ function queryRouteForName(name: string) {
                 items: {
                   $ref: `#/components/schemas/${asTitleCase(name)}`,
                 },
-              }
+              },
             },
           },
         },
@@ -207,19 +207,18 @@ export const generateOpenApiSpec = (schemas: Schema[]) => {
       required: requiredFields.length > 0 ? requiredFields : undefined,
     }
 
-
     // our fields
     components.schemas[`${asTitleCase(name)}Fields`] = {
-        type: 'string',
-        enum : getFieldNames(fields)
-      }
+      type: 'string',
+      enum: getFieldNames(fields),
+    }
 
     // the query schema for our POST query route
     components.schemas[`${asTitleCase(name)}Query`] = {
       type: 'object',
       properties: {
         field: {
-            $ref: `#/components/schemas/${asTitleCase(name)}Fields`,
+          $ref: `#/components/schemas/${asTitleCase(name)}Fields`,
         },
         value: {
           type: 'string',

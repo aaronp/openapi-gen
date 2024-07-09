@@ -1,20 +1,18 @@
-# Use an official Node.js runtime as a parent image
-FROM node:14
+# Use the official Node.js image as the base image
+FROM node:18-alpine
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+# Set the working directory inside the container
+WORKDIR /app
 
-# Copy the package.json and package-lock.json files
-COPY package*.json ./
+# Copy package.json and package-lock.json (if available)
+COPY package.json ./
+COPY package-lock.json ./
 
-# Install the dependencies
+# Install project dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Copy the rest of the project files
 COPY . .
 
-# Build the TypeScript code
-RUN npm run build
-
-# Specify the command to run the application
-CMD ["npx", "ts-node", "src/index.ts", "schema.json"]
+# Specify the command to run your project
+CMD ["node", "src/index.ts"]

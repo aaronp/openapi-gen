@@ -1,0 +1,12 @@
+
+{
+  "name": "Product",
+  "fields": [
+    { "name": "id", "type": "string", "required": true },
+    { "name": "name", "type": "string", "required": true },
+    { "name": "price", "type": "decimal", "required": true },
+    { "name": "quantity", "type": "int", "required": true },
+    { "name": "description", "type": "invalid"},
+    { "name": "createdAt", "type": "date" }
+  ]
+}
