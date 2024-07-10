@@ -39,7 +39,7 @@ components:
       properties:
         urlPrefix:
           type: string
-          example: "https://example.com/api"
+          example: 'https://example.com/api'
         fields:
           type: array
           items:
@@ -53,13 +53,13 @@ components:
       properties:
         name:
           type: string
-          example: "fieldName"
+          example: 'fieldName'
         type:
           type: string
           enum: [string, integer, double, boolean, enum]
-          example: "string"
+          example: 'string'
         items:
           type: array
           items:
             type: string
-          example: ["item1", "item2"]
+          example: ['item1', 'item2']
