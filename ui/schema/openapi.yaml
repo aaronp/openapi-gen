@@ -1,0 +1,65 @@
+openapi: 3.0.0
+info:
+  title: Gen API
+  description: API for the UI for the open generator
+  version: 1.0.0
+
+paths:
+  /api/settings:
+    get:
+      summary: Get settings
+      responses:
+        '200':
+          description: A JSON object containing application settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+    post:
+      summary: Update settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+      responses:
+        '200':
+          description: Settings updated successfully
+        '400':
+          description: Invalid request body
+
+components:
+  schemas:
+    Settings:
+      type: object
+      required:
+        - urlPrefix
+        - fields
+      properties:
+        urlPrefix:
+          type: string
+          example: "https://example.com/api"
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/Field'
+
+    Field:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+          example: "fieldName"
+        type:
+          type: string
+          enum: [string, integer, double, boolean, enum]
+          example: "string"
+        items:
+          type: array
+          items:
+            type: string
+          example: ["item1", "item2"]
