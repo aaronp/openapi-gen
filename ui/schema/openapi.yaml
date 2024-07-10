@@ -43,9 +43,9 @@ components:
         fields:
           type: array
           items:
-            $ref: '#/components/schemas/Field'
+            $ref: '#/components/schemas/SchemaField'
 
-    Field:
+    SchemaField:
       type: object
       required:
         - name
