@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { AppBar, AppLayout, Card, Button, NavItem, Tooltip, settings } from 'svelte-ux';
+	import { AppBar, AppLayout, Card, Button, NavItem, Tooltip, settings } from 'svelte-ux'
 
-	import { mdiCog, mdiDatabase, mdiDataMatrix, mdiWeb } from '@mdi/js';
+	import { mdiCog, mdiDatabase, mdiDataMatrix, mdiWeb } from '@mdi/js'
 
-	import { page } from '$app/stores';
-	import '../app.postcss';
-	import TwoCols from '$lib/TwoCols.svelte';
+	import { page } from '$app/stores'
+	import '../app.postcss'
+	import TwoCols from '$lib/TwoCols.svelte'
 
 	settings({
 		components: {
@@ -23,17 +23,12 @@
 				}
 			}
 		}
-	});
+	})
 </script>
 
 <AppLayout>
 	<svelte:fragment slot="nav">
-		<NavItem
-			path="/"
-			text="Home"
-			icon="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"
-			currentUrl={$page.url}
-		/>
+		<NavItem path="/" text="Home" icon="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" currentUrl={$page.url} />
 
 		<NavItem path="/settings" text="Settings" icon={mdiCog} currentUrl={$page.url} />
 
@@ -50,12 +45,7 @@
 	<AppBar title="Data Definitions">
 		<div slot="actions" class="flex gap-3">
 			<Tooltip title="Kind" placement="left" offset={2}>
-				<Button
-					icon={mdiWeb}
-					href="https://kindservices.co.uk"
-					class="p-2"
-					target="_blank"
-				/>
+				<Button icon={mdiWeb} href="https://kindservices.co.uk" class="p-2" target="_blank" />
 			</Tooltip>
 
 			<Tooltip title="View repository" placement="left" offset={2}>
