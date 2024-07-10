@@ -64,9 +64,13 @@ components:
     Settings:
       type: object
       required:
+        - filename
         - urlPrefix
         - fields
       properties:
+        filename:
+          type: string
+          example: 'data.json'
         urlPrefix:
           type: string
           example: 'https://example.com/api'
@@ -103,6 +107,8 @@ components:
 
     Spreadsheet:
       type: object
+      required:
+        - rows
       properties:
         rows:
           type: array
@@ -111,6 +117,8 @@ components:
 
     Row:
       type: object
+      required:
+        - cells
       properties:
         cells:
           type: array
@@ -119,6 +127,9 @@ components:
 
     Cell:
       type: object
+      required:
+        - value
+        - type
       properties:
         value:
           type: string

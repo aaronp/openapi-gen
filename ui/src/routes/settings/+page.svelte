@@ -14,6 +14,7 @@
 
 	onMount(async () => {
 		settings = await api.getSettings()
+		latestSettings.set(settings)
 	})
 
 	function asOption(name: string): MenuOption {
@@ -80,11 +81,6 @@
 </script>
 
 <main class="p-2">
-	<h1>Settings!</h1>
-	<h3>selected:{JSON.stringify(selected)}</h3>
-	<h3>options:{JSON.stringify(options)}</h3>
-	<pre>{JSON.stringify(settings, null, 2)}</pre>
-
 	{#each settings.fields as field, index}
 		<Card title={field.name}>
 			<div class="grid grid-cols-[auto,auto] gap-2">
