@@ -31,6 +31,34 @@ paths:
         '400':
           description: Invalid request body
 
+  /api/data:
+    get:
+      summary: Get spreadsheet data
+      operationId: getSpreadsheet
+      responses:
+        '200':
+          description: A JSON object containing spreadsheet data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Spreadsheet'
+        '400':
+          description: Invalid request
+    post:
+      summary: Submit spreadsheet data
+      operationId: saveSpreadsheet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Spreadsheet'
+      responses:
+        '200':
+          description: Spreadsheet data submitted successfully
+        '400':
+          description: Invalid request body
+
 components:
   schemas:
     Settings:
@@ -72,3 +100,27 @@ components:
           items:
             type: string
           example: ['item1', 'item2']
+
+    Spreadsheet:
+      type: object
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/Row'
+
+    Row:
+      type: object
+      properties:
+        cells:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cell'
+
+    Cell:
+      type: object
+      properties:
+        value:
+          type: string
+        type:
+          $ref: '#/components/schemas/SchemaField'
