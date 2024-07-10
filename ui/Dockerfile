@@ -7,13 +7,14 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY ./src ./src
-COPY ./public ./public
+# COPY ./src ./src
+# COPY ./static ./static
+COPY . .
 
-RUN npm run-script build
+RUN npm run build
 
-EXPOSE 5000
+EXPOSE 8080
 
 ENV HOST=0.0.0.0
 
-CMD [ "npm", "start" ]
+CMD ["npm", "run", "start", "--", "--host"]
