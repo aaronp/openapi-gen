@@ -5,6 +5,7 @@
 
 	import { page } from '$app/stores';
 	import '../app.postcss';
+	import TwoCols from '$lib/TwoCols.svelte';
 
 	settings({
 		components: {
@@ -68,5 +69,7 @@
 		</div>
 	</AppBar>
 
-	<slot />
+	<TwoCols>
+		<slot />
+	</TwoCols>
 </AppLayout>
