@@ -7,11 +7,28 @@
     },
     {
       "name": "Type",
-      "type": "oneOf",
+      "type": "boolean",
       "availableValues": [
         "string",
         "text",
         "boolean"
+      ]
+    },
+    {
+      "name": "usedBy",
+      "type": "anyOf",
+      "availableValues": [
+        "marketplace",
+        "settlement"
+      ]
+    },
+    {
+      "name": "Clear",
+      "type": "anyOf",
+      "availableValues": [
+        "foo",
+        "bar",
+        "bazz"
       ]
     }
   ]

@@ -2,14 +2,20 @@
 	import type { SchemaField, Settings } from '$lib/generated/index'
 	import { api, latestSettings } from '$lib/session'
 
+	import { debounce } from '$lib/util/debounce'
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 
-	import { tick } from 'svelte'
+	import { tick, onMount } from 'svelte'
 	import { Card, Field, Button, Input, SelectField, type MenuOption } from 'svelte-ux'
 	let settings: Settings = {
 		urlPrefix: '/api/v1',
 		fields: []
 	}
+
+	onMount(async () => {
+		settings = await api.getSettings()
+	})
+
 	function asOption(name: string): MenuOption {
 		return { label: name, value: name }
 	}
@@ -27,10 +33,12 @@
 
 	async function save() {
 		latestSettings.set(settings)
-        console.log("Saving ...")
-        await api.updateSettings({ settings })
+		console.log('Saving ...')
+		await api.updateSettings({ settings })
 		settings = settings
 	}
+	const debouncedSave = debounce(save, 4000)
+
 	async function focusLastInput(id: string) {
 		await tick() // Wait for DOM update
 		const newElm = document.getElementById(id) as HTMLInputElement
@@ -42,6 +50,7 @@
 		if (event.key === 'Enter') {
 			onAddField()
 		}
+		debouncedSave()
 	}
 
 	function onUpdateValues(field: SchemaField, value: string) {
@@ -77,7 +86,7 @@
 	<pre>{JSON.stringify(settings, null, 2)}</pre>
 
 	{#each settings.fields as field, index}
-		<Card title={field.name} >
+		<Card title={field.name}>
 			<div class="grid grid-cols-[auto,auto] gap-2">
 				<div class="border items-center">
 					<Field label="Name" let:id>
@@ -102,7 +111,7 @@
 				</Field>
 			{/if}
 		</Card>
-        <div class="p-2"></div>
+		<div class="p-2"></div>
 	{/each}
 
 	<Button class="p-2" color="primary" variant="fill" rounded on:click={onAddField}>Add Field</Button>
