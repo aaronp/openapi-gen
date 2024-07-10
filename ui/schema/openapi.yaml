@@ -8,6 +8,7 @@ paths:
   /api/settings:
     get:
       summary: Get settings
+      operationId: getSettings
       responses:
         '200':
           description: A JSON object containing application settings
@@ -17,6 +18,7 @@ paths:
                 $ref: '#/components/schemas/Settings'
     post:
       summary: Update settings
+      operationId: updateSettings
       requestBody:
         required: true
         content:
@@ -45,6 +47,7 @@ components:
           items:
             $ref: '#/components/schemas/SchemaField'
 
+    # remember - this types are just for what users can put in as metadata values
     SchemaField:
       type: object
       required:
@@ -54,12 +57,18 @@ components:
         name:
           type: string
           example: 'fieldName'
+        # isArray:
+        #   type: boolean
+        #   description: Is the value repeated?
+        #   example: false
         type:
           type: string
-          enum: [string, integer, double, boolean, enum]
+          # enum: [string, user, id, email, integer, double, price, document, boolean, date, oneOf, anyOf, binary, json, uri]
+          enum: [string, integer, double, boolean, oneOf, anyOf]
           example: 'string'
-        items:
+        availableValues:
           type: array
+          description: Used for oneOf and anyOf types
           items:
             type: string
           example: ['item1', 'item2']

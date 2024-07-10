@@ -1,21 +1,60 @@
 <script lang="ts">
-	import type { Settings } from '$lib/generated/index'
-	import { latestSettings } from '$lib/session'
+	import type { SchemaField, Settings } from '$lib/generated/index'
+	import { api, latestSettings } from '$lib/session'
 
-	import { Card, Field, Button, Input, Icon, saveAs } from 'svelte-ux'
+	import { SchemaFieldTypeEnum } from '$lib/generated/index'
+
+	import { tick } from 'svelte'
+	import { Card, Field, Button, Input, SelectField, type MenuOption } from 'svelte-ux'
 	let settings: Settings = {
 		urlPrefix: '/api/v1',
 		fields: []
 	}
+	function asOption(name: string): MenuOption {
+		return { label: name, value: name }
+	}
 
-	// latestSettings.subscribe((value) => {
-	// 	settings = value
-	// })
+	let options: MenuOption[] = [
+		asOption(SchemaFieldTypeEnum.String),
+		asOption(SchemaFieldTypeEnum.Integer),
+		asOption(SchemaFieldTypeEnum.Double),
+		asOption(SchemaFieldTypeEnum.Boolean),
+		asOption(SchemaFieldTypeEnum.OneOf),
+		asOption(SchemaFieldTypeEnum.AnyOf)
+	]
 
-    function save() {
-        latestSettings.set(settings)
-    }
-    
+	let selected = options[0].value
+
+	async function save() {
+		latestSettings.set(settings)
+        console.log("Saving ...")
+        await api.updateSettings({ settings })
+		settings = settings
+	}
+	async function focusLastInput(id: string) {
+		await tick() // Wait for DOM update
+		const newElm = document.getElementById(id) as HTMLInputElement
+		newElm?.focus()
+		newElm?.setSelectionRange(0, 100)
+	}
+
+	function onEnterCheck(field: SchemaField, event) {
+		if (event.key === 'Enter') {
+			onAddField()
+		}
+	}
+
+	function onUpdateValues(field: SchemaField, value: string) {
+		const values = value
+			.split(',')
+			.map((item: string) => item.trim())
+			.filter((item: string) => item.length > 0)
+
+		field.availableValues = values
+
+		save()
+	}
+
 	const onAddField = () => {
 		settings.fields = [
 			...settings.fields,
@@ -25,28 +64,46 @@
 			}
 		]
 
-        save()
-	}
+		focusLastInput(`${settings.fields.length - 1}`)
 
+		save()
+	}
 </script>
 
 <main class="p-2">
 	<h1>Settings!</h1>
+	<h3>selected:{JSON.stringify(selected)}</h3>
+	<h3>options:{JSON.stringify(options)}</h3>
 	<pre>{JSON.stringify(settings, null, 2)}</pre>
-	<Button class="p-2" color="secondary" variant="outline" rounded on:click={onAddField}>Add</Button>
 
-	{#each settings.fields as field}
-		<div class="grid grid-cols-[auto,1fr,auto] gap-2">
-			<Card>
-				<Field label="Name" let:id>
-					<Input {id} replace="fieldname" bind:value={field.name} />
+	{#each settings.fields as field, index}
+		<Card title={field.name} >
+			<div class="grid grid-cols-[auto,auto] gap-2">
+				<div class="border items-center">
+					<Field label="Name" let:id>
+						<Input {id} replace="fieldname" bind:value={field.name} on:keypress={(e) => onEnterCheck(field, e)} />
+					</Field>
+				</div>
+
+				<div class="border">
+					<Field label="Type" id={index}>
+						<SelectField {index} {options} bind:value={field.type} />
+					</Field>
+				</div>
+			</div>
+			{#if field.type === SchemaFieldTypeEnum.OneOf || field.type === SchemaFieldTypeEnum.AnyOf}
+				<Field label="Values" let:id>
+					<Input
+						{id}
+						replace="values"
+						on:change={(e) => onUpdateValues(field, e.detail.value)}
+						on:keypress={(e) => onEnterCheck(field, e)}
+					/>
 				</Field>
-			</Card>
-			<Card>
-				<Field label="Type" let:id>
-					<Input {id} replace="type" bind:value={field.name} />
-				</Field>
-			</Card>
-		</div>
+			{/if}
+		</Card>
+        <div class="p-2"></div>
 	{/each}
+
+	<Button class="p-2" color="primary" variant="fill" rounded on:click={onAddField}>Add Field</Button>
 </main>

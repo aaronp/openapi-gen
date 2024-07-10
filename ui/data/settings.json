@@ -1,0 +1,18 @@
+{
+  "urlPrefix": "/api/v1",
+  "fields": [
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "Type",
+      "type": "oneOf",
+      "availableValues": [
+        "string",
+        "text",
+        "boolean"
+      ]
+    }
+  ]
+}
