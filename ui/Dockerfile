@@ -19,9 +19,17 @@ RUN openapi-generator-cli generate -i ./schema/openapi.yaml -g typescript-fetch 
 RUN npm run build
 RUN npm prune --production
 
-# ---  
+
+# ------------------
+FROM node:22 AS run
+
 ENV NODE_ENV=production
 
+WORKDIR /app
+COPY --from=build /app .
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/node_modules ./node_modules
+
 RUN ulimit -c unlimited
+
 ENTRYPOINT ["node", "build"]
-#ENTRYPOINT ["bash"]

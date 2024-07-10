@@ -1,3 +1,6 @@
+IMAGE:=kindservices/openapi-gen-ui
+VERSION=1.0.0
+
 dev: install api-gen
 	npm run dev
 run: 
@@ -15,3 +18,9 @@ latestNode:
 	nvm use node
 api-gen:
 	npm run generate-api
+docker-build:
+	docker build -t $(IMAGE):latest .
+docker-push:
+	docker buildx create --use & docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE):$(VERSION) -t $(IMAGE):latest --push .
+docker-run:
+	docker run --rm -v $(CURRENT_DIR)/data:/data $(IMAGE):latest
