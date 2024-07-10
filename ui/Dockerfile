@@ -23,5 +23,5 @@ RUN npm prune --production
 ENV NODE_ENV=production
 
 RUN ulimit -c unlimited
-ENTRYPOINT ["npm", "run", "build"]
+ENTRYPOINT ["node", "build"]
 #ENTRYPOINT ["bash"]
