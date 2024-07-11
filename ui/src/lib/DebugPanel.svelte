@@ -1,12 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { latestSettings } from '$lib/session'
+	import { latestSettings, latestData } from '$lib/session'
 
 	onMount(() => {})
 
 	let settings = {}
 	latestSettings.subscribe((value) => {
 		settings = value
+	})
+
+
+	let data = {}
+	latestData.subscribe((value) => {
+		data = value
 	})
 
 	let inner = 0
@@ -21,4 +27,9 @@
 <h2>Settings:</h2>
 <pre>
     {JSON.stringify(settings, null, 2)}
+</pre>
+
+<h2>Data:</h2>
+<pre>
+    {JSON.stringify(data, null, 2)}
 </pre>

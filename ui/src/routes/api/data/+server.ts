@@ -1,5 +1,5 @@
 import type { SaveSpreadsheetRequest } from '$lib/generated'
-import { saveSpreadsheet, readSpreadsheet } from '$lib/generated/apis/db'
+import { saveSpreadsheet, readSpreadsheet } from '../db'
 
 export async function GET({ request }: Request) {
 	return Response.json(readSpreadsheet())
@@ -9,7 +9,7 @@ export async function POST({ request }: Request) {
 	const response = await request
 		.json()
 		.then((data: SaveSpreadsheetRequest) => {
-			console.log('Saving ', data, ' of type ', typeof data)
+			console.log('Saving spreadsheet data ', data)
 			try {
 				const path = saveSpreadsheet(data)
 				return Response.json({ path, message: 'Spreadsheet saved' })

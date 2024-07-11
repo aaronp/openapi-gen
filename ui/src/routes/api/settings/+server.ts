@@ -1,5 +1,5 @@
 import type { UpdateSettingsRequest } from '$lib/generated'
-import { saveSettings, readSettings } from '$lib/generated/apis/db'
+import { saveSettings, readSettings } from '../db'
 
 export async function GET({ request }: Request) {
 	return Response.json(readSettings())

@@ -23,6 +23,7 @@
 
 	let options: MenuOption[] = [
 		asOption(SchemaFieldTypeEnum.String),
+		asOption(SchemaFieldTypeEnum.Text),
 		asOption(SchemaFieldTypeEnum.Integer),
 		asOption(SchemaFieldTypeEnum.Double),
 		asOption(SchemaFieldTypeEnum.Boolean),
@@ -54,7 +55,13 @@
 		debouncedSave()
 	}
 
+	function onUpdateType(field: SchemaField, value: string) {
+		console.log('onUpdateType')
+
+		save()
+	}
 	function onUpdateValues(field: SchemaField, value: string) {
+		console.log('onUpdateValues')
 		const values = value
 			.split(',')
 			.map((item: string) => item.trim())
@@ -82,22 +89,22 @@
 
 <main class="p-2">
 	{#each settings.fields as field, index}
-		<Card title={field.name}>
+		<Card title={field.name} class="dark:bg-gray-800 bg-gray-200">
 			<div class="grid grid-cols-[auto,auto] gap-2">
-				<div class="border items-center">
-					<Field label="Name" let:id>
+				<div class="items-center py-2 text-lg">
+					<Field label="Name" let:id class="h-2 text-lg">
 						<Input {id} replace="fieldname" bind:value={field.name} on:keypress={(e) => onEnterCheck(field, e)} />
 					</Field>
 				</div>
 
-				<div class="border">
+				<div class="">
 					<Field label="Type" id={index}>
-						<SelectField {index} {options} bind:value={field.type} />
+						<SelectField {index} {options} bind:value={field.type} on:change={(e) => onUpdateType(field, e.detail.value)}/>
 					</Field>
 				</div>
 			</div>
 			{#if field.type === SchemaFieldTypeEnum.OneOf || field.type === SchemaFieldTypeEnum.AnyOf}
-				<Field label="Values" let:id>
+				<Field label="Values" let:id class="py-2">
 					<Input
 						{id}
 						replace="values"

@@ -96,7 +96,7 @@ components:
         type:
           type: string
           # enum: [string, user, id, email, integer, double, price, document, boolean, date, oneOf, anyOf, binary, json, uri]
-          enum: [string, integer, double, boolean, oneOf, anyOf]
+          enum: [string, text, integer, double, boolean, oneOf, anyOf]
           example: 'string'
         availableValues:
           type: array
@@ -128,9 +128,13 @@ components:
     Cell:
       type: object
       required:
-        - value
         - type
       properties:
+        # values is used if the type is anyOf
+        values:
+          type: array
+          items:
+            type: string
         value:
           type: string
         type:
