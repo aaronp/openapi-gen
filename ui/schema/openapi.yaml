@@ -78,6 +78,36 @@ paths:
         '400':
           description: Invalid request body
 
+  /api/save/{name}:
+    post:
+      summary: Save generated data
+      operationId: saveGeneratedData
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: The name of the file to save
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: A JSON array of spreadsheet names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid request body
+
   /api/data/{name}:
     delete:
       summary: Delete spreadsheet data
@@ -151,16 +181,8 @@ components:
     Settings:
       type: object
       required:
-        - filename
-        - urlPrefix
         - fields
       properties:
-        filename:
-          type: string
-          example: 'data.json'
-        urlPrefix:
-          type: string
-          example: 'https://example.com/api'
         fields:
           type: array
           items:

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CodePanel from './CodePanel.svelte'
 	import DebugPanel from './DebugPanel.svelte'
 	import ResponsiveCols from './ResponsiveCols.svelte'
 </script>
@@ -8,6 +9,7 @@
 		<slot />
 	</div>
 	<div slot="right">
-		<DebugPanel />
+		<!-- <DebugPanel /> -->
+		 <CodePanel />
 	</div>
 </ResponsiveCols>

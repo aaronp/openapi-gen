@@ -54,10 +54,8 @@
 		</div>
 	</AppBar>
 
-	<!--
-		<TwoCols>
-	</TwoCols>
 
-	-->
-	<slot />
+	<TwoCols>
+		<slot />
+	</TwoCols>
 </AppLayout>
