@@ -9,7 +9,6 @@
 		settings = value
 	})
 
-
 	let data = {}
 	latestData.subscribe((value) => {
 		data = value

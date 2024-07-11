@@ -99,7 +99,12 @@
 
 				<div class="">
 					<Field label="Type" id={index}>
-						<SelectField {index} {options} bind:value={field.type} on:change={(e) => onUpdateType(field, e.detail.value)}/>
+						<SelectField
+							{index}
+							{options}
+							bind:value={field.type}
+							on:change={(e) => onUpdateType(field, e.detail.value)}
+						/>
 					</Field>
 				</div>
 			</div>

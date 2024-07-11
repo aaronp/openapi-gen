@@ -7,13 +7,31 @@ export function dataDir(): string {
 	return 'data'
 }
 const settingsPath = () => path.join(dataDir(), 'settings.json')
-function spreadsheetPath() {
-	const settings = readSettings()
-	return path.join(dataDir(), settings.filename)
+
+export function listSpreadsheets(): string[] {
+	const dir = path.join('data', 'spreadsheets')
+	try {
+		const files = fs.readdirSync(dir)
+
+		// Filter out only JSON files and remove their extensions
+		return files
+			.filter((file) => path.extname(file).toLowerCase() === '.json')
+			.map((file) => path.basename(file, '.json'))
+	} catch (e) {
+		console.log('ERROR reading spreadsheets', e)
+		return []
+	}
 }
 
-export function readSpreadsheet(): Spreadsheet {
-	const filename = spreadsheetPath()
+function spreadsheetPath(filename: string) {
+	const dir = path.join('data', 'spreadsheets')
+	fs.mkdirSync(dir, { recursive: true })
+	const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
+	return path.join(dir, fqn)
+}
+
+export function readSpreadsheet(name: string): Spreadsheet {
+	const filename = spreadsheetPath(name)
 	try {
 		return JSON.parse(fs.readFileSync(filename, 'utf-8'))
 	} catch (e) {
@@ -22,6 +40,13 @@ export function readSpreadsheet(): Spreadsheet {
 			rows: []
 		}
 	}
+}
+
+export function renameSheet(name: string, newName: string): string {
+	const oldPath = spreadsheetPath(name)
+	const newPath = spreadsheetPath(newName)
+	fs.renameSync(oldPath, newPath)
+	return newPath
 }
 
 export function readSettings(): Settings {
@@ -41,6 +66,10 @@ export function saveSettings(data: Settings) {
 	fs.writeFileSync(settingsPath(), JSON.stringify(data, null, 2))
 }
 
-export function saveSpreadsheet(data: Spreadsheet) {
-	fs.writeFileSync(spreadsheetPath(), JSON.stringify(data, null, 2))
+export function saveSpreadsheet(name: string, data: Spreadsheet) {
+	fs.writeFileSync(spreadsheetPath(name), JSON.stringify(data, null, 2))
+}
+
+export function deleteSpreadsheet(name: string) {
+	fs.rmSync(spreadsheetPath(name))
 }

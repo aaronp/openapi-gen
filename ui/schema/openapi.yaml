@@ -43,7 +43,68 @@ paths:
                 type: array
                 items:
                   type: string
+
+  /api/rename/{name}/{newName}:
+    post:
+      summary: Rename spreadsheet
+      operationId: renameSpreadsheet
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the spreadsheet
+          schema:
+            type: string
+        - name: newName
+          in: path
+          required: true
+          description: New name of the spreadsheet
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON array of spreadsheet names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  spreadsheets:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid request body
+
   /api/data/{name}:
+    delete:
+      summary: Delete spreadsheet data
+      operationId: deleteSpreadsheet
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the spreadsheet
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deleted spreadsheet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  spreadsheets:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid request
     get:
       summary: Get spreadsheet data
       operationId: getSpreadsheet
@@ -160,8 +221,8 @@ components:
         values:
           type: array
           items:
-            type: string
+            type: object
         value:
-          type: string
+          type: object
         type:
           $ref: '#/components/schemas/SchemaField'

@@ -28,8 +28,7 @@
 
 <AppLayout>
 	<svelte:fragment slot="nav">
-
-	<NavItem path="/" text="Data" icon={mdiDatabase} currentUrl={$page.url} />
+		<NavItem path="/data" text="Data" icon={mdiDatabase} currentUrl={$page.url} />
 
 		<NavItem path="/settings" text="Settings" icon={mdiCog} currentUrl={$page.url} />
 
