@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { latestSettings, latestData, sheetJson } from '$lib/session'
+	import { latestSettings, latestData } from '$lib/session'
+	import { sheetAsJson } from './util/sheetAsJson'
+	import type { Spreadsheet } from './generated'
 
 	onMount(() => {})
 
@@ -10,15 +12,13 @@
 	})
 
 	let latestSheet = {}
+	let latestJason = {}
 	latestData.subscribe((value) => {
 		latestSheet = value
+		latestJason = sheetAsJson(latestSheet as Spreadsheet)
 	})
 
 	
-	let latestJason = {}
-	sheetJson.subscribe((value) => {
-		latestJason = value
-	})
 	let inner = 0
 	let outer = 0
 </script>
@@ -33,5 +33,5 @@
 <div>
 
 Sheet:
-<pre>{JSON.stringify(latestSheet)}</pre>
+<pre>{JSON.stringify(latestSheet, null, 2)}</pre>
 </div>

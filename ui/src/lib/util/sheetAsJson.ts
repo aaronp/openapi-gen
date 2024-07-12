@@ -1,12 +1,10 @@
 import { SchemaFieldTypeEnum, type Row, type Spreadsheet } from "$lib/generated";
+import { toCamelCase } from "$lib/openapi/generateOpenApi";
 
 function asRecord(row : Row) {
     return row.cells.reduce((acc, cell) => {
-        if (cell.type.type == SchemaFieldTypeEnum.AnyOf) {
-            acc[cell.type.name] = cell.values
-        } else {
-            acc[cell.type.name] = cell.value
-        }
+        const key = toCamelCase(cell.type.name)
+        acc[key] = (cell.type.type == SchemaFieldTypeEnum.AnyOf) ? cell.values : cell.value
         return acc;
     }, {} as { [key: string]: any })
 }

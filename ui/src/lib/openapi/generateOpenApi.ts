@@ -55,7 +55,7 @@ const getFieldNames = (fields: Array<Field>): string[] => {
 	return fields.map((field) => asIdentifier(field))
 }
 
-const toCamelCase = (input: string): string => {
+export const toCamelCase = (input: string): string => {
 	// Remove non-alphanumeric characters and split by space or underscore
 	let words = input.replace(/[^a-zA-Z0-9 ]/g, '').split(/[\s_]+/)
 
@@ -70,7 +70,7 @@ const toCamelCase = (input: string): string => {
 	return camelCaseString
 }
 
-const asIdentifier = (input: Field) => input?.fieldName ?? toCamelCase(input.name)
+export const asIdentifier = (input: Field) => input?.fieldName ?? toCamelCase(input.name)
 
 // input.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
 
