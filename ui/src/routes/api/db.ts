@@ -66,6 +66,15 @@ export function saveSettings(data: Settings) {
 	fs.writeFileSync(settingsPath(), JSON.stringify(data, null, 2))
 }
 
+export function saveData(dir : string, filename : string, data: string | NodeJS.ArrayBufferView) {
+	const saveDir = path.join(dataDir(), dir)
+	fs.mkdirSync(saveDir, { recursive: true })
+
+	const fqn = path.join(saveDir, filename)
+	fs.writeFileSync(fqn, data)
+	return fqn
+}
+
 export function saveSpreadsheet(name: string, data: Spreadsheet) {
 	fs.writeFileSync(spreadsheetPath(name), JSON.stringify(data, null, 2))
 }

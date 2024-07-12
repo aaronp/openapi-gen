@@ -78,11 +78,17 @@ paths:
         '400':
           description: Invalid request body
 
-  /api/save/{name}:
+  /api/save/{dir}/{name}:
     post:
-      summary: Save generated data
+      summary: Save generated data - e.g. POST an openapi.yml to /someSheet/openapi.yml, or schema.json to /someSheet/schema.json
       operationId: saveGeneratedData
       parameters:
+        - name: dir
+          in: path
+          required: true
+          description: The locatioan of where to save the file
+          schema:
+            type: string
         - name: name
           in: path
           required: true
