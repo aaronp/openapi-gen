@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { latestSettings, latestData } from '$lib/session'
+	import { latestSettings, latestData, sheetJson } from '$lib/session'
 
 	onMount(() => {})
 
@@ -9,11 +9,16 @@
 		settings = value
 	})
 
-	let data = {}
+	let latestSheet = {}
 	latestData.subscribe((value) => {
-		data = value
+		latestSheet = value
 	})
 
+	
+	let latestJason = {}
+	sheetJson.subscribe((value) => {
+		latestJason = value
+	})
 	let inner = 0
 	let outer = 0
 </script>
@@ -23,12 +28,10 @@
 <div>inner-width: {inner}px</div>
 <div>outer-width: {outer}px</div>
 
-<h2>Settings:</h2>
-<pre>
-    {JSON.stringify(settings, null, 2)}
-</pre>
+<div>Jason:
+	<pre>{JSON.stringify(latestJason, null, 2)}</pre></div>
 
-<h2>Data:</h2>
-<pre>
-    {JSON.stringify(data, null, 2)}
-</pre>
+<div>
+Sheet:
+<pre>{JSON.stringify(latestSheet)}</pre>
+</div>

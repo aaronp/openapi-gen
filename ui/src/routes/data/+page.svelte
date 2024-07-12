@@ -161,13 +161,11 @@
 <main class="p-2">
 	<div>
 		<div class="flex">
-			<div class="border">
-				Sheet:
-			</div>
-			<div class="border">
+			<div class="px-2 pt-1 text-lg mb-12">Sheet:</div>
+			<div >
 				<TextField bind:value={currentTab} />
 			</div>
-			<div class="border">
+			<div  class="px-2 text-lg">
 				<Button disabled={spreadsheetName.length < 1}  on:click={onRenameSheet} icon={mdiUpdate} >Rename</Button>
 			</div>
 		</div>
