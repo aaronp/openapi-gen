@@ -1,4 +1,4 @@
-import { listScripts } from '../../db'
+import { listScripts } from '../db'
 
 export async function GET({ request }: Request) {
 	return Response.json(listScripts())

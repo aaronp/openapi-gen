@@ -1,5 +1,5 @@
 import type { Script } from '$lib/generated'
-import { readScript, saveScript } from '../../../db'
+import { readScript, saveScript } from '../../db'
 
 export async function GET({ request }: Request) {
 	const url = new URL(request?.url)

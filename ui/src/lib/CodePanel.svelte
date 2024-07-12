@@ -78,6 +78,7 @@
 
 	async function relistScripts(): Promise<string[]> {
 		const all = await api.listScripts()
+		console.log("all scripts: ", JSON.stringify(all))
 		scriptNames = all.length < 1 ? ["New"] : all
 		return scriptNames
 	}
@@ -119,6 +120,22 @@
 </div>
 
 <h1 class="text-lg font-bold">Transformations:</h1>
+
+<div>
+	<div class="flex">
+		<div class="px-2 pt-1 text-lg mb-12">Script:</div>
+		<div >
+			<TextField bind:value={currentTab} />
+		</div>
+	</div>
+</div>
+
+	
+<div class="h-[80vh]" style="overflow: auto">
+	<div>Tab : {currentTab}</div>
+	<div>script: {script.script}</div>
+	<div>scriptName: {scriptName}</div>
+</div>
 
 <Tabs placement="bottom" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
 	{#each tabOptions as option (option.value)}
