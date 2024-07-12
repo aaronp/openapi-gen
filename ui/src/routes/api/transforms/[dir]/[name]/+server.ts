@@ -8,7 +8,7 @@ export async function POST({ request }: Request) {
 
 	console.log(`Saving ${name} in ${dir}`)
 
-	const response = await request
+	return await request
 		.json()
 		.then((data: any) => {
 			try {
@@ -24,6 +24,4 @@ export async function POST({ request }: Request) {
 			console.error('ERROR saving data', err)
 			return Response.json({ message: 'ERROR saving data', err }, { status: 500 })
 		})
-
-	return response
 }

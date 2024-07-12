@@ -78,7 +78,69 @@ paths:
         '400':
           description: Invalid request body
 
-  /api/save/{dir}/{name}:
+  /api/transforms/:
+    get:
+      summary: List the transforms
+      operationId: listTransformDirs
+      responses:
+        '200':
+          description: A JSON array of transform names
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/transforms/{dir}:
+    get:
+      summary: List transforms in the given location
+      operationId: listTransforms
+      parameters:
+        - name: dir
+          in: path
+          required: true
+          description: The location
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object containing transform data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '404':
+          description: Not Found
+  /api/transforms/{dir}/{name}:
+    get:
+      summary: Get transform data
+      operationId: getTransform
+      parameters:
+        - name: dir
+          in: path
+          required: true
+          description: The location
+          schema:
+            type: string
+        - name: name
+          in: path
+          required: true
+          description: The name of the transform
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object containing transform data
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Not Found
     post:
       summary: Save generated data - e.g. POST an openapi.yml to /someSheet/openapi.yml, or schema.json to /someSheet/schema.json
       operationId: saveGeneratedData
