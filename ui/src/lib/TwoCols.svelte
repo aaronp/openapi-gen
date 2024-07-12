@@ -10,6 +10,6 @@
 	</div>
 	<div slot="right">
 		<!-- <DebugPanel /> -->
-		 <CodePanel />
+		<CodePanel />
 	</div>
 </ResponsiveCols>

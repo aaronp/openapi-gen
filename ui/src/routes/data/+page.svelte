@@ -3,7 +3,7 @@
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 	import { api, latestSettings, latestData } from '$lib/session'
 
-	import { Drawer, Dialog, Tabs, Tab, Icon, Button, Input, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip } from 'svelte-ux'
+	import { Overflow, Drawer, Dialog, Tabs, Tab, Icon, Button, Input, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip } from 'svelte-ux'
 
 	import { onMount } from 'svelte'
 	import { mdiClose, mdiDelete, mdiPlus, mdiUpdate } from '@mdi/js'
@@ -37,11 +37,7 @@
 		rows: []
 	}
 	
-	let msg = ''
-
 	let settings: Settings = {
-		filename: '',
-		urlPrefix: '',
 		fields: []
 	}
 	function newRow(): Row {
@@ -62,7 +58,6 @@
 		onSave()
 	}
 	async function onSave() {
-		console.log('onSave ', spreadsheetName)
 
 		if (spreadsheetName) {
 			latestData.set(spreadsheet)
@@ -75,7 +70,6 @@
 	}
 	async function relistSpreadsheets(): Promise<string[]> {
 		const all = await api.listSpreadsheets()
-		msg = 'relistSpreadsheets:' + all.length + ' : ' + all.join(', ') 
 		spreadsheets = all.length < 1 ? ["New"] : all
 		return spreadsheets
 	}
@@ -111,7 +105,6 @@
 		await relistSpreadsheets()
 	}
 	function onChange(cell : Cell) {
-		msg = 'onChange:' + cell.value + ' for ' + spreadsheetName
 		onSave()
 	}
 	
@@ -123,7 +116,6 @@
 	}
 
 	function onRemoveTab(value : string) {
-		msg = 'onRemoveTab:' + value
 		
 		deletePage = value
 		confirmDeleteOpen = true
@@ -145,11 +137,9 @@
 	}
 
 	async function onRenameSheet({detail}){
-		console.log('onRenameSheet')
-		console.log(currentTab)
+
 		const oldName = spreadsheetName
 		const newName = currentTab
-		msg = `onUpdateSheetName: spreadsheetName=${spreadsheetName}, current=${currentTab} to ${newName}`
 		try {
 			const result = await api.renameSpreadsheet({name : oldName, newName : newName})
 			showSnackbar(result.message ?? "Rename returned " + JSON.stringify(result))
@@ -169,9 +159,6 @@
 </script>
 
 <main class="p-2">
-	<div>msg:{msg}</div>
-	<div>spreadsheetName = {spreadsheetName}</div>
-	<div>currentTab = {currentTab}</div>
 	<div>
 		<div class="flex">
 			<div class="border">
@@ -186,45 +173,50 @@
 		</div>
 	</div>
 
-	<table>
-		<thead>
-			{#if spreadsheet.rows.length > 0}
-			<tr>
-				<th>Action</th>
-				{#each settings.fields as field}
-					<th>{field.name}</th>
-				{/each}
-			</tr>
-			{/if}
-		</thead>
-		<tbody>
-			{#each spreadsheet.rows as row, rowIndex}
+	<Overflow>
+		
+	<div class="h-[80vh]" style="overflow: auto">
+		<table>
+			<thead>
+				{#if spreadsheet.rows.length > 0}
 				<tr>
-					<td><Button on:click={(e) => removeRow(rowIndex)} icon={mdiDelete}></Button></td>
-					{#each row.cells as cell}
-						<td class="px-6 py-2 border-b border-gray-300 text-center">
-
-							<Tooltip title={cell.type.name}>
-							{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
-								<SelectField on:change={(e) => onChange(cell)} options={(cell.type.availableValues ?? []).map((v) => asOption(v))} bind:value={cell.value}  />									
-							{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
-								<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={(cell.type.availableValues ?? []).map((v) => asOption(v))} bind:value={cell.values} />
-							{:else if cell.type.type === SchemaFieldTypeEnum.Text}
-								<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg px-2 py-4 text-left text-lg" />
-							{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}
-									<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
-							{:else}
-							<span >
-								<Input debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-300 dark:bg-gray-500 shadow-lg px-2 py-2 text-left text-lg" />
-							</span>
-							{/if}
-						</Tooltip>
-						</td>
+					<th>Action</th>
+					{#each settings.fields as field}
+						<th>{field.name}</th>
 					{/each}
 				</tr>
-			{/each}
-		</tbody>
-	</table>
+				{/if}
+			</thead>
+			<tbody>
+				{#each spreadsheet.rows as row, rowIndex}
+					<tr>
+						<td><Button on:click={(e) => removeRow(rowIndex)} icon={mdiDelete}></Button></td>
+						{#each row.cells as cell}
+							<td class="px-6 py-2 border-b border-gray-300 text-center">
+	
+								<Tooltip title={cell.type.name}>
+								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
+									<SelectField on:change={(e) => onChange(cell)} options={(cell.type.availableValues ?? []).map((v) => asOption(v))} bind:value={cell.value.value}  />									
+								{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
+									<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={(cell.type.availableValues ?? []).map((v) => asOption(v))} bind:value={cell.values} />
+								{:else if cell.type.type === SchemaFieldTypeEnum.Text}
+									<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg px-2 py-4 text-left text-lg" />
+								{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}
+										<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
+								{:else}
+								<span >
+									<Input debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-300 dark:bg-gray-500 shadow-lg px-2 py-2 text-left text-lg" />
+								</span>
+								{/if}
+							</Tooltip>
+							</td>
+						{/each}
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
+</Overflow>
 	<Button class="p-2" color="primary" variant="outline" rounded on:click={onAdd}>Add</Button>
 	<Button class="p-2" color="primary" variant="fill" rounded on:click={onSave}>Save</Button>
 

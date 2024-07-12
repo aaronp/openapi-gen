@@ -54,7 +54,6 @@
 		</div>
 	</AppBar>
 
-
 	<TwoCols>
 		<slot />
 	</TwoCols>
