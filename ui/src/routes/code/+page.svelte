@@ -1,42 +1,39 @@
-<script>
+<script lang="ts">
+	import { executeCode, newSandbox, tidyUp, compile } from '$lib/util/execute'
 	import { onMount } from 'svelte'
 	import * as ts from 'typescript'
 
-	let code = `console.log("Hello, world!");`
+	let codeInput = `console.log("Hello, world!");`
 	let output = ''
 
 	function callMe() {
 		console.log('callMe')
+		alert('callMe')
 	}
 
-	function executeCode() {
+	function runCallMe(code : string) {
+		const compiledCode = compile(code)
+
+		const iframe = newSandbox()
+
+		// here we squirt in the functions we want to expose in the code
+		iframe.contentWindow.callMe = callMe
+		
 		try {
-			// Compile TypeScript to JavaScript
-			const compiledCode = ts.transpileModule(code, {
-				compilerOptions: { module: ts.ModuleKind.ESNext }
-			}).outputText
-
-			// Use a sandboxed environment to execute the code
-			const iframe = document.createElement('iframe')
-			iframe.style.display = 'none'
-			document.body.appendChild(iframe)
-			const iframeWindow = iframe.contentWindow
-
-			iframeWindow.callMe = callMe
-			const result = iframeWindow.eval(compiledCode)
-
-			eval("console.log('Hello from eval!')")
-
-			output = 'Code executed successfully with: ' + result
-		} catch (error) {
-			output = `Error: ${error.message}`
+			return iframe.contentWindow.eval(compiledCode)
+		} finally {
+			tidyUp(iframe)
 		}
 	}
+
+
+	const run = (code : string) => output = executeCode(code)
 </script>
 
 <main>
-	<textarea bind:value={code}></textarea>
-	<button on:click={executeCode}>Execute</button>
+	<textarea bind:value={codeInput}></textarea>
+	<button on:click={(e) => run(codeInput)}>Execute</button>
+	<button on:click={(e) => runCallMe(codeInput)}>Call Me</button>
 	<p>{output}</p>
 </main>
 

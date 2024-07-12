@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { latestSettings, latestData, api } from '$lib/session'
+	import { latestData, api } from '$lib/session'
 	import { sheetAsJson } from './util/sheetAsJson'
 	import type { SaveScriptRequest, Script, Spreadsheet } from './generated'
+	import { executeCode, newSandbox, tidyUp, compile } from '$lib/util/execute'
 
 	import {
 		Field,
@@ -28,11 +29,6 @@
 
 	let scriptNames: string[] = []
 	let scriptName = ''
-
-	let settings = {}
-	latestSettings.subscribe((value) => {
-		settings = value
-	})
 
 	let latestSheet = {}
 	let latestJason = {}
@@ -66,8 +62,27 @@
 	latestData.subscribe((value) => {
 		latestSheet = value
 		latestJason = sheetAsJson(latestSheet as Spreadsheet)
+
+		executeScript(latestJason)
 	})
 
+
+	function executeScript(input : any) {
+		const iframe = newSandbox()
+		try {
+			const compiledCode = compile(script.script)
+
+			// here we squirt in the functions we want to expose in the code
+			iframe.contentWindow.input = input
+			
+			scriptOutput =  iframe.contentWindow.eval(compiledCode)
+
+		} catch (e) {
+			scriptOutput = "Error: " + e
+		} finally {
+			tidyUp(iframe)
+		}
+	}
 
 	onMount(async () => {
 
