@@ -84,6 +84,8 @@
 				}
 			})
 		})
+
+		latestData.set(spreadsheet)
 	}
 	function onMultiselectChange({detail} : CustomEvent, cell : Cell) {
 		cell.values = detail.value
@@ -94,6 +96,7 @@
 
 	function removeRow(index : number) {
 		spreadsheet.rows = spreadsheet.rows.filter((_, i) => i !== index)
+		onSave()
 	}
 
 	async function onAddNewSheet(name : string) {

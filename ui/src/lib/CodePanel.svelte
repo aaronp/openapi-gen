@@ -29,9 +29,7 @@
 <div>outer-width: {outer}px</div>
 
 <div>Jason:
-	<pre>{JSON.stringify(latestJason, null, 2)}</pre></div>
-<div>
-
-Sheet:
-<pre>{JSON.stringify(latestSheet, null, 2)}</pre>
+	<pre>{JSON.stringify(latestJason, null, 2)}</pre>
 </div>
+
+ 
