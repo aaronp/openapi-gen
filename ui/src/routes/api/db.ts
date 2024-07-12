@@ -1,35 +1,21 @@
 import fs from 'fs'
 import path from 'path'
-import type { Settings, Spreadsheet } from '../../lib/generated/models'
+import type { Settings, Spreadsheet, Script } from '../../lib/generated/models'
 
 export function dataDir(): string {
 	fs.mkdirSync('data', { recursive: true })
 	return 'data'
 }
+
+export function scriptsDir(): string {
+	const dir = path.join('data', 'scripts')
+	fs.mkdirSync(dir, { recursive: true })
+	return dir
+}
 const settingsPath = () => path.join(dataDir(), 'settings.json')
 
-export function listTransformsInDir(dirname :string): string[] {
-	const dir = path.join('data', 'transforms', dirname)
-	try {
-		return fs.readdirSync(dir)
-	} catch (e) {
-		console.log('ERROR reading transforms', e)
-		return []
-	}
-}
-export function listTransforms(): string[] {
-	const dir = path.join('data', 'transforms')
-	// fs.mkdirSync(dir, { recursive: true })
-	try {
-		return fs.readdirSync(dir)
-	} catch (e) {
-		console.log('ERROR reading transforms', e)
-		return []
-	}
-}
-
 export function saveData(dirname: string, filename: string, data: string | NodeJS.ArrayBufferView) {
-	const saveDir = path.join(dataDir(), 'transforms', dirname)
+	const saveDir = path.join(dataDir(), 'output', dirname)
 	fs.mkdirSync(saveDir, { recursive: true })
 
 	const fqn = path.join(saveDir, filename)
@@ -48,6 +34,34 @@ export function listSpreadsheets(): string[] {
 			.map((file) => path.basename(file, '.json'))
 	} catch (e) {
 		console.log('ERROR reading spreadsheets', e)
+		return []
+	}
+}
+
+
+export function readScript(filename : string): Settings {
+	try {
+		const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
+		const fullPath = path.join(scriptsDir(), fqn)
+		return JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
+	} catch (e) {
+		console.error('ERROR reading script', e)
+		return {
+			fields: []
+		}
+	}
+}
+
+
+export function listScripts(): string[] {
+	const dir = path.join('data', 'scripts')
+	try {
+		const files = fs.readdirSync(dir)
+		return files
+			.filter((file) => path.extname(file).toLowerCase() === '.json')
+			.map((file) => path.basename(file, '.json'))
+	} catch (e) {
+		console.log('ERROR reading scripts', e)
 		return []
 	}
 }
@@ -88,6 +102,13 @@ export function readSettings(): Settings {
 		}
 	}
 }
+
+export function saveScript(filename : string, data: Script) {
+	const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
+	const fullPath = path.join(scriptsDir(), fqn)
+	fs.writeFileSync(fullPath, JSON.stringify(data, null, 2))
+}
+
 
 export function saveSettings(data: Settings) {
 	fs.writeFileSync(settingsPath(), JSON.stringify(data, null, 2))
