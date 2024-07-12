@@ -18,7 +18,6 @@
 		latestJason = sheetAsJson(latestSheet as Spreadsheet)
 	})
 
-	
 	let inner = 0
 	let outer = 0
 </script>
@@ -28,8 +27,7 @@
 <div>inner-width: {inner}px</div>
 <div>outer-width: {outer}px</div>
 
-<div>Jason:
+<div>
+	Jason:
 	<pre>{JSON.stringify(latestJason, null, 2)}</pre>
 </div>
-
- 

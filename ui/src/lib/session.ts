@@ -8,9 +8,8 @@ export const latestData = writable({})
 export const currentSheet = writable({})
 
 currentSheet.subscribe((sheet) => {
-    console.log('FYI, sheeet ', sheet)
-}
-)
+	console.log('FYI, sheeet ', sheet)
+})
 // export const sheetJson = derived(
 //     [currentSheet],
 //     ([$sheet]) => {

@@ -92,7 +92,13 @@
 			<div class="flex gap-2">
 				<div class="items-center text-lg">
 					<Field label="Name" let:id class="pl-2 w-80">
-						<Input class="h-9 text-lg" {id} replace="fieldname" bind:value={field.name} on:keypress={(e) => onEnterCheck(field, e)} />
+						<Input
+							class="h-9 text-lg"
+							{id}
+							replace="fieldname"
+							bind:value={field.name}
+							on:keypress={(e) => onEnterCheck(field, e)}
+						/>
 					</Field>
 				</div>
 
@@ -101,7 +107,6 @@
 						<SelectField
 							{index}
 							{options}
-
 							bind:value={field.type}
 							on:change={(e) => onUpdateType(field, e.detail.value)}
 						/>
@@ -119,7 +124,7 @@
 					/>
 				</Field>
 			{/if}
-			</div>
+		</div>
 		<div class="p-2"></div>
 	{/each}
 
