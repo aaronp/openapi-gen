@@ -109,9 +109,12 @@
 		return scriptNames
 	}
 
-	function onTabChange(value : string) {
+	async function onTabChange(value : string) {
 		currentTab = value
-		reloadScript(value)
+		await reloadScript(value)
+
+		executeScript(latestJason)
+
 		scriptName = value
 	}
 
@@ -150,6 +153,8 @@
 
 
 	function onUpdateScript({detail}) {
+		executeScript(latestJason)
+
 		onSave()
 	}
 
@@ -185,9 +190,13 @@
 <div class="h-3/4" style="overflow: auto">
 	
 	<Checkbox bind:value={script.autoSave} label="Auto Save" >Auto-Save</Checkbox>
-	<Field label="Script">
-		<TextField on:change={onUpdateScript} dense={false} min={25} rows={20} debounceChange={500} multiline bind:value={script.script} class="w-full text-left text-lg h-20" />
-	</Field>
+	<!-- <Field label="Script" class="h-80"> -->
+	 <div class="h-40">
+		<TextField on:change={onUpdateScript} 
+		classes={{ input: "h-40", container: "h-40"}}
+		debounceChange={500} multiline bind:value={script.script} class="w-full text-left text-lg h-20" />
+	</div>
+	<!-- </Field> -->
 
 	<div class="border p-2">
 		<h1 class="text-lg font-bold">Output:</h1>

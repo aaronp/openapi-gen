@@ -172,7 +172,7 @@
 
 	<Overflow>
 		
-	<div class="h-[80vh]" style="overflow: auto">
+	<div class="h-[70vh]" style="overflow: auto">
 		<table>
 			<thead>
 				{#if spreadsheet.rows.length > 0}
@@ -214,8 +214,7 @@
 		</table>
 	</div>
 </Overflow>
-	<Button class="p-2" color="primary" variant="outline" rounded on:click={onAdd}>Add</Button>
-	<Button class="p-2" color="primary" variant="fill" rounded on:click={onSave}>Save</Button>
+	<Button class="p-2 m-2" color="primary" variant="fill" rounded on:click={onAdd}>Add Row</Button>
 
 
 	<Tabs  placement="bottom" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
