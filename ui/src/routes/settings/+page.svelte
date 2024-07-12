@@ -35,7 +35,6 @@
 
 	async function save() {
 		latestSettings.set(settings)
-		console.log('Saving ...')
 		await api.updateSettings({ settings })
 		settings = settings
 	}

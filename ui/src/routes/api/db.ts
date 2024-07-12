@@ -55,8 +55,6 @@ export function readSettings(): Settings {
 	} catch (e) {
 		console.error('ERROR reading settings', e)
 		return {
-			filename: 'data.json',
-			urlPrefix: '/api',
 			fields: []
 		}
 	}

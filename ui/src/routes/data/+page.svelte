@@ -128,7 +128,7 @@
 		await relistSpreadsheets()
 	}
 
-	function showSnackbar(message : string, duration : number = 2000) {
+	function showSnackbar(message : string, duration : number = 1000) {
 		snackbarMessage = message
 		snackbarOpen = true
 		window.setTimeout(() => {
@@ -193,10 +193,10 @@
 						<td><Button on:click={(e) => removeRow(rowIndex)} icon={mdiDelete}></Button></td>
 						{#each row.cells as cell}
 							<td class="px-6 py-2 border-b border-gray-300 text-center">
-	
+
 								<Tooltip title={cell.type.name}>
 								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
-									<SelectField on:change={(e) => onChange(cell)} options={(cell.type.availableValues ?? []).map((v) => asOption(v))} bind:value={cell.value.value}  />									
+									<SelectField on:change={(e) => onChange(cell)} options={(cell.type.availableValues ?? []).map((v) => asOption(v))} bind:value={cell.value}  />									
 								{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
 									<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={(cell.type.availableValues ?? []).map((v) => asOption(v))} bind:value={cell.values} />
 								{:else if cell.type.type === SchemaFieldTypeEnum.Text}
