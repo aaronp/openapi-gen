@@ -86,7 +86,6 @@
 		})
 	}
 	function onMultiselectChange({detail} : CustomEvent, cell : Cell) {
-		console.log('onMultiselectChange', detail.value, ', type ', typeof detail, ', detail ', detail)
 		cell.values = detail.value
 		cell.value = detail.value.join(',')
 
@@ -134,6 +133,12 @@
 		window.setTimeout(() => {
 			snackbarOpen = false
 		}, duration)
+	}
+
+	function availableValues(cell : Cell) {
+		const field = settings.fields.find((f) => f.name === cell.type.name) ?? cell.type
+		// return (cell.type.availableValues ?? []).map((v) => asOption(v)) 
+		return (field.availableValues ?? []).map((v) => asOption(v))
 	}
 
 	async function onRenameSheet({detail}){
@@ -194,9 +199,9 @@
 
 								<Tooltip title={cell.type.name}>
 								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
-									<SelectField on:change={(e) => onChange(cell)} options={(cell.type.availableValues ?? []).map((v) => asOption(v))} bind:value={cell.value}  />									
+									<SelectField on:change={(e) => onChange(cell)} options={availableValues(cell)} bind:value={cell.value}  />									
 								{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
-									<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={(cell.type.availableValues ?? []).map((v) => asOption(v))} bind:value={cell.values} />
+									<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={availableValues(cell)} bind:value={cell.values} />
 								{:else if cell.type.type === SchemaFieldTypeEnum.Text}
 									<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg px-2 py-4 text-left text-lg" />
 								{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}

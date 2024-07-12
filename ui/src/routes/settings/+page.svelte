@@ -88,19 +88,20 @@
 
 <main class="p-2">
 	{#each settings.fields as field, index}
-		<Card title={field.name} class="dark:bg-gray-800 bg-gray-200">
-			<div class="grid grid-cols-[auto,auto] gap-2">
-				<div class="items-center py-2 text-lg">
-					<Field label="Name" let:id class="h-2 text-lg">
-						<Input {id} replace="fieldname" bind:value={field.name} on:keypress={(e) => onEnterCheck(field, e)} />
+		<div class="dark:bg-gray-700 bg-gray-200 p-2">
+			<div class="flex gap-2">
+				<div class="items-center text-lg">
+					<Field label="Name" let:id class="pl-2 w-80">
+						<Input class="h-9 text-lg" {id} replace="fieldname" bind:value={field.name} on:keypress={(e) => onEnterCheck(field, e)} />
 					</Field>
 				</div>
 
-				<div class="">
+				<div class="w-40">
 					<Field label="Type" id={index}>
 						<SelectField
 							{index}
 							{options}
+
 							bind:value={field.type}
 							on:change={(e) => onUpdateType(field, e.detail.value)}
 						/>
@@ -108,16 +109,17 @@
 				</div>
 			</div>
 			{#if field.type === SchemaFieldTypeEnum.OneOf || field.type === SchemaFieldTypeEnum.AnyOf}
-				<Field label="Values" let:id class="py-2">
+				<Field label="Values" let:id class="pl-2 py-2 w-80 ">
 					<Input
 						{id}
 						replace="values"
+						class="h-9 text-lg"
 						on:change={(e) => onUpdateValues(field, e.detail.value)}
 						on:keypress={(e) => onEnterCheck(field, e)}
 					/>
 				</Field>
 			{/if}
-		</Card>
+			</div>
 		<div class="p-2"></div>
 	{/each}
 
