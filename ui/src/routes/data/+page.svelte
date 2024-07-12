@@ -6,7 +6,7 @@
 	import { Drawer, Dialog, Tabs, Tab, Icon, Button, Input, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip } from 'svelte-ux'
 
 	import { onMount } from 'svelte'
-	import { mdiClose, mdiDelete, mdiPlus } from '@mdi/js'
+	import { mdiClose, mdiDelete, mdiPlus, mdiUpdate } from '@mdi/js'
 	
 	
 	onMount(async () => {
@@ -16,6 +16,7 @@
 		const all = await relistSpreadsheets()
 		
 		spreadsheetName = all[0]
+		currentTab = spreadsheetName
 		reloadSpreadsheet(spreadsheetName)
 	})
 
@@ -135,19 +136,27 @@
 		await relistSpreadsheets()
 	}
 
-	function showSnackbar(message : string) {
+	function showSnackbar(message : string, duration : number = 2000) {
 		snackbarMessage = message
 		snackbarOpen = true
 		window.setTimeout(() => {
 			snackbarOpen = false
-		}, 2000)
+		}, duration)
 	}
 
-	async function onUpdateSheetName({detail}){
-		msg = `onUpdateSheetName: spreadsheetName=${spreadsheetName}, current=${currentTab} to ${detail.value}`
-		const result = await api.renameSpreadsheet({name : spreadsheetName, newName : detail.value})
+	async function onRenameSheet({detail}){
+		console.log('onRenameSheet')
+		console.log(currentTab)
+		const oldName = spreadsheetName
+		const newName = currentTab
+		msg = `onUpdateSheetName: spreadsheetName=${spreadsheetName}, current=${currentTab} to ${newName}`
+		try {
+			const result = await api.renameSpreadsheet({name : oldName, newName : newName})
+			showSnackbar(result.message ?? "Rename returned " + JSON.stringify(result))
+		} catch (e) {
+			showSnackbar("Rename errored with " + e, 15000)
+		}
 
-		showSnackbar(result.message ?? "Rename returned " + result)
 		
 		await relistSpreadsheets()
 		// const index = spreadsheets.findIndex((s) => s === detail.value)
@@ -163,7 +172,19 @@
 	<div>msg:{msg}</div>
 	<div>spreadsheetName = {spreadsheetName}</div>
 	<div>currentTab = {currentTab}</div>
-	<TextField debounceChange bind:value={currentTab} on:change={onUpdateSheetName} />
+	<div>
+		<div class="flex">
+			<div class="border">
+				Sheet:
+			</div>
+			<div class="border">
+				<TextField bind:value={currentTab} />
+			</div>
+			<div class="border">
+				<Button disabled={spreadsheetName.length < 1}  on:click={onRenameSheet} icon={mdiUpdate} >Rename</Button>
+			</div>
+		</div>
+	</div>
 
 	<table>
 		<thead>
@@ -241,7 +262,7 @@
 		<Dialog bind:open={confirmDeleteOpen}>
 			<div slot="title">Do you want to delete "{deletePage}"</div>
 			<div slot="actions">
-			  <Button on:click={onDoRemoveSheet(deletePage)} class="px-2" variant="fill" color="primary">Yes</Button>
+			  <Button on:click={(e) => onDoRemoveSheet(deletePage)} class="px-2" variant="fill" color="primary">Yes</Button>
 			  <Button class="px-2" variant="outline" color="secondary">Close</Button>
 			</div>
 		  </Dialog>
