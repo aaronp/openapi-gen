@@ -10,6 +10,9 @@ function asRecord(row : Row) {
         return acc;
     }, {} as { [key: string]: any })
 }
+
 export function sheetAsJson(sheet : Spreadsheet) {
-    return sheet.rows.map(row => asRecord(row))
+    console.log('sheet.rows is ', sheet.rows)
+    const rows = sheet?.rows || []
+    return rows.map(row => asRecord(row))
 }

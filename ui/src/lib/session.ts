@@ -7,11 +7,17 @@ export const latestSettings = writable({})
 export const latestData = writable({})
 export const currentSheet = writable({})
 
+currentSheet.subscribe((sheet) => {
+    console.log('FYI, sheeet ', sheet)
+}
+)
 export const sheetJson = derived(
     [currentSheet],
     ([$sheet]) => {
         try {
-            return sheetAsJson($sheet as Spreadsheet)
+            const result = sheetAsJson($sheet as Spreadsheet)
+            console.log('computing sheeet ', JSON.stringify(result))
+            return result
         } catch (e) {
             console.log('could not convert sheet to json', e)
             return {}
