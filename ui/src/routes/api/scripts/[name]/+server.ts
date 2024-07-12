@@ -9,7 +9,6 @@ export async function GET({ request }: Request) {
 	return Response.json(readScript(name))
 }
 
-
 export async function DELETE({ request }: Request) {
 	const url = new URL(request?.url)
 	const parts = url.pathname.split('/')
@@ -28,7 +27,6 @@ export async function DELETE({ request }: Request) {
 		return Response.json({ message: 'ERROR deleting: ' + e, error: e }, { status: 500 })
 	}
 }
-
 
 export async function POST({ request }: Request) {
 	const url = new URL(request?.url)

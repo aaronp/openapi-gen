@@ -3,7 +3,7 @@
 	import { latestData, api } from '$lib/session'
 	import { sheetAsJson } from './util/sheetAsJson'
 	import type { SaveScriptRequest, Script, Spreadsheet } from './generated'
-	import { executeCode, newSandbox, tidyUp, compile } from '$lib/util/execute'
+	import { newSandbox, tidyUp, compile } from '$lib/util/execute'
 
 	import {
 		Field,
@@ -13,13 +13,9 @@
 		Tab,
 		Icon,
 		Button,
-		Input,
-		SelectField,
-		MultiSelectField,
 		type MenuOption,
 		Checkbox,
-		TextField,
-		Tooltip
+		TextField
 	} from 'svelte-ux'
 	import { mdiClose, mdiPlus, mdiUpdate } from '@mdi/js'
 
@@ -48,16 +44,16 @@
 	let inner = 0
 	let outer = 0
 
-	const newScript = () : Script => {
-		return { 
-			name: '', 
+	const newScript = (): Script => {
+		return {
+			name: '',
 			scriptPath: 'script.ts',
 			script: '',
-			autoSave : true,
-			outputPath : 'output/output.json'
+			autoSave: true,
+			outputPath: 'output/openapi.yaml'
 		}
 	}
-	let script : Script = newScript()
+	let script: Script = newScript()
 
 	latestData.subscribe((value) => {
 		latestSheet = value
@@ -66,26 +62,27 @@
 		executeScript(latestJason)
 	})
 
-
-	function executeScript(input : any) {
-		const iframe = newSandbox()
+	function executeScript(input: any) {
 		try {
-			const compiledCode = compile(script.script)
+			const iframe = newSandbox()
+			try {
+				const compiledCode = compile(script.script)
 
-			// here we squirt in the functions we want to expose in the code
-			iframe.contentWindow.input = input
-			
-			scriptOutput =  iframe.contentWindow.eval(compiledCode)
+				// here we squirt in the functions we want to expose in the code
+				iframe.contentWindow.input = input
 
+				scriptOutput = iframe.contentWindow.eval(compiledCode)
+			} catch (e) {
+				scriptOutput = 'Error: ' + e
+			} finally {
+				tidyUp(iframe)
+			}
 		} catch (e) {
-			scriptOutput = "Error: " + e
-		} finally {
-			tidyUp(iframe)
+
 		}
 	}
 
 	onMount(async () => {
-
 		const all = await relistScripts()
 
 		scriptName = all[0]
@@ -98,18 +95,18 @@
 		confirmDeleteOpen = true
 	}
 
-	async function reloadScript(n : string = scriptName) {
-		script = await api.getScript({name : n})
+	async function reloadScript(n: string = scriptName) {
+		script = await api.getScript({ name: n })
 	}
 
 	async function relistScripts(): Promise<string[]> {
 		const all = await api.listScripts()
-		console.log("all scripts: ", JSON.stringify(all))
-		scriptNames = all.length < 1 ? ["New"] : all
+		console.log('all scripts: ', JSON.stringify(all))
+		scriptNames = all.length < 1 ? ['New'] : all
 		return scriptNames
 	}
 
-	async function onTabChange(value : string) {
+	async function onTabChange(value: string) {
 		currentTab = value
 		await reloadScript(value)
 
@@ -118,32 +115,31 @@
 		scriptName = value
 	}
 
-	async function onAddNewScript(name : string) {
-		await api.saveScript({ name, script : newScript() })
-		
+	async function onAddNewScript(name: string) {
+		await api.saveScript({ name, script: newScript() })
+
 		await relistScripts()
 	}
 
-	async function onRenameScript({detail}){
+	async function onRenameScript({ detail }) {
 		const oldName = scriptName
 		const newName = currentTab
 		try {
-			const result = await api.renameScript({name : oldName, newName : newName})
+			const result = await api.renameScript({ name: oldName, newName: newName })
 			showSnackbar(result.message ?? `Renamed ${oldName} to ${newName}`)
 		} catch (e) {
-			showSnackbar("Rename errored with " + e, 15000)
+			showSnackbar('Rename errored with ' + e, 15000)
 		}
 
 		await relistScripts()
 	}
 	async function onDoRemoveScript(tab: string) {
-		await api.deleteScript({name : tab})
+		await api.deleteScript({ name: tab })
 		showSnackbar('Deleted ' + tab)
 		await relistScripts()
 	}
 
-
-	function showSnackbar(message : string, duration : number = 1000) {
+	function showSnackbar(message: string, duration: number = 1000) {
 		snackbarMessage = message
 		snackbarOpen = true
 		window.setTimeout(() => {
@@ -151,22 +147,19 @@
 		}, duration)
 	}
 
-
-	function onUpdateScript({detail}) {
+	function onUpdateScript({ detail }) {
 		executeScript(latestJason)
 
 		onSave()
 	}
 
 	async function onSave() {
-		const request : SaveScriptRequest = { name : scriptName, script }
+		const request: SaveScriptRequest = { name: scriptName, script }
 		await api.saveScript(request)
-	
 	}
 </script>
 
 <svelte:window bind:innerWidth={inner} bind:outerWidth={outer} />
-
 
 <h1 class="text-lg font-bold">Input:</h1>
 <div class="border h-96" style="overflow: auto">
@@ -175,38 +168,7 @@
 
 <h1 class="py-2 text-lg font-bold">Transformations:</h1>
 
-<div>
-	<div class="flex">
-		<div class="pt-1 text-lg ">Name:</div>
-		<div >
-			<TextField bind:value={currentTab} />
-		</div>
-		<div  class="px-2 text-lg">
-			<Button disabled={scriptName.length < 1}  on:click={onRenameScript} icon={mdiUpdate} >Rename</Button>
-		</div>
-	</div>
-</div>
-
-<div class="h-3/4" style="overflow: auto">
-	
-	<Checkbox bind:value={script.autoSave} label="Auto Save" >Auto-Save</Checkbox>
-	<!-- <Field label="Script" class="h-80"> -->
-	 <div class="h-40">
-		<TextField on:change={onUpdateScript} 
-		classes={{ input: "h-40", container: "h-40"}}
-		debounceChange={500} multiline bind:value={script.script} class="w-full text-left text-lg h-20" />
-	</div>
-	<!-- </Field> -->
-
-	<div class="border p-2">
-		<h1 class="text-lg font-bold">Output:</h1>
-		<div class="border h-20" style="overflow: auto">
-			<pre>{scriptOutput}</pre>
-		</div>
-	</div>
-</div>
-
-<Tabs placement="bottom" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
+<Tabs placement="top" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
 	{#each tabOptions as option (option.value)}
 		<Tab on:click={() => onTabChange(option.value)} selected={currentTab === option.value}>
 			{option.label}
@@ -227,6 +189,55 @@
 	</Tab>
 
 	<svelte:fragment slot="content">
+		<div class="p-2">
+			<!--  Script Name -->
+			<div>
+				<div class="flex pt-2">
+					<div class="pt-1 pr-2 text-lg">Name:</div>
+					<div>
+						<TextField bind:value={currentTab} />
+					</div>
+					<div class="px-2 text-lg">
+						<Button disabled={scriptName.length < 1} on:click={onRenameScript} icon={mdiUpdate}>Rename</Button>
+					</div>
+				</div>
+			</div>
+
+			<!--  Transformation -->
+			<div class="h-3/4" style="overflow: auto">
+				<!--  Script  -->
+				<div class="h-40">
+					<TextField
+						on:change={onUpdateScript}
+						classes={{ input: 'h-40', container: 'h-40' }}
+						debounceChange={500}
+						multiline
+						bind:value={script.script}
+						class="w-full text-left text-lg h-20"
+					/>
+				</div>
+
+				<Checkbox class="pt-2" on:change={onSave} bind:checked={script.autoSave} label="Auto Save">Auto-Save</Checkbox>
+
+				<!--  Ouptut Path -->
+				<div class="pb-2">
+					<div class="flex">
+						<div class="pt-1 text-lg">Save To:</div>
+						<div class="px-2">
+							<TextField debounceChange on:change={onSave} bind:value={script.outputPath} />
+						</div>
+					</div>
+				</div>
+
+				<!--  Output -->
+				<div class="py-2">
+					<h1 class="text-lg font-bold">Output:</h1>
+					<div class="border h-20"  style="overflow: auto">
+						<pre>{scriptOutput}</pre>
+					</div>
+				</div>
+			</div>
+		</div>
 		<Dialog bind:open={confirmDeleteOpen}>
 			<div slot="title">Do you want to delete "{deleteTab}"</div>
 			<div slot="actions">

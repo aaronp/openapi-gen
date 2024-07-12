@@ -11,14 +11,14 @@
 		alert('callMe')
 	}
 
-	function runCallMe(code : string) {
+	function runCallMe(code: string) {
 		const compiledCode = compile(code)
 
 		const iframe = newSandbox()
 
 		// here we squirt in the functions we want to expose in the code
 		iframe.contentWindow.callMe = callMe
-		
+
 		try {
 			return iframe.contentWindow.eval(compiledCode)
 		} finally {
@@ -26,8 +26,7 @@
 		}
 	}
 
-
-	const run = (code : string) => output = executeCode(code)
+	const run = (code: string) => (output = executeCode(code))
 </script>
 
 <main>
