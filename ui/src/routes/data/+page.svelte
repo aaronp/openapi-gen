@@ -148,7 +148,7 @@
 		const newName = currentTab
 		try {
 			const result = await api.renameSpreadsheet({name : oldName, newName : newName})
-			showSnackbar(result.message ?? "Rename returned " + JSON.stringify(result))
+			showSnackbar(result.message ?? `Renamed ${oldName} to ${newName}`)
 		} catch (e) {
 			showSnackbar("Rename errored with " + e, 15000)
 		}

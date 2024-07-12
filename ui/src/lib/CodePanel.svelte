@@ -5,7 +5,7 @@
 	import type { SaveScriptRequest, Script, Spreadsheet } from './generated'
 
 	import {
-		Overflow,
+		Field,
 		Drawer,
 		Dialog,
 		Tabs,
@@ -43,6 +43,7 @@
 	let confirmDeleteOpen = false
 	$: tabOptions = scriptNames.map((s) => asOption(s))
 
+	let scriptOutput = ''
 
 	// used for showing snackbars
 	let snackbarOpen = false
@@ -51,14 +52,16 @@
 	let inner = 0
 	let outer = 0
 
-	let script : Script = { 
-		name: '', 
-		scriptPath: 'script.ts',
-		script: '',
-		autoSave : true,
-		outputPath : 'output/output.json'
+	const newScript = () : Script => {
+		return { 
+			name: '', 
+			scriptPath: 'script.ts',
+			script: '',
+			autoSave : true,
+			outputPath : 'output/output.json'
+		}
 	}
-
+	let script : Script = newScript()
 
 	latestData.subscribe((value) => {
 		latestSheet = value
@@ -98,13 +101,8 @@
 	}
 
 	async function onAddNewScript(name : string) {
+		await api.saveScript({ name, script : newScript() })
 		
-		const request : SaveScriptRequest = { name, script }
-
-		const response = await api.saveScript(request)
-		
-		showSnackbar(`onAdd >${name}< returned ` + JSON.stringify(response))
-
 		await relistScripts()
 	}
 
@@ -113,7 +111,7 @@
 		const newName = currentTab
 		try {
 			const result = await api.renameScript({name : oldName, newName : newName})
-			showSnackbar(result.message ?? "Rename returned " + JSON.stringify(result))
+			showSnackbar(result.message ?? `Renamed ${oldName} to ${newName}`)
 		} catch (e) {
 			showSnackbar("Rename errored with " + e, 15000)
 		}
@@ -134,6 +132,17 @@
 			snackbarOpen = false
 		}, duration)
 	}
+
+
+	function onUpdateScript({detail}) {
+		onSave()
+	}
+
+	async function onSave() {
+		const request : SaveScriptRequest = { name : scriptName, script }
+		await api.saveScript(request)
+	
+	}
 </script>
 
 <svelte:window bind:innerWidth={inner} bind:outerWidth={outer} />
@@ -144,11 +153,11 @@
 	<pre>{JSON.stringify(latestJason, null, 2)}</pre>
 </div>
 
-<h1 class="text-lg font-bold">Transformations:</h1>
+<h1 class="py-2 text-lg font-bold">Transformations:</h1>
 
 <div>
 	<div class="flex">
-		<div class="px-2 pt-1 text-lg mb-12">Script:</div>
+		<div class="pt-1 text-lg ">Name:</div>
 		<div >
 			<TextField bind:value={currentTab} />
 		</div>
@@ -158,10 +167,19 @@
 	</div>
 </div>
 
-<div class="h-1/2" style="overflow: auto">
-	<div>Tab : {currentTab}</div>
-	<div>script: {script.script}</div>
-	<div>scriptName: {scriptName}</div>
+<div class="h-3/4" style="overflow: auto">
+	
+	<Checkbox bind:value={script.autoSave} label="Auto Save" >Auto-Save</Checkbox>
+	<Field label="Script">
+		<TextField on:change={onUpdateScript} dense={false} min={25} rows={20} debounceChange={500} multiline bind:value={script.script} class="w-full text-left text-lg h-20" />
+	</Field>
+
+	<div class="border p-2">
+		<h1 class="text-lg font-bold">Output:</h1>
+		<div class="border h-20" style="overflow: auto">
+			<pre>{scriptOutput}</pre>
+		</div>
+	</div>
 </div>
 
 <Tabs placement="bottom" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
