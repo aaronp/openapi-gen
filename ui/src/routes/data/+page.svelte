@@ -118,7 +118,6 @@
 	}
 
 	function onRemoveTab(value : string) {
-		
 		deletePage = value
 		confirmDeleteOpen = true
 	}

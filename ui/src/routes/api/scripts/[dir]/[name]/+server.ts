@@ -1,13 +1,12 @@
 import type { Script } from '$lib/generated'
 import { readScript, saveScript } from '../../../db'
 
-
 export async function GET({ request }: Request) {
 	const url = new URL(request?.url)
 	const parts = url.pathname.split('/')
 	const name: string = parts.pop()!
 
-    return Response.json(readScript(name))
+	return Response.json(readScript(name))
 }
 
 export async function POST({ request }: Request) {

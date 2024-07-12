@@ -146,8 +146,28 @@ paths:
         '400':
           description: Invalid request body
   /api/scripts:
+    get:
+      summary: List all script names
+      operationId: listScripts
+      responses:
+        '200':
+          description: A list of script names
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/scripts/{name}:
     post:
       summary: Save a new Script
+      operationId: saveScript
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         description: The script to save
         required: true
@@ -159,19 +179,8 @@ paths:
         '201':
           description: Script created successfully
     get:
-      summary: List all script names
-      responses:
-        '200':
-          description: A list of script names
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/scripts/{name}:
-    get:
       summary: Get a Script by name
+      operationId: getScript
       parameters:
         - name: name
           in: path

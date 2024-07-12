@@ -38,8 +38,7 @@ export function listSpreadsheets(): string[] {
 	}
 }
 
-
-export function readScript(filename : string): Settings {
+export function readScript(filename: string): Settings {
 	try {
 		const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
 		const fullPath = path.join(scriptsDir(), fqn)
@@ -51,7 +50,6 @@ export function readScript(filename : string): Settings {
 		}
 	}
 }
-
 
 export function listScripts(): string[] {
 	const dir = path.join('data', 'scripts')
@@ -103,17 +101,15 @@ export function readSettings(): Settings {
 	}
 }
 
-export function saveScript(filename : string, data: Script) {
+export function saveScript(filename: string, data: Script) {
 	const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
 	const fullPath = path.join(scriptsDir(), fqn)
 	fs.writeFileSync(fullPath, JSON.stringify(data, null, 2))
 }
 
-
 export function saveSettings(data: Settings) {
 	fs.writeFileSync(settingsPath(), JSON.stringify(data, null, 2))
 }
-
 
 export function saveSpreadsheet(name: string, data: Spreadsheet) {
 	fs.writeFileSync(spreadsheetPath(name), JSON.stringify(data, null, 2))
