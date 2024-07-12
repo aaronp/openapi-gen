@@ -78,6 +78,40 @@ paths:
         '400':
           description: Invalid request body
 
+  /api/renamescript/{name}/{newName}:
+    post:
+      summary: Rename script
+      operationId: renameScript
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the script
+          schema:
+            type: string
+        - name: newName
+          in: path
+          required: true
+          description: New name of the script
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON array of script names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  script:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid request body
+
   /api/data/{name}:
     delete:
       summary: Delete spreadsheet data
@@ -159,6 +193,20 @@ paths:
                 items:
                   type: string
   /api/scripts/{name}:
+    delete:
+      summary: Delete a Script
+      operationId: deleteScript
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Script deleted
+        '404':
+          description: Script not found
     post:
       summary: Save a new Script
       operationId: saveScript
@@ -178,6 +226,24 @@ paths:
       responses:
         '201':
           description: Script created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  message:
+                    type: string
+        '500':
+          description: Error creating script
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
     get:
       summary: Get a Script by name
       operationId: getScript

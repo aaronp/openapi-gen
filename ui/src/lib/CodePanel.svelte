@@ -20,7 +20,7 @@
 		TextField,
 		Tooltip
 	} from 'svelte-ux'
-	import { mdiClose, mdiPlus } from '@mdi/js'
+	import { mdiClose, mdiPlus, mdiUpdate } from '@mdi/js'
 
 	function asOption(value: string): MenuOption {
 		return { label: value, value: value }
@@ -42,6 +42,14 @@
 	let deleteTab = ''
 	let confirmDeleteOpen = false
 	$: tabOptions = scriptNames.map((s) => asOption(s))
+
+
+	// used for showing snackbars
+	let snackbarOpen = false
+	let snackbarMessage = ''
+
+	let inner = 0
+	let outer = 0
 
 	let script : Script = { 
 		name: '', 
@@ -93,22 +101,39 @@
 		
 		const request : SaveScriptRequest = { name, script }
 
-		await api.saveScript(request)
+		const response = await api.saveScript(request)
+		
+		showSnackbar(`onAdd >${name}< returned ` + JSON.stringify(response))
 
 		await relistScripts()
 	}
 
+	async function onRenameScript({detail}){
+		const oldName = scriptName
+		const newName = currentTab
+		try {
+			const result = await api.renameScript({name : oldName, newName : newName})
+			showSnackbar(result.message ?? "Rename returned " + JSON.stringify(result))
+		} catch (e) {
+			showSnackbar("Rename errored with " + e, 15000)
+		}
+
+		await relistScripts()
+	}
 	async function onDoRemoveScript(tab: string) {
-		// TODO - actually delete the script
+		await api.deleteScript({name : tab})
+		showSnackbar('Deleted ' + tab)
 		await relistScripts()
 	}
 
-	// used for showing snackbars
-	let snackbarOpen = false
-	let snackbarMessage = ''
 
-	let inner = 0
-	let outer = 0
+	function showSnackbar(message : string, duration : number = 1000) {
+		snackbarMessage = message
+		snackbarOpen = true
+		window.setTimeout(() => {
+			snackbarOpen = false
+		}, duration)
+	}
 </script>
 
 <svelte:window bind:innerWidth={inner} bind:outerWidth={outer} />
@@ -127,11 +152,13 @@
 		<div >
 			<TextField bind:value={currentTab} />
 		</div>
+		<div  class="px-2 text-lg">
+			<Button disabled={scriptName.length < 1}  on:click={onRenameScript} icon={mdiUpdate} >Rename</Button>
+		</div>
 	</div>
 </div>
 
-	
-<div class="h-[80vh]" style="overflow: auto">
+<div class="h-1/2" style="overflow: auto">
 	<div>Tab : {currentTab}</div>
 	<div>script: {script.script}</div>
 	<div>scriptName: {scriptName}</div>
@@ -153,7 +180,7 @@
 		</Tab>
 	{/each}
 
-	<Tab on:click={(e) => onAddNewScript(`New-${scriptNames.length}`)}>
+	<Tab on:click={(e) => onAddNewScript(`New-${scriptNames.length + 1}`)}>
 		<Icon data={mdiPlus} class="rounded-full p-0.5 hover:bg-surface-content/5" />
 	</Tab>
 

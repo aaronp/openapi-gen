@@ -71,6 +71,11 @@ function spreadsheetPath(filename: string) {
 	return path.join(dir, fqn)
 }
 
+function scriptsPath(filename: string) {
+	const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
+	return path.join(scriptsDir(), fqn)
+}
+
 export function readSpreadsheet(name: string): Spreadsheet {
 	const filename = spreadsheetPath(name)
 	try {
@@ -101,12 +106,28 @@ export function readSettings(): Settings {
 	}
 }
 
-export function saveScript(filename: string, data: Script) {
-	const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
-	const fullPath = path.join(scriptsDir(), fqn)
-	fs.writeFileSync(fullPath, JSON.stringify(data, null, 2))
+export function deleteScript(filename: string) {
+	const fullPath = scriptsPath(filename)
+	if (fs.existsSync(fullPath)) {
+		fs.rmSync(fullPath)
+		return true
+	} else {
+		return false
+	}
 }
 
+export function saveScript(filename: string, data: Script) {
+	const fullPath = scriptsPath(filename)
+	fs.writeFileSync(fullPath, JSON.stringify(data, null, 2))
+	return fullPath
+}
+
+export function renameScript(name: string, newName: string): string {
+	const oldPath = scriptsPath(name)
+	const newPath = scriptsPath(newName)
+	fs.renameSync(oldPath, newPath)
+	return newPath
+}
 export function saveSettings(data: Settings) {
 	fs.writeFileSync(settingsPath(), JSON.stringify(data, null, 2))
 }

@@ -24,7 +24,6 @@
 	let deletePage = ''
 	let confirmDeleteOpen = false
 
-
 	// used for showing snackbars
 	let snackbarOpen = false
 	let snackbarMessage = ''
@@ -154,14 +153,7 @@
 			showSnackbar("Rename errored with " + e, 15000)
 		}
 
-		
 		await relistSpreadsheets()
-		// const index = spreadsheets.findIndex((s) => s === detail.value)
-		// if (index >= 0) {
-		// 	spreadsheets[index] = detail.value
-		// }
-		// spreadsheetName = detail.value
-		// currentTab = detail.value
 	}
 </script>
 
