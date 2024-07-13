@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { latestSettings, latestData } from '$lib/session'
+	import { latestSettings, latestSheet } from '$lib/session'
 
 	onMount(() => {})
 
@@ -10,7 +10,7 @@
 	})
 
 	let data = {}
-	latestData.subscribe((value) => {
+	latestSheet.subscribe((value) => {
 		data = value
 	})
 

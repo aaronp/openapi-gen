@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Cell, Row, SaveSpreadsheetRequest, Settings, Spreadsheet } from '$lib/generated/index'
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
-	import { api, latestSettings, latestData } from '$lib/session'
+	import { api, latestSettings, latestSheet } from '$lib/session'
 
-	import { Overflow, Drawer, Dialog, Tabs, Tab, Icon, Button, Input, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip } from 'svelte-ux'
+	import { Drawer, Dialog, Tabs, Tab, Icon, Button, Input, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip } from 'svelte-ux'
 
 	import { onMount } from 'svelte'
 	import { mdiClose, mdiDelete, mdiPlus, mdiUpdate } from '@mdi/js'
@@ -15,9 +15,9 @@
 		
 		const all = await relistSpreadsheets()
 		
-		spreadsheetName = all[0]
-		currentTab = spreadsheetName
-		reloadSpreadsheet(spreadsheetName)
+		spreadsheet.name = all[0]
+		currentTab = spreadsheet.name
+		reloadSpreadsheet(spreadsheet.name)
 	})
 
 	// used for confirming / deleting pages
@@ -29,10 +29,10 @@
 	let snackbarMessage = ''
 
 	let spreadsheets : string[] = []
-	let spreadsheetName : string = ''
 	let currentTab = ''
 	$: tabOptions = spreadsheets.map((s) => asOption(s))
 	let spreadsheet: Spreadsheet = {
+		name :  '',
 		rows: []
 	}
 	
@@ -43,7 +43,7 @@
 		const cells = settings.fields.map((field) => {
 			const cell: Cell = {
 				type: field,
-				value: '', 
+				value: '', // ignore
 				values: []
 			}
 			return cell
@@ -51,16 +51,15 @@
 		return { cells: cells }
 	}
 	function onAdd() {
-		console.log('onAdd')
 		spreadsheet.rows = [...spreadsheet.rows, newRow()]
 
 		onSave()
 	}
 	async function onSave() {
-
-		if (spreadsheetName) {
-			latestData.set(spreadsheet)
-			await api.saveSpreadsheet({ name : spreadsheetName ,  spreadsheet })
+		console.log(`onSave >${spreadsheet.name}<`)
+		if (spreadsheet.name) {
+			latestSheet.set(spreadsheet)
+			await api.saveSpreadsheet({ spreadsheet })
 		}
 	}
 
@@ -72,19 +71,24 @@
 		spreadsheets = all.length < 1 ? ["New"] : all
 		return spreadsheets
 	}
-	async function reloadSpreadsheet(n : string = spreadsheetName) {
+	async function reloadSpreadsheet(n : string = spreadsheet.name) {
 		spreadsheet = await api.getSpreadsheet({name : n})
 		spreadsheet.rows.forEach((row) => {
 			row.cells.forEach((cell) => {
 				if (cell.type.type === SchemaFieldTypeEnum.AnyOf) {
 					if (!cell.value) {
+						// ignore
 						cell.value = (cell?.values ?? []).join(',')
 					}
 				}
 			})
 		})
 
-		latestData.set(spreadsheet)
+		if (!spreadsheet.name)  {
+			spreadsheet.name = currentTab
+		}
+			
+		latestSheet.set(spreadsheet)
 	}
 	function onMultiselectChange({detail} : CustomEvent, cell : Cell) {
 		cell.values = detail.value
@@ -99,7 +103,7 @@
 	}
 
 	async function onAddNewSheet(name : string) {
-		const request : SaveSpreadsheetRequest = {name, spreadsheet : { rows : []}}
+		const request : SaveSpreadsheetRequest = { spreadsheet : { name , rows : []}}
 
 		await api.saveSpreadsheet(request)
 
@@ -111,9 +115,10 @@
 	
 	function onTabChange(value : string) {
 		currentTab = value
-		
+		console.log("onTabChange", value)
 		reloadSpreadsheet(value)
-		spreadsheetName = value
+		spreadsheet.name = value
+		
 	}
 
 	function onRemoveTab(value : string) {
@@ -144,7 +149,7 @@
 
 	async function onRenameSheet({detail}){
 
-		const oldName = spreadsheetName
+		const oldName = spreadsheet.name
 		const newName = currentTab
 		try {
 			const result = await api.renameSpreadsheet({name : oldName, newName : newName})
@@ -164,7 +169,7 @@
 			<TextField bind:value={currentTab} />
 		</div>
 		<div  class="px-2 text-lg">
-			<Button disabled={spreadsheetName.length < 1}  on:click={onRenameSheet} icon={mdiUpdate} >Rename</Button>
+			<Button disabled={(spreadsheet?.name?.length ?? 0) < 1}  on:click={onRenameSheet} icon={mdiUpdate} >Rename</Button>
 		</div>
 	</div>
 </div>
@@ -219,23 +224,23 @@
 				<tr>
 					<td><Button on:click={(e) => removeRow(rowIndex)} icon={mdiDelete}></Button></td>
 					{#each row.cells as cell}
-						<td class="px-6 py-2 border-b border-gray-300 text-center">
+						<td class="px-6 border-b border-gray-300 text-center">
 
 							<Tooltip title={cell.type.name}>
-							{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
-								<SelectField on:change={(e) => onChange(cell)} options={availableValues(cell)} bind:value={cell.value}  />									
-							{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
-								<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={availableValues(cell)} bind:value={cell.values} />
-							{:else if cell.type.type === SchemaFieldTypeEnum.Text}
-								<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg px-2 py-4 text-left text-lg" />
-							{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}
-									<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
-							{:else}
-							<span >
-								<Input debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-300 dark:bg-gray-500 shadow-lg px-2 py-2 text-left text-lg" />
-							</span>
-							{/if}
-						</Tooltip>
+								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
+									<SelectField on:change={(e) => onChange(cell)} options={availableValues(cell)} bind:value={cell.value}  />									
+								{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
+									<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={availableValues(cell)} bind:value={cell.values} />
+								{:else if cell.type.type === SchemaFieldTypeEnum.Text}
+									<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg px-2 py-4 text-left text-lg" />
+								{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}
+										<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
+								{:else}
+								<span >
+									<Input debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-300 dark:bg-gray-500 shadow-lg px-2 py-2 text-left text-lg" />
+								</span>
+								{/if}
+							</Tooltip>
 						</td>
 					{/each}
 				</tr>

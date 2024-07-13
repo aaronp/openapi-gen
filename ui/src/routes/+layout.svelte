@@ -1,18 +1,7 @@
 <script lang="ts">
-	import { AppBar, AppLayout, Toggle, Drawer, ToggleButton, Icon, Button, NavItem, Tooltip, settings } from 'svelte-ux'
+	import { AppBar, AppLayout, Toggle, Drawer, Button, NavItem, Tooltip, settings } from 'svelte-ux'
 
-	import {
-		mdiAirballoon,
-		mdiCog,
-		mdiDanceBallroom,
-		mdiDatabase,
-		mdiDataMatrix,
-		mdiDataMatrixEdit,
-		mdiPin,
-		mdiPinOff,
-		mdiScript,
-		mdiWeb
-	} from '@mdi/js'
+	import { mdiCog, mdiDatabase, mdiDebugStepInto, mdiDebugStepOver, mdiScript, mdiWeb } from '@mdi/js'
 
 	import { page } from '$app/stores'
 	import '../app.postcss'
@@ -49,6 +38,8 @@
 		<NavItem path="/data" text="Data" icon={mdiDatabase} currentUrl={$page.url} />
 
 		<NavItem path="/settings" text="Settings" icon={mdiCog} currentUrl={$page.url} />
+
+		<NavItem path="/scriptselect" text="Settings" icon={mdiDebugStepOver} currentUrl={$page.url} />
 	</svelte:fragment>
 
 	<AppBar title="Data Definitions">
@@ -56,6 +47,11 @@
 			<Tooltip title="Scripts" placement="left" offset={2}>
 				<Button icon={mdiScript} rounded on:click={toggleCodePanel} target="_blank" />
 			</Tooltip>
+
+			<Tooltip title="Debug" placement="left" offset={2}>
+				<Button icon={mdiDebugStepInto} rounded on:click={toggleCodePanel} target="_blank" />
+			</Tooltip>
+
 			<Tooltip title="Kind" placement="left" offset={2}>
 				<Button icon={mdiWeb} href="https://kindservices.co.uk" class="p-2" target="_blank" />
 			</Tooltip>

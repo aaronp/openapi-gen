@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import type { Settings, Spreadsheet, Script } from '../../lib/generated/models'
+import type { Settings, Spreadsheet, Script, ScriptResult } from '../../lib/generated/models'
 
 export function dataDir(): string {
 	fs.mkdirSync('data', { recursive: true })
@@ -33,7 +33,7 @@ export function listSpreadsheets(): string[] {
 			.filter((file) => path.extname(file).toLowerCase() === '.json')
 			.map((file) => path.basename(file, '.json'))
 	} catch (e) {
-		console.log('ERROR reading spreadsheets', e)
+		console.log('ERROR reading spreadsheets')
 		return []
 	}
 }
@@ -71,6 +71,11 @@ function spreadsheetPath(filename: string) {
 	return path.join(dir, fqn)
 }
 
+function resultsPath(filename: string) {
+	const dir = path.join('output')
+	fs.mkdirSync(dir, { recursive: true })
+	return path.join(dir, filename)
+}
 function scriptsPath(filename: string) {
 	const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
 	return path.join(scriptsDir(), fqn)
@@ -83,6 +88,7 @@ export function readSpreadsheet(name: string): Spreadsheet {
 	} catch (e) {
 		console.error(`ERROR reading ${filename}`, e)
 		return {
+			name: '',
 			rows: []
 		}
 	}
@@ -132,10 +138,13 @@ export function saveSettings(data: Settings) {
 	fs.writeFileSync(settingsPath(), JSON.stringify(data, null, 2))
 }
 
-export function saveSpreadsheet(name: string, data: Spreadsheet) {
-	fs.writeFileSync(spreadsheetPath(name), JSON.stringify(data, null, 2))
+export function saveSpreadsheet(data: Spreadsheet) {
+	fs.writeFileSync(spreadsheetPath(data.name), JSON.stringify(data, null, 2))
 }
 
+export function saveResults(data: ScriptResult) {
+	fs.writeFileSync(resultsPath(data.name), data.content)
+}
 export function deleteSpreadsheet(name: string) {
 	fs.rmSync(spreadsheetPath(name))
 }

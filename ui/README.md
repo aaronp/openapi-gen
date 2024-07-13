@@ -15,7 +15,8 @@ This project was created so people could migrate those spreadsheets into version
 
 # TODO
 
-- Use Drawer
+- Use Drawer (?)
+- Drive 'input' from cache
 
 ## Nice-to-have
 

@@ -6,6 +6,7 @@ export async function POST({ request }: Request) {
 	const newName: string = parts.pop()!
 	const name: string = parts.pop()!
 
-	const path = renameScript(name, newName)
+	console.log('Renaming script', name, 'to', newName)
+	renameScript(name, newName)
 	return Response.json(listScripts())
 }

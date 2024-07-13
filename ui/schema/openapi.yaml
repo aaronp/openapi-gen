@@ -30,7 +30,40 @@ paths:
           description: Settings updated successfully
         '400':
           description: Invalid request body
+  /api/results:
+    post:
+      summary: Save a ScriptResult
+      description: Endpoint to save a ScriptResult with name and content properties
+      operationId: saveScriptResult
+      requestBody:
+        description: ScriptResult object that needs to be added
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScriptResult'
+      responses:
+        '200':
+          description: ScriptResult saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScriptResult'
   /api/data:
+    post:
+      summary: Submit spreadsheet data
+      operationId: saveSpreadsheet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Spreadsheet'
+      responses:
+        '200':
+          description: Spreadsheet data submitted successfully
+        '400':
+          description: Invalid request body
     get:
       summary: List the spreadsheet names
       operationId: listSpreadsheets
@@ -158,27 +191,6 @@ paths:
                 $ref: '#/components/schemas/Spreadsheet'
         '400':
           description: Invalid request
-    post:
-      summary: Submit spreadsheet data
-      operationId: saveSpreadsheet
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: Name of the spreadsheet
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Spreadsheet'
-      responses:
-        '200':
-          description: Spreadsheet data submitted successfully
-        '400':
-          description: Invalid request body
   /api/scripts:
     get:
       summary: List all script names
@@ -192,30 +204,9 @@ paths:
                 type: array
                 items:
                   type: string
-  /api/scripts/{name}:
-    delete:
-      summary: Delete a Script
-      operationId: deleteScript
-      parameters:
-        - name: name
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Script deleted
-        '404':
-          description: Script not found
     post:
       summary: Save a new Script
       operationId: saveScript
-      parameters:
-        - name: name
-          in: path
-          required: true
-          schema:
-            type: string
       requestBody:
         description: The script to save
         required: true
@@ -244,6 +235,21 @@ paths:
                 properties:
                   message:
                     type: string
+  /api/scripts/{name}:
+    delete:
+      summary: Delete a Script
+      operationId: deleteScript
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Script deleted
+        '404':
+          description: Script not found
     get:
       summary: Get a Script by name
       operationId: getScript
@@ -304,7 +310,10 @@ components:
       type: object
       required:
         - rows
+        - name
       properties:
+        name:
+          type: string
         rows:
           type: array
           items:
@@ -337,20 +346,34 @@ components:
           $ref: '#/components/schemas/SchemaField'
     Script:
       type: object
+      description: The script inputs will be the name of the sheet, or 'sheets' as a special value for an array of all sheet values, or else the name of another script
       properties:
         name:
           type: string
-        scriptPath:
-          type: string
+          description: This should be the script output (e.g. openApi.yaml, schema.json, ui.json, etc)
         script:
           type: string
+          description: the typescript code
+        input:
+          type: string
+          description: the input for the script
         autoSave:
           type: boolean
-        outputPath:
-          type: string
+          description: If set, the script output will be saved. Otherwise it's assumed it'll be used by another script
       required:
         - name
-        - scriptPath
         - script
+        - input
         - autoSave
-        - outputPath
+    ScriptResult:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the script result
+        content:
+          type: string
+          description: Content of the script result
+      required:
+        - name
+        - content

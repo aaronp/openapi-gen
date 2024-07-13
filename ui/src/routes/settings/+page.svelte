@@ -55,12 +55,9 @@
 	}
 
 	function onUpdateType(field: SchemaField, value: string) {
-		console.log('onUpdateType')
-
 		save()
 	}
 	function onUpdateValues(field: SchemaField, value: string) {
-		console.log('onUpdateValues')
 		const values = value
 			.split(',')
 			.map((item: string) => item.trim())

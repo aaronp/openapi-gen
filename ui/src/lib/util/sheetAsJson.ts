@@ -16,7 +16,7 @@ function asRecord(row: Row) {
  * @param sheet the sheet to turn into a JSON object
  * @returns the JSON object
  */
-export function sheetAsJson(sheet: Spreadsheet) {
+export function sheetAsJson(sheet: Spreadsheet): { [key: string]: any }[] {
 	const rows = sheet?.rows || []
 	return rows.map((row) => asRecord(row))
 }
