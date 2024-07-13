@@ -2,22 +2,20 @@
 	import { onMount } from 'svelte'
 	import { latestData, api } from '$lib/session'
 	import { sheetAsJson } from './util/sheetAsJson'
+	import { createEventDispatcher } from 'svelte'
 	import type { SaveScriptRequest, Script, Spreadsheet } from './generated'
 	import { newSandbox, tidyUp, compile } from '$lib/util/execute'
 
-	import {
-		Field,
-		Drawer,
-		Dialog,
-		Tabs,
-		Tab,
-		Icon,
-		Button,
-		type MenuOption,
-		Checkbox,
-		TextField
-	} from 'svelte-ux'
-	import { mdiClose, mdiPlus, mdiUpdate } from '@mdi/js'
+	import { Drawer, Dialog, Tabs, Tab, Icon, Button, type MenuOption, Checkbox, TextField } from 'svelte-ux'
+	import { mdiClose, mdiPin, mdiPinOff, mdiPlus, mdiUpdate } from '@mdi/js'
+
+	export let pinned
+
+	const dispatch = createEventDispatcher()
+	function onToggleCodePanel(event) {
+		console.log('CodePanel:onToggleCodePanel ', pinned)
+		dispatch('toggleCodePanel')
+	}
 
 	function asOption(value: string): MenuOption {
 		return { label: value, value: value }
@@ -77,9 +75,7 @@
 			} finally {
 				tidyUp(iframe)
 			}
-		} catch (e) {
-
-		}
+		} catch (e) {}
 	}
 
 	onMount(async () => {
@@ -161,6 +157,8 @@
 
 <svelte:window bind:innerWidth={inner} bind:outerWidth={outer} />
 
+<Button color="secondary" variant="fill" rounded on:click={onToggleCodePanel}><Icon data={mdiPin} />Toggle</Button>
+
 <h1 class="text-lg font-bold">Input:</h1>
 <div class="border h-96" style="overflow: auto">
 	<pre>{JSON.stringify(latestJason, null, 2)}</pre>
@@ -232,7 +230,7 @@
 				<!--  Output -->
 				<div class="py-2">
 					<h1 class="text-lg font-bold">Output:</h1>
-					<div class="border h-20"  style="overflow: auto">
+					<div class="border h-20" style="overflow: auto">
 						<pre>{scriptOutput}</pre>
 					</div>
 				</div>

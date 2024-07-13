@@ -157,111 +157,110 @@
 	}
 </script>
 
-<main class="p-2">
-	<div>
-		<div class="flex">
-			<div class="px-2 pt-1 text-lg mb-12">Sheet:</div>
-			<div >
-				<TextField bind:value={currentTab} />
-			</div>
-			<div  class="px-2 text-lg">
-				<Button disabled={spreadsheetName.length < 1}  on:click={onRenameSheet} icon={mdiUpdate} >Rename</Button>
-			</div>
+<div>
+	<div class="flex">
+		<div class="px-2 pt-1 text-lg mb-12">Sheet:</div>
+		<div >
+			<TextField bind:value={currentTab} />
+		</div>
+		<div  class="px-2 text-lg">
+			<Button disabled={spreadsheetName.length < 1}  on:click={onRenameSheet} icon={mdiUpdate} >Rename</Button>
 		</div>
 	</div>
+</div>
 
-	<Overflow>
-		
-	<div class="h-[70vh]" style="overflow: auto">
-		<table>
-			<thead>
-				{#if spreadsheet.rows.length > 0}
+<Tabs  placement="top" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
+
+	{#each tabOptions as option (option.value)}
+	<Tab
+		on:click={() => (onTabChange(option.value))}
+		selected={currentTab === option.value}
+	>
+		{option.label}
+
+		<Icon
+		data={mdiClose}
+		class="rounded-full p-0.5 hover:bg-surface-content/5"
+		on:click={(e) => {
+			e.stopPropagation()
+			onRemoveTab(option.value)
+		}}
+		/>
+	</Tab>
+	{/each}
+
+	<Tab
+	on:click={(e) => onAddNewSheet(`New-${spreadsheets.length}`)}
+	>
+	<Icon
+		data={mdiPlus}
+		class="rounded-full p-0.5 hover:bg-surface-content/5"
+	/>
+	</Tab>
+
+	<svelte:fragment slot="content">
+
+
+
+<div class="p-2 h-[70vh]" style="overflow: auto">
+	<table>
+		<thead>
+			{#if spreadsheet.rows.length > 0}
+			<tr>
+				<th>Action</th>
+				{#each settings.fields as field}
+					<th>{field.name}</th>
+				{/each}
+			</tr>
+			{/if}
+		</thead>
+		<tbody>
+			{#each spreadsheet.rows as row, rowIndex}
 				<tr>
-					<th>Action</th>
-					{#each settings.fields as field}
-						<th>{field.name}</th>
+					<td><Button on:click={(e) => removeRow(rowIndex)} icon={mdiDelete}></Button></td>
+					{#each row.cells as cell}
+						<td class="px-6 py-2 border-b border-gray-300 text-center">
+
+							<Tooltip title={cell.type.name}>
+							{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
+								<SelectField on:change={(e) => onChange(cell)} options={availableValues(cell)} bind:value={cell.value}  />									
+							{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
+								<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={availableValues(cell)} bind:value={cell.values} />
+							{:else if cell.type.type === SchemaFieldTypeEnum.Text}
+								<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg px-2 py-4 text-left text-lg" />
+							{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}
+									<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
+							{:else}
+							<span >
+								<Input debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-300 dark:bg-gray-500 shadow-lg px-2 py-2 text-left text-lg" />
+							</span>
+							{/if}
+						</Tooltip>
+						</td>
 					{/each}
 				</tr>
-				{/if}
-			</thead>
-			<tbody>
-				{#each spreadsheet.rows as row, rowIndex}
-					<tr>
-						<td><Button on:click={(e) => removeRow(rowIndex)} icon={mdiDelete}></Button></td>
-						{#each row.cells as cell}
-							<td class="px-6 py-2 border-b border-gray-300 text-center">
+			{/each}
+		</tbody>
+	</table>
+</div>
 
-								<Tooltip title={cell.type.name}>
-								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
-									<SelectField on:change={(e) => onChange(cell)} options={availableValues(cell)} bind:value={cell.value}  />									
-								{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
-									<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={availableValues(cell)} bind:value={cell.values} />
-								{:else if cell.type.type === SchemaFieldTypeEnum.Text}
-									<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg px-2 py-4 text-left text-lg" />
-								{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}
-										<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
-								{:else}
-								<span >
-									<Input debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-300 dark:bg-gray-500 shadow-lg px-2 py-2 text-left text-lg" />
-								</span>
-								{/if}
-							</Tooltip>
-							</td>
-						{/each}
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</div>
-</Overflow>
-	<Button class="p-2 m-2" color="primary" variant="fill" rounded on:click={onAdd}>Add Row</Button>
-
-
-	<Tabs  placement="bottom" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
-
-		{#each tabOptions as option (option.value)}
-		<Tab
-		  on:click={() => (onTabChange(option.value))}
-		  selected={currentTab === option.value}
-		>
-		  {option.label}
-	
-		  <Icon
-			data={mdiClose}
-			class="rounded-full p-0.5 hover:bg-surface-content/5"
-			on:click={(e) => {
-			  e.stopPropagation()
-			  onRemoveTab(option.value)
-			}}
-		  />
-		</Tab>
-	  {/each}
-	
-	  <Tab
-		on:click={(e) => onAddNewSheet(`New-${spreadsheets.length}`)}
-	  >
-		<Icon
-		  data={mdiPlus}
-		  class="rounded-full p-0.5 hover:bg-surface-content/5"
-		/>
-	  </Tab>
-	
-	  <svelte:fragment slot="content">
-		<Dialog bind:open={confirmDeleteOpen}>
-			<div slot="title">Do you want to delete "{deletePage}"</div>
-			<div slot="actions">
-			  <Button on:click={(e) => onDoRemoveSheet(deletePage)} class="px-2" variant="fill" color="primary">Yes</Button>
-			  <Button class="px-2" variant="outline" color="secondary">Close</Button>
-			</div>
-		  </Dialog>
-	  </svelte:fragment>
-	  
-	</Tabs>
-
-	<Drawer bind:open={snackbarOpen} placement="bottom" class="h-32">
-		<h1 class="text-center py-8">{snackbarMessage}</h1>
+	<Dialog bind:open={confirmDeleteOpen}>
+		<div slot="title">Do you want to delete "{deletePage}"</div>
 		<div slot="actions">
-		  <Button on:click={() => (snackbarOpen = false)}>Close</Button>
+			<Button on:click={(e) => onDoRemoveSheet(deletePage)} class="px-2" variant="fill" color="primary">Yes</Button>
+			<Button class="px-2" variant="outline" color="secondary">Close</Button>
 		</div>
-	  </Drawer>
-</main>
+		</Dialog>
+	</svelte:fragment>
+	
+</Tabs>
+
+
+<Button class="p-2 m-2" color="primary" variant="fill" rounded on:click={onAdd}>Add Row</Button>
+
+<Drawer bind:open={snackbarOpen} placement="bottom" class="h-32">
+	<h1 class="text-center py-8">{snackbarMessage}</h1>
+	<div slot="actions">
+		<Button on:click={() => (snackbarOpen = false)}>Close</Button>
+	</div>
+</Drawer>

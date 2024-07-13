@@ -1,14 +1,22 @@
-# create-svelte-ux-demo
+# Document Gen
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+This repo was created as an easier way to have a 'source of truth' for business data used to develop software:
 
-```bash
-npm run dev
+- generate OpenApi specis
+- generate front-end user interfaces
+- produce tests/validation
+- ...
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+Quite often people use conventional tools like spreadsheets to describe software systems.
 
-You will learn the rest on the Home page of the demo app.
+At some point, the data on those spreadsheets turns into specifications for people to build software.
 
-More info on: https://svelte-ux.techniq.dev/
+This project was created so people could migrate those spreadsheets into version control, storing the underlying data as something a bit more friendly (i.e. json) so as to make it easier to write tooling which helps downstream development (e.g. converting that data into an openapi spec)
+
+# TODO
+
+- Use Drawer
+
+## Nice-to-have
+
+- Separate out Snackbard, TabBar

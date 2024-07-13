@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { AppBar, AppLayout, Card, Button, NavItem, Tooltip, settings } from 'svelte-ux'
+	import { AppBar, AppLayout, Toggle, Drawer, ToggleButton, Icon, Button, NavItem, Tooltip, settings } from 'svelte-ux'
 
-	import { mdiCog, mdiDatabase, mdiDataMatrix, mdiWeb } from '@mdi/js'
+	import { mdiCog, mdiDatabase, mdiDataMatrix, mdiPin, mdiPinOff, mdiWeb } from '@mdi/js'
 
 	import { page } from '$app/stores'
 	import '../app.postcss'
 	import TwoCols from '$lib/TwoCols.svelte'
+	import CodePanel from '$lib/CodePanel.svelte'
 
+	let stickyCode = false
 	settings({
 		components: {
 			AppBar: {
@@ -24,6 +26,11 @@
 			}
 		}
 	})
+
+	function toggleCodePanel() {
+		console.log('layout:toggleCodePanel ', stickyCode)
+		stickyCode = !stickyCode
+	}
 </script>
 
 <AppLayout>
@@ -35,6 +42,7 @@
 		<!--
 		<NavItem path="/home" text="Home" icon="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" currentUrl={$page.url} />
 		-->
+		<Button class="bottom-button">My Button</Button>
 	</svelte:fragment>
 
 	<AppBar title="Data Definitions">
@@ -51,10 +59,40 @@
 					target="_blank"
 				/>
 			</Tooltip>
+
+
+			<div class="pt-2 flex-none h-20">
+				<Button color="secondary" variant="fill" rounded on:click={toggleCodePanel}>Scripts</Button>
+			</div>
 		</div>
 	</AppBar>
 
-	<TwoCols>
-		<slot />
-	</TwoCols>
+	<main class="p-2">
+		{#if stickyCode}
+			<div class="flex flex-col h-full">
+				<div class="flex-auto">
+					<TwoCols on:toggleCodePanel={toggleCodePanel}>
+						<slot />
+					</TwoCols>
+				</div>
+				<div class="pt-2 flex-none h-20">
+					<Button on:click={toggleCodePanel}><Icon data={stickyCode ? mdiPin : mdiPinOff} />Scripts</Button>
+				</div>
+			</div>
+		{:else}
+			<Toggle let:on={open} let:toggle let:toggleOff>
+				<Drawer {open} on:close={toggleOff} persistent class="w-[60vw]">
+					<CodePanel pinned="false" on:toggleCodePanel={toggleCodePanel} />
+					<div slot="actions">
+						<Button on:click={toggleOff}>Close</Button>
+					</div>
+				</Drawer>
+				<div class="flex flex-col h-full">
+					<div class="flex-auto">
+						<slot />
+					</div>
+				</div>
+			</Toggle>
+		{/if}
+	</main>
 </AppLayout>

@@ -29,12 +29,10 @@
 	const run = (code: string) => (output = executeCode(code))
 </script>
 
-<main>
-	<textarea bind:value={codeInput}></textarea>
-	<button on:click={(e) => run(codeInput)}>Execute</button>
-	<button on:click={(e) => runCallMe(codeInput)}>Call Me</button>
-	<p>{output}</p>
-</main>
+<textarea bind:value={codeInput}></textarea>
+<button on:click={(e) => run(codeInput)}>Execute</button>
+<button on:click={(e) => runCallMe(codeInput)}>Call Me</button>
+<p>{output}</p>
 
 <style>
 	textarea {
