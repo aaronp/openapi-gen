@@ -1,5 +1,16 @@
 # Document Gen
 
+This is a simple Spreadsheet app for saving the data as json and derived outputs (e.g. openapi.yaml, UI formats, etc.)
+
+## Running
+
+```
+mkdir d8a
+mkdir output
+docker run -p 3000:8080 -v `pwd`/d8a:/app/data -v `pwd`/output:/app/output docker.io/kindservices/openapi-gen-ui:latest  
+```
+
+# About 
 This repo was created as an easier way to have a 'source of truth' for business data used to develop software:
 
 - generate OpenApi specis
@@ -13,11 +24,3 @@ At some point, the data on those spreadsheets turns into specifications for peop
 
 This project was created so people could migrate those spreadsheets into version control, storing the underlying data as something a bit more friendly (i.e. json) so as to make it easier to write tooling which helps downstream development (e.g. converting that data into an openapi spec)
 
-# TODO
-
-- Use Drawer (?)
-- Drive 'input' from cache
-
-## Nice-to-have
-
-- Separate out Snackbard, TabBar
