@@ -226,7 +226,7 @@
 				<tr>
 					<td><Button on:click={(e) => removeRow(rowIndex)} icon={mdiDelete}></Button></td>
 					{#each row.cells as cell}
-						<td class="px-6 border-b border-gray-300 text-center">
+						<td class="px-6 py-2 border-b border-gray-300 text-center">
 
 							<Tooltip title={cell.type.name}>
 								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
@@ -239,7 +239,7 @@
 										<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
 								{:else}
 								<span >
-									<Input debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-300 dark:bg-gray-500 shadow-lg px-2 py-2 text-left text-lg" />
+									<Input debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm px-2 py-2 text-left text-lg" />
 								</span>
 								{/if}
 							</Tooltip>
