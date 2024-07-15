@@ -47,7 +47,7 @@ export function listSpreadsheets(): string[] {
 			.filter((file) => path.extname(file).toLowerCase() === '.json')
 			.map((file) => path.basename(file, '.json'))
 	} catch (e) {
-		console.log('ERROR reading spreadsheets')
+		console.error('ERROR reading spreadsheets: ', e)
 		return []
 	}
 }
@@ -72,7 +72,7 @@ export function listScripts(): string[] {
 			.filter((file) => path.extname(file).toLowerCase() === '.json')
 			.map((file) => path.basename(file, '.json'))
 	} catch (e) {
-		console.log('ERROR reading scripts', e)
+		console.error('ERROR reading scripts', e)
 		return []
 	}
 }
@@ -104,6 +104,7 @@ export function renameSheet(name: string, newName: string): string {
 	const oldPath = spreadsheetPath(name)
 	const newPath = spreadsheetPath(newName)
 	fs.renameSync(oldPath, newPath)
+	console.log(`Renamed sheet from ${oldPath} to ${fs.realpathSync(newPath)}`)
 	return newPath
 }
 
@@ -121,6 +122,7 @@ export function readSettings(): Settings {
 export function deleteScript(filename: string) {
 	const fullPath = scriptsPath(filename)
 	if (fs.existsSync(fullPath)) {
+		console.log(`Deleting script ${fs.realpathSync(fullPath)}`)
 		fs.rmSync(fullPath)
 		return true
 	} else {
@@ -131,6 +133,7 @@ export function deleteScript(filename: string) {
 export function saveScript(filename: string, data: Script) {
 	const fullPath = scriptsPath(filename)
 	fs.writeFileSync(fullPath, JSON.stringify(data, null, 2))
+	console.log('Saving script to ', fs.realpathSync(fullPath))
 	return fullPath
 }
 
@@ -138,19 +141,28 @@ export function renameScript(name: string, newName: string): string {
 	const oldPath = scriptsPath(name)
 	const newPath = scriptsPath(newName)
 	fs.renameSync(oldPath, newPath)
+	console.log(`Renamed script from ${oldPath} to ${fs.realpathSync(newPath)}`)
 	return newPath
 }
 export function saveSettings(data: Settings) {
-	fs.writeFileSync(settingsPath(), JSON.stringify(data, null, 2))
+	const fqn = settingsPath()
+	console.log(`Saving settings to ${fs.realpathSync(fqn)}`)
+	fs.writeFileSync(fqn, JSON.stringify(data, null, 2))
 }
 
 export function saveSpreadsheet(data: Spreadsheet) {
-	fs.writeFileSync(spreadsheetPath(data.name), JSON.stringify(data, null, 2))
+	const fqn = spreadsheetPath(data.name)
+	console.log(`Saving spreadsheet to ${fs.realpathSync(fqn)}`)
+	fs.writeFileSync(fqn, JSON.stringify(data, null, 2))
 }
 
 export function saveResults(data: ScriptResult) {
-	fs.writeFileSync(resultsPath(data.name), data.content)
+	const fqn = resultsPath(data.name)
+	console.log(`Saving results to ${fs.realpathSync(fqn)}`)
+	fs.writeFileSync(fqn, data.content)
 }
 export function deleteSpreadsheet(name: string) {
-	fs.rmSync(spreadsheetPath(name))
+	const fqn = spreadsheetPath(name)
+	console.log(`Deleting spreadsheet ${fs.realpathSync(fqn)}`)
+	fs.rmSync(fqn)
 }
