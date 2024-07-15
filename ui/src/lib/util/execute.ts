@@ -2,10 +2,10 @@ import * as ts from 'typescript'
 import type { StackElement } from './cache'
 
 export type StackResult = {
-	element: StackElement,
-	input : any,
-	error: boolean,
-	inputs : string[],
+	element: StackElement
+	input: any
+	error: boolean
+	inputs: string[]
 	result: any
 }
 
@@ -105,11 +105,11 @@ async function evaluateStackRecursive(
 	const head = stack[0]
 
 	const inputsMap = new Map<string, any>()
-	
+
 	results.forEach((value, key) => {
 		inputsMap.set(key, value)
 	})
-	
+
 	inputsMap.set('input', lastResult)
 
 	try {
@@ -119,8 +119,8 @@ async function evaluateStackRecursive(
 		resultBuffer.push({
 			element: head,
 			error: false,
-			input : lastResult,
-			inputs : Array.from(inputsMap.keys()),
+			input: lastResult,
+			inputs: Array.from(inputsMap.keys()),
 			result
 		})
 
@@ -138,8 +138,8 @@ async function evaluateStackRecursive(
 		resultBuffer.push({
 			element: head,
 			error: true,
-			input : lastResult,
-			inputs : Array.from(inputsMap.keys()),
+			input: lastResult,
+			inputs: Array.from(inputsMap.keys()),
 			result: { error: `${e}` }
 		})
 
