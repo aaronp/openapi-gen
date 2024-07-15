@@ -8,7 +8,7 @@
 	}
 </script>
 
-<main class="p-2 content-center">
+<main class="p-2 content-center justify-self-center ">
 
 <Shine>
 	<h1 class="text-2xl font-semibold mb-2">Welcome to ✨Data Gen✨ !</h1>

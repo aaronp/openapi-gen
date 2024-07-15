@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { AppBar, AppLayout, Toggle, Drawer, Button, NavItem, Tooltip, settings } from 'svelte-ux'
+	import { AppBar, AppLayout, Toggle, Drawer, Button, NavItem, Tooltip, settings, ThemeInit, ThemeSelect, ThemeSwitch } from 'svelte-ux'
+
 
 	import { mdiCog, mdiDatabase, mdiDebugStepInto, mdiDebugStepOver, mdiScript, mdiWeb } from '@mdi/js'
 
@@ -7,6 +8,7 @@
 	import '../app.postcss'
 	import TwoCols from '$lib/TwoCols.svelte'
 	import CodePanel from '$lib/CodePanel.svelte'
+
 
 	let stickyCode = false
 	settings({
@@ -31,15 +33,21 @@
 		console.log('layout:toggleCodePanel ', stickyCode)
 		stickyCode = !stickyCode
 	}
+
+	export let data;
 </script>
 
+<ThemeInit />
 <AppLayout>
 	<svelte:fragment slot="nav">
-		<NavItem path="/data" text="Data" icon={mdiDatabase} currentUrl={$page.url} />
 
-		<NavItem path="/settings" text="Settings" icon={mdiCog} currentUrl={$page.url} />
+		<div class="grid grid-rows-[auto_auto_auto_1fr] h-screen">
+			<div class="self-start "><NavItem path="/data" text="Data" icon={mdiDatabase} currentUrl={$page.url} /></div>
+			<div class="self-start "><NavItem path="/settings" text="Settings" icon={mdiCog} currentUrl={$page.url} /></div>
+			<div class="self-start "><NavItem path="/scriptselect" text="Settings" icon={mdiDebugStepOver} currentUrl={$page.url} /></div>
+			<div class="self-end pl-4 pb-20">...</div>
+		</div>
 
-		<NavItem path="/scriptselect" text="Settings" icon={mdiDebugStepOver} currentUrl={$page.url} />
 	</svelte:fragment>
 
 	<AppBar title="Data Definitions">
@@ -55,6 +63,8 @@
 			<Tooltip title="Kind" placement="left" offset={2}>
 				<Button icon={mdiWeb} href="https://kindservices.co.uk" class="p-2" target="_blank" />
 			</Tooltip>
+
+			<ThemeSelect />
 
 			<Tooltip title="View repository" placement="left" offset={2}>
 				<Button
@@ -72,7 +82,6 @@
 			<TwoCols>
 				<slot />
 			</TwoCols>
-		{:else}
 		{/if}
 		<Toggle let:on={open} let:toggle let:toggleOff>
 			<Drawer {open} on:close={toggleOff} persistent class="w-[60vw]">
