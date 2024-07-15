@@ -1,6 +1,17 @@
 <script lang="ts">
-	import { AppBar, AppLayout, Toggle, Drawer, Button, NavItem, Tooltip, settings, ThemeInit, ThemeSelect, ThemeSwitch } from 'svelte-ux'
-
+	import {
+		AppBar,
+		AppLayout,
+		Toggle,
+		Drawer,
+		Button,
+		NavItem,
+		Tooltip,
+		settings,
+		ThemeInit,
+		ThemeSelect,
+		ThemeSwitch
+	} from 'svelte-ux'
 
 	import { mdiClose, mdiCog, mdiDatabase, mdiDebugStepInto, mdiDebugStepOver, mdiScript, mdiWeb } from '@mdi/js'
 
@@ -8,7 +19,6 @@
 	import '../app.postcss'
 	import TwoCols from '$lib/TwoCols.svelte'
 	import CodePanel from '$lib/CodePanel.svelte'
-
 
 	let stickyCode = false
 	settings({
@@ -34,19 +44,17 @@
 		stickyCode = !stickyCode
 	}
 
-	export let data;
+	export let data
 </script>
 
 <ThemeInit />
 <AppLayout>
 	<svelte:fragment slot="nav">
-
 		<div class="grid grid-rows-[auto_auto_1fr] h-screen">
-			<div class="self-start "><NavItem path="/data" text="Data" icon={mdiDatabase} currentUrl={$page.url} /></div>
-			<div class="self-start "><NavItem path="/settings" text="Settings" icon={mdiCog} currentUrl={$page.url} /></div>
+			<div class="self-start"><NavItem path="/data" text="Data" icon={mdiDatabase} currentUrl={$page.url} /></div>
+			<div class="self-start"><NavItem path="/settings" text="Settings" icon={mdiCog} currentUrl={$page.url} /></div>
 			<div class="self-end pl-4 pb-20">...</div>
 		</div>
-
 	</svelte:fragment>
 
 	<AppBar title="Data Definitions">
@@ -86,7 +94,7 @@
 				</div>
 			</Drawer>
 			<slot />
-			{#if ($page.url.toString().endsWith('data'))}
+			{#if $page.url.toString().endsWith('data')}
 				<Button class="my-2" icon={mdiScript} variant="fill-light" on:click={toggle}>Script</Button>
 			{/if}
 		</Toggle>

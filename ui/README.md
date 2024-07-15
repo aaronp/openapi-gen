@@ -19,6 +19,7 @@ docker run -p 3000:3000 -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.i
 ```
 
 Or, if you want to mess with the port:
+
 ```
 docker run -e PORT=1234 -p 8080:1234 -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest
 ```
@@ -34,9 +35,6 @@ This repo was created as an easier way to have a 'source of truth' for business 
 
 # TODO
 
-- fix docker build / node runtime
-  - be able to mount both data and output directories
-- clean up script UI
 - CSV import
 - test saving
   - fine-tune/fix script names w/ different output types (e.g. openapi.yaml.json)

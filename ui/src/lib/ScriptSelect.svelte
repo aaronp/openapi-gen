@@ -139,7 +139,12 @@
 	$: selectError = !script.input ? 'Input source is required' : ''
 </script>
 
-<Tabs class="bg-muted mt-2 rounded" placement="top" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
+<Tabs
+	class="bg-muted mt-2 rounded"
+	placement="top"
+	bind:options={tabOptions}
+	on:change={(e) => (currentTab = e.detail.value)}
+>
 	{#each tabOptions as option (option.value)}
 		<Tab on:click={() => onTabChange(option.value)} selected={currentTab === option.value}>
 			{option.label}

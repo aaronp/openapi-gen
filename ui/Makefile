@@ -23,4 +23,4 @@ docker-build:
 docker-push:
 	docker buildx create --use & docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE):$(VERSION) -t $(IMAGE):latest --push .
 docker-run:
-	docker run --rm -v $(CURRENT_DIR)/data:/data $(IMAGE):latest
+	docker run --rm -v $(CURRENT_DIR)/data:/app/data $(CURRENT_DIR)/out:/app/output $(IMAGE):latest

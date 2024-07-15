@@ -2,8 +2,10 @@ import * as ts from 'typescript'
 import type { StackElement } from './cache'
 
 export type StackResult = {
-	element: StackElement
-	error: boolean
+	element: StackElement,
+	input : any,
+	error: boolean,
+	inputs : string[],
 	result: any
 }
 
@@ -87,12 +89,12 @@ export async function evaluateStack(stack: StackElement[]): Promise<StackResult[
 	if (stack.length === 0) {
 		return []
 	}
-	return await evaluateStackRecursive(stack, {}, [], stack[0].input)
+	return await evaluateStackRecursive(stack, new Map<string, any>(), [], stack[0].input)
 }
 
 async function evaluateStackRecursive(
 	stack: StackElement[],
-	results: { [key: string]: any },
+	results: Map<string, any>,
 	resultBuffer: StackResult[],
 	lastResult: any
 ): Promise<StackResult[]> {
@@ -103,12 +105,12 @@ async function evaluateStackRecursive(
 	const head = stack[0]
 
 	const inputsMap = new Map<string, any>()
-	inputsMap.set('results', results)
+	
+	results.forEach((value, key) => {
+		inputsMap.set(key, value)
+	})
+	
 	inputsMap.set('input', lastResult)
-	if (head.script.input) {
-		const key = toCamelCase(head.script.input)
-		inputsMap.set(key, lastResult)
-	}
 
 	try {
 		console.log(`executing w/ input map of size ${inputsMap.size}`)
@@ -117,19 +119,27 @@ async function evaluateStackRecursive(
 		resultBuffer.push({
 			element: head,
 			error: false,
+			input : lastResult,
+			inputs : Array.from(inputsMap.keys()),
 			result
 		})
 
+		if (head.script.input) {
+			const key = toCamelCase(head.script.input)
+			inputsMap.set(key, result)
+		}
+
 		const tail = stack.slice(1)
 		const scriptKey = toCamelCase(head.script.name)
-		results[scriptKey] = result
-		return await evaluateStackRecursive(tail, results, resultBuffer, result)
+		return await evaluateStackRecursive(tail, inputsMap, resultBuffer, result)
 	} catch (e) {
 		console.error(`Error executing script: ${e}`)
 
 		resultBuffer.push({
 			element: head,
 			error: true,
+			input : lastResult,
+			inputs : Array.from(inputsMap.keys()),
 			result: { error: `${e}` }
 		})
 

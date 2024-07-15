@@ -5,8 +5,7 @@ import type { Settings, Spreadsheet, Script, ScriptResult } from '../../lib/gene
 const DataDir = process.env.DATA_DIR || './data'
 const OutputDir = process.env.OUTPUT_DIR || './output'
 
-
-const resolved = (name : string) => {
+const resolved = (name: string) => {
 	if (fs.existsSync(name)) {
 		return fs.realpathSync(name)
 	} else {
@@ -155,7 +154,7 @@ export function renameScript(name: string, newName: string): string {
 }
 export function saveSettings(data: Settings) {
 	const fqn = settingsPath()
-	console.log(`Saving settings to ${resolved(fqn)}`)	
+	console.log(`Saving settings to ${resolved(fqn)}`)
 	fs.writeFileSync(fqn, JSON.stringify(data, null, 2))
 }
 
