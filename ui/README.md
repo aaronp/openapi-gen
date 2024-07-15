@@ -4,10 +4,23 @@ This is a simple Spreadsheet app for saving the data as json and derived outputs
 
 ## Running
 
+The main point is the UI helps create project files.
+
+The setting, scripts, spreadsheets, etc are all saved under '/app/data'.
+
+The scripts which can run against the sheets are saved in '/app/output'.
+
+This way you can choose how you want to mount the relevant directories for your repo (e.g. ./.data and ./src, for example)
+
 ```
 mkdir d8a
-mkdir output
-docker run -p 3000:8080 -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest
+mkdir out
+docker run -p 3000:3000 -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest
+```
+
+Or, if you want to mess with the port:
+```
+docker run -e PORT=1234 -p 8080:1234 -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest
 ```
 
 # About

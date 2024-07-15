@@ -32,7 +32,6 @@ COPY --from=build /app/node_modules ./node_modules
 
 RUN ulimit -c unlimited
 
-RUN mkdir -p /app/data 
-RUN mkdir -p /app/output
+VOLUME ["/app/data", "/app/output"]
 
 ENTRYPOINT ["node", "build"]

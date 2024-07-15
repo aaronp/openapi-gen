@@ -1,4 +1,3 @@
-import type { UpdateSettingsRequest } from '$lib/generated'
 import { saveSettings, readSettings } from '../db'
 
 export async function GET({ request }: Request) {
@@ -8,8 +7,7 @@ export async function GET({ request }: Request) {
 export async function POST({ request }: Request) {
 	const response = await request
 		.json()
-		.then((data: UpdateSettingsRequest) => {
-			console.log('Saving ', data, ' of type ', typeof data)
+		.then((data) => {
 			try {
 				const path = saveSettings(data)
 				return Response.json({ path, message: 'Settings saved' })
