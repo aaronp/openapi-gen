@@ -96,6 +96,7 @@
 							class="h-9 text-lg"
 							{id}
 							replace="fieldname"
+							autofocus
 							bind:value={field.name}
 							on:keypress={(e) => onEnterCheck(field, e)}
 						/>
