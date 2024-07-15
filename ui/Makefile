@@ -1,5 +1,5 @@
 IMAGE:=kindservices/openapi-gen-ui
-VERSION=1.0.1
+VERSION=1.0.2
 
 dev: install api-gen
 	npm run dev
@@ -21,6 +21,6 @@ api-gen:
 docker-build:
 	docker build -t $(IMAGE):latest .
 docker-push:
-	docker buildx create --use & docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE):$(VERSION) -t $(IMAGE):latest --push .
+	docker buildx create --use & docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t $(IMAGE):$(VERSION) -t $(IMAGE):latest --push .
 docker-run:
 	docker run --rm -v $(CURRENT_DIR)/data:/app/data $(CURRENT_DIR)/out:/app/output $(IMAGE):latest
