@@ -73,15 +73,16 @@
 				<slot />
 			</TwoCols>
 		{:else}
-			<Toggle let:on={open} let:toggle let:toggleOff>
-				<Drawer {open} on:close={toggleOff} persistent class="w-[60vw]">
-					<CodePanel />
-					<div slot="actions">
-						<Button on:click={toggleOff}>Close</Button>
-					</div>
-				</Drawer>
-				<slot />
-			</Toggle>
 		{/if}
+		<Toggle let:on={open} let:toggle let:toggleOff>
+			<Drawer {open} on:close={toggleOff} persistent class="w-[60vw]">
+				<CodePanel />
+				<div slot="actions">
+					<Button on:click={toggleOff}>Close</Button>
+				</div>
+			</Drawer>
+			<slot />
+			<Button class="my-2" icon={mdiScript} variant="fill-light" on:click={toggle}>Script</Button>
+		</Toggle>
 	</main>
 </AppLayout>
