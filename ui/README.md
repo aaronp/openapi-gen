@@ -23,7 +23,8 @@ This repo was created as an easier way to have a 'source of truth' for business 
 
 - fix docker build / node runtime
   - be able to mount both data and output directories
-- control themes
+- clean up script UI
+- test saving  
 - fix weird script tab (sometimes input source gets wiped?)
 - clean up UI
 - fine-tune/fix script names w/ different output types (e.g. openapi.yaml.json)

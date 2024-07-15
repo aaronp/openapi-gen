@@ -56,10 +56,6 @@
 				<Button icon={mdiScript} rounded on:click={toggleCodePanel} target="_blank" />
 			</Tooltip>
 
-			<Tooltip title="Debug" placement="left" offset={2}>
-				<Button icon={mdiDebugStepInto} rounded on:click={toggleCodePanel} target="_blank" />
-			</Tooltip>
-
 			<Tooltip title="Kind" placement="left" offset={2}>
 				<Button icon={mdiWeb} href="https://kindservices.co.uk" class="p-2" target="_blank" />
 			</Tooltip>
