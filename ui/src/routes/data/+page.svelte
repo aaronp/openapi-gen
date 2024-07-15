@@ -56,6 +56,8 @@
 		onSave()
 	}
 	async function onSave() {
+		// this is a hack -- our spreadhseet name seems to get out of step w/ our tabs :-( 
+		spreadsheet.name = currentTab
 		console.log(`onSave >${spreadsheet.name}<`)
 		if (spreadsheet.name) {
 			latestSheet.set(spreadsheet)

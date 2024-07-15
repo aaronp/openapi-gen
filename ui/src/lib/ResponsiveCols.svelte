@@ -2,7 +2,7 @@
 	<div class="flex-grow">
 		<slot name="left" />
 	</div>
-	<div class="right-column bg-gray-800 pl-4">
+	<div class="right-column dark:bg-secondary-900 bg-secondary-100 pl-4">
 		<slot name="right" />
 	</div>
 </div>

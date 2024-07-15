@@ -139,7 +139,7 @@
 	$: selectError = !script.input ? 'Input source is required' : ''
 </script>
 
-<Tabs placement="top" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
+<Tabs class="bg-muted mt-2 rounded" placement="top" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
 	{#each tabOptions as option (option.value)}
 		<Tab on:click={() => onTabChange(option.value)} selected={currentTab === option.value}>
 			{option.label}
@@ -181,7 +181,7 @@
 
 			<!-- Input -->
 			{#if loadedScript.input != ''}
-				<div class="py-1 text-green-500">Previous: {loadedScript.input}</div>
+				<div class="py-1 text-secondary-900 dark:text-secondary-100">Input: {loadedScript.input}</div>
 			{/if}
 			<SelectField class="pt-2" bind:value={script.input} options={sources} label="Input" error={selectError} />
 

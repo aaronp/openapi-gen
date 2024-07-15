@@ -23,6 +23,7 @@ This repo was created as an easier way to have a 'source of truth' for business 
 
 - fix docker build / node runtime
   - be able to mount both data and output directories
+- CSV import
 - clean up script UI
 - test saving  
 - fix weird script tab (sometimes input source gets wiped?)

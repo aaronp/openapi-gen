@@ -2,7 +2,7 @@
 	import { AppBar, AppLayout, Toggle, Drawer, Button, NavItem, Tooltip, settings, ThemeInit, ThemeSelect, ThemeSwitch } from 'svelte-ux'
 
 
-	import { mdiCog, mdiDatabase, mdiDebugStepInto, mdiDebugStepOver, mdiScript, mdiWeb } from '@mdi/js'
+	import { mdiClose, mdiCog, mdiDatabase, mdiDebugStepInto, mdiDebugStepOver, mdiScript, mdiWeb } from '@mdi/js'
 
 	import { page } from '$app/stores'
 	import '../app.postcss'
@@ -41,10 +41,9 @@
 <AppLayout>
 	<svelte:fragment slot="nav">
 
-		<div class="grid grid-rows-[auto_auto_auto_1fr] h-screen">
+		<div class="grid grid-rows-[auto_auto_1fr] h-screen">
 			<div class="self-start "><NavItem path="/data" text="Data" icon={mdiDatabase} currentUrl={$page.url} /></div>
 			<div class="self-start "><NavItem path="/settings" text="Settings" icon={mdiCog} currentUrl={$page.url} /></div>
-			<div class="self-start "><NavItem path="/scriptselect" text="Settings" icon={mdiDebugStepOver} currentUrl={$page.url} /></div>
 			<div class="self-end pl-4 pb-20">...</div>
 		</div>
 
@@ -80,14 +79,16 @@
 			</TwoCols>
 		{/if}
 		<Toggle let:on={open} let:toggle let:toggleOff>
-			<Drawer {open} on:close={toggleOff} persistent class="w-[60vw]">
-				<CodePanel />
+			<Drawer {open} on:close={toggleOff} persistent class="w-[60vw] m-2 dark:bg-secondary-900 bg-secondary-100 pl-4">
+				<div class=""><CodePanel /></div>
 				<div slot="actions">
-					<Button on:click={toggleOff}>Close</Button>
+					<Button icon={mdiClose} class="m-2 w-96" on:click={toggleOff}>Close</Button>
 				</div>
 			</Drawer>
 			<slot />
-			<Button class="my-2" icon={mdiScript} variant="fill-light" on:click={toggle}>Script</Button>
+			{#if ($page.url.toString().endsWith('data'))}
+				<Button class="my-2" icon={mdiScript} variant="fill-light" on:click={toggle}>Script</Button>
+			{/if}
 		</Toggle>
 	</main>
 </AppLayout>

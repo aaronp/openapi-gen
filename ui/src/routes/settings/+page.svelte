@@ -83,7 +83,7 @@
 </script>
 
 <div class="m-2">
-    <header class="bg-blue-500 text-white p-4">
+    <header class="bg-secondary-100 text-black dark:text-white p-4 my-4">
         <h1 class="text-2xl font-bold">Sheet Settings</h1>
     </header>
 
