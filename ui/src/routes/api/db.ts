@@ -2,20 +2,34 @@ import fs from 'fs'
 import path from 'path'
 import type { Settings, Spreadsheet, Script, ScriptResult } from '../../lib/generated/models'
 
+const DataDir = process.env.DATA_DIR || './data'
+const OutputDir = process.env.OUTPUT_DIR || './output'
+
 export function dataDir(): string {
-	fs.mkdirSync('data', { recursive: true })
-	return 'data'
+	fs.mkdirSync(DataDir, { recursive: true })
+	return DataDir
 }
 
-export function scriptsDir(): string {
-	const dir = path.join('data', 'scripts')
+export function outputDir(): string {
+	fs.mkdirSync(OutputDir, { recursive: true })
+	return OutputDir
+}
+
+function spreadsheetsDir(): string {
+	const dir = path.join(dataDir(), 'spreadsheets')
+	fs.mkdirSync(dir, { recursive: true })
+	return dir
+}
+
+function scriptsDir(): string {
+	const dir = path.join(dataDir(), 'scripts')
 	fs.mkdirSync(dir, { recursive: true })
 	return dir
 }
 const settingsPath = () => path.join(dataDir(), 'settings.json')
 
 export function saveData(dirname: string, filename: string, data: string | NodeJS.ArrayBufferView) {
-	const saveDir = path.join(dataDir(), 'output', dirname)
+	const saveDir = path.join(outputDir(), dirname)
 	fs.mkdirSync(saveDir, { recursive: true })
 
 	const fqn = path.join(saveDir, filename)
@@ -24,7 +38,7 @@ export function saveData(dirname: string, filename: string, data: string | NodeJ
 }
 
 export function listSpreadsheets(): string[] {
-	const dir = path.join('data', 'spreadsheets')
+	const dir = spreadsheetsDir()
 	try {
 		const files = fs.readdirSync(dir)
 
@@ -52,9 +66,8 @@ export function readScript(filename: string): Settings {
 }
 
 export function listScripts(): string[] {
-	const dir = path.join('data', 'scripts')
 	try {
-		const files = fs.readdirSync(dir)
+		const files = fs.readdirSync(scriptsDir())
 		return files
 			.filter((file) => path.extname(file).toLowerCase() === '.json')
 			.map((file) => path.basename(file, '.json'))
@@ -65,21 +78,13 @@ export function listScripts(): string[] {
 }
 
 function spreadsheetPath(filename: string) {
-	const dir = path.join('data', 'spreadsheets')
-	fs.mkdirSync(dir, { recursive: true })
 	const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
-	return path.join(dir, fqn)
+	return path.join(spreadsheetsDir(), fqn)
 }
 
-function resultsPath(filename: string) {
-	const dir = path.join('output')
-	fs.mkdirSync(dir, { recursive: true })
-	return path.join(dir, filename)
-}
-function scriptsPath(filename: string) {
-	const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
-	return path.join(scriptsDir(), fqn)
-}
+const resultsPath = (filename: string) => path.join(outputDir(), filename)
+
+const scriptsPath = (filename: string) => path.join(scriptsDir(), filename.endsWith('.json') ? filename : `${filename}.json`)
 
 export function readSpreadsheet(name: string): Spreadsheet {
 	const filename = spreadsheetPath(name)

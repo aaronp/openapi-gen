@@ -63,8 +63,6 @@
 			loadedScript = await api.getScript({ name })
 			script = loadedScript
 
-			scriptSelect.set(loadedScript)
-
 			currentTab = script.name
 
 			// publish the latest script
@@ -172,7 +170,7 @@
 						<TextField bind:value={script.name} />
 					</div>
 					<div class="px-2 text-lg">
-						<Button variant="outline" disabled={script.name.length < 1} on:click={(e) => onRenameScript()} icon={mdiUpdate}
+						<Button variant="outline" disabled={script?.name?.length < 1} on:click={(e) => onRenameScript()} icon={mdiUpdate}
 							>Rename</Button
 						>
 					</div>
