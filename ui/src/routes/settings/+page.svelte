@@ -8,7 +8,6 @@
 	import { tick, onMount } from 'svelte'
 	import { Card, Field, Button, Input, SelectField, type MenuOption } from 'svelte-ux'
 	let settings: Settings = {
-		urlPrefix: '/api/v1',
 		fields: []
 	}
 
@@ -83,45 +82,51 @@
 	}
 </script>
 
-{#each settings.fields as field, index}
-	<div class="dark:bg-gray-700 bg-gray-200 p-2">
-		<div class="flex gap-2">
-			<div class="items-center text-lg">
-				<Field label="Name" let:id class="pl-2 w-80">
+<div class="m-2">
+    <header class="bg-blue-500 text-white p-4">
+        <h1 class="text-2xl font-bold">Sheet Settings</h1>
+    </header>
+
+	{#each settings.fields as field, index}
+		<div class="dark:bg-gray-700 bg-gray-200 p-2">
+			<div class="flex gap-2">
+				<div class="items-center text-lg">
+					<Field label="Name" let:id class="pl-2 w-80">
+						<Input
+							class="h-9 text-lg"
+							{id}
+							replace="fieldname"
+							bind:value={field.name}
+							on:keypress={(e) => onEnterCheck(field, e)}
+						/>
+					</Field>
+				</div>
+
+				<div class="w-40">
+					<Field label="Type" id={index}>
+						<SelectField
+							{index}
+							{options}
+							bind:value={field.type}
+							on:change={(e) => onUpdateType(field, e.detail.value)}
+						/>
+					</Field>
+				</div>
+			</div>
+			{#if field.type === SchemaFieldTypeEnum.OneOf || field.type === SchemaFieldTypeEnum.AnyOf}
+				<Field label="Values" let:id class="pl-2 py-2 w-80 ">
 					<Input
-						class="h-9 text-lg"
 						{id}
-						replace="fieldname"
-						bind:value={field.name}
+						replace="values"
+						class="h-9 text-lg"
+						on:change={(e) => onUpdateValues(field, e.detail.value)}
 						on:keypress={(e) => onEnterCheck(field, e)}
 					/>
 				</Field>
-			</div>
-
-			<div class="w-40">
-				<Field label="Type" id={index}>
-					<SelectField
-						{index}
-						{options}
-						bind:value={field.type}
-						on:change={(e) => onUpdateType(field, e.detail.value)}
-					/>
-				</Field>
-			</div>
+			{/if}
 		</div>
-		{#if field.type === SchemaFieldTypeEnum.OneOf || field.type === SchemaFieldTypeEnum.AnyOf}
-			<Field label="Values" let:id class="pl-2 py-2 w-80 ">
-				<Input
-					{id}
-					replace="values"
-					class="h-9 text-lg"
-					on:change={(e) => onUpdateValues(field, e.detail.value)}
-					on:keypress={(e) => onEnterCheck(field, e)}
-				/>
-			</Field>
-		{/if}
-	</div>
-	<div class="p-2"></div>
-{/each}
+		<div class="p-2"></div>
+	{/each}
 
-<Button class="p-2" color="primary" variant="fill" rounded on:click={onAddField}>Add Field</Button>
+	<Button class="p-2" color="primary" variant="fill" rounded on:click={onAddField}>Add Field</Button>
+</div>

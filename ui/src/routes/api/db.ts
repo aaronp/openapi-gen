@@ -84,7 +84,8 @@ function spreadsheetPath(filename: string) {
 
 const resultsPath = (filename: string) => path.join(outputDir(), filename)
 
-const scriptsPath = (filename: string) => path.join(scriptsDir(), filename.endsWith('.json') ? filename : `${filename}.json`)
+const scriptsPath = (filename: string) =>
+	path.join(scriptsDir(), filename.endsWith('.json') ? filename : `${filename}.json`)
 
 export function readSpreadsheet(name: string): Spreadsheet {
 	const filename = spreadsheetPath(name)

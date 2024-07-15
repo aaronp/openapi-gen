@@ -95,11 +95,10 @@
 	}
 
 	async function onRenameScript() {
-
 		console.log(`Renaming script oldName=${currentTab} to newName=${script.name}`)
 
 		try {
-			const result = await api.renameScript({ name: currentTab, newName : script.name })
+			const result = await api.renameScript({ name: currentTab, newName: script.name })
 		} catch (e) {
 			showSnackbar('Rename errored with ' + e, 15000)
 		}
@@ -170,8 +169,11 @@
 						<TextField bind:value={script.name} />
 					</div>
 					<div class="px-2 text-lg">
-						<Button variant="outline" disabled={script?.name?.length < 1} on:click={(e) => onRenameScript()} icon={mdiUpdate}
-							>Rename</Button
+						<Button
+							variant="outline"
+							disabled={script?.name?.length < 1}
+							on:click={(e) => onRenameScript()}
+							icon={mdiUpdate}>Rename</Button
 						>
 					</div>
 				</div>

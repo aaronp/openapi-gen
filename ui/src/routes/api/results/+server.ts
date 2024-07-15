@@ -1,14 +1,13 @@
 import type { ScriptResult } from '$lib/generated'
 import { saveResults } from '../db'
 
-
 export async function POST({ request }: Request) {
 	const url = new URL(request?.url)
 
 	const response = await request
 		.json()
 		.then((data: ScriptResult) => {
-			const name  = data.name
+			const name = data.name
 			console.log(`Saving results ${name}: `)
 			try {
 				const path = saveResults(data)

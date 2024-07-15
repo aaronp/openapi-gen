@@ -27,8 +27,8 @@
 	})
 
 	async function onRun() {
-		const input : Script = script as Script
-		await api.saveScript({ script : input })
+		const input: Script = script as Script
+		await api.saveScript({ script: input })
 		callStack = await upstreamDependencies(input, sheet)
 		latestResult = await evaluateStack(callStack)
 	}
@@ -40,5 +40,4 @@
 	{#if callStack.length > 0}
 		<CallStack stack={latestResult} />
 	{/if}
-	
 </ScriptSelect>

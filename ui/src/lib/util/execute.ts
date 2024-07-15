@@ -90,7 +90,12 @@ export async function evaluateStack(stack: StackElement[]): Promise<StackResult[
 	return await evaluateStackRecursive(stack, {}, [], stack[0].input)
 }
 
-async function evaluateStackRecursive(stack: StackElement[], results : {[key: string]: any},  resultBuffer : StackResult[], lastResult : any): Promise<StackResult[]> {
+async function evaluateStackRecursive(
+	stack: StackElement[],
+	results: { [key: string]: any },
+	resultBuffer: StackResult[],
+	lastResult: any
+): Promise<StackResult[]> {
 	if (stack.length === 0) {
 		return resultBuffer
 	}
@@ -108,7 +113,7 @@ async function evaluateStackRecursive(stack: StackElement[], results : {[key: st
 	try {
 		console.log(`executing w/ input map of size ${inputsMap.size}`)
 		const result = await executeCodeWithInput(head.script.script, inputsMap)
-		
+
 		resultBuffer.push({
 			element: head,
 			error: false,
@@ -130,5 +135,4 @@ async function evaluateStackRecursive(stack: StackElement[], results : {[key: st
 
 		return resultBuffer
 	}
-
 }
