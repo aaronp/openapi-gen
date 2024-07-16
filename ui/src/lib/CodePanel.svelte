@@ -5,7 +5,7 @@
 	import type { Script, Spreadsheet } from '$lib/generated'
 
 	import { upstreamDependencies, type StackElement } from '$lib/util/cache'
-	import { scriptSelect, latestSheet, api } from '$lib/session'
+	import { latestSheet, api } from '$lib/session'
 	import { sheetAsJson } from '$lib/util/sheetAsJson'
 	import { evaluateStack, type StackResult } from '$lib/util/execute'
 	import { mdiPlay } from '@mdi/js'
@@ -17,11 +17,6 @@
 
 	latestSheet.subscribe(async (value) => {
 		sheet = sheetAsJson(value as Spreadsheet)
-		callStack = []
-		latestResult = []
-	})
-	scriptSelect.subscribe(async (value) => {
-		script = value
 		callStack = []
 		latestResult = []
 	})

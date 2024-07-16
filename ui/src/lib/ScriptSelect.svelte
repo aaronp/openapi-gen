@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte'
-	import { scriptSelect, api } from '$lib/session'
+	import { api } from '$lib/session'
 	import type { Script } from './generated'
 
 	import { inputSources, EverySheet } from '$lib/util/cache'
@@ -66,7 +66,6 @@
 			currentTab = script.name
 
 			// publish the latest script
-			scriptSelect.set(script)
 		}
 	}
 

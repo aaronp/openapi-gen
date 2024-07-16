@@ -112,13 +112,19 @@ export function readSpreadsheet(name: string): Spreadsheet {
 }
 
 export function renameSheet(name: string, newName: string): string {
-	const oldPath = spreadsheetPath(name)
-	const newPath = spreadsheetPath(newName)
 
-	
+	// const oldPath = spreadsheetPath(name)
+	// const newPath = spreadsheetPath(newName)
 
-	fs.renameSync(oldPath, newPath)
-	console.log(`Renamed sheet from ${oldPath} to ${resolved(newPath)}`)
+	// this is a bit sketchy (renames)
+	// save and delete seem more consistent
+	const renamed = readSpreadsheet(name)
+	renamed.name = newName
+	const newPath = saveSpreadsheet(renamed)
+	deleteSpreadsheet(name)
+
+	// fs.renameSync(oldPath, newPath)
+	console.log(`Renamed sheet from ${name} to ${resolved(newPath)}`)
 	return newPath
 }
 
@@ -172,6 +178,7 @@ export function saveSpreadsheet(data: Spreadsheet) {
 	const fqn = spreadsheetPath(data.name)
 	console.log(`Saving spreadsheet to ${resolved(fqn)}`)
 	fs.writeFileSync(fqn, JSON.stringify(data, null, 2))
+	return fqn
 }
 
 export function saveResults(data: ScriptResult) {
