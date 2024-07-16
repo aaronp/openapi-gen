@@ -6,13 +6,18 @@
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 
 	import { tick, onMount } from 'svelte'
-	import { Card, Field, Button, Input, SelectField, type MenuOption } from 'svelte-ux'
+	import { Field, Button, Input, SelectField, type MenuOption } from 'svelte-ux'
 	let settings: Settings = {
 		fields: []
 	}
 
+	let valuesByFieldName = new Map<string, string>()
+
 	onMount(async () => {
 		settings = await api.getSettings()
+		settings.fields.forEach((field) => {
+			valuesByFieldName.set(field.name, field?.availableValues?.join(', ') ?? '')
+		})
 		latestSettings.set(settings)
 	})
 
@@ -63,6 +68,7 @@
 			.filter((item: string) => item.length > 0)
 
 		field.availableValues = values
+		valuesByFieldName.set(field.name, value)
 
 		save()
 	}
@@ -120,6 +126,7 @@
 						{id}
 						replace="values"
 						class="h-9 text-lg"
+						value={valuesByFieldName.get(field.name)}
 						on:change={(e) => onUpdateValues(field, e.detail.value)}
 						on:keypress={(e) => onEnterCheck(field, e)}
 					/>
