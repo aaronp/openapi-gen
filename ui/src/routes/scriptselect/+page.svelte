@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CodePanel from '$lib/CodePanel.svelte'
+	import ScriptTabs from '$lib/ScriptTabs.svelte'
 </script>
 
-<CodePanel />
+<ScriptTabs />
