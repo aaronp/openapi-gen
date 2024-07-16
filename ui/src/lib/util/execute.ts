@@ -108,6 +108,7 @@ async function evaluateStackRecursive(
 
 	results.forEach((value, key) => {
 		inputsMap.set(key, value)
+		console.log(`\t${head.input} setting input for key: ${JSON.stringify(key)} of type ${typeof key} value: >${value}<`)
 	})
 
 	inputsMap.set('input', lastResult)
@@ -124,13 +125,10 @@ async function evaluateStackRecursive(
 			result
 		})
 
-		if (head.script.input) {
-			const key = toCamelCase(head.script.input)
-			inputsMap.set(key, result)
-		}
-
 		const tail = stack.slice(1)
 		const scriptKey = toCamelCase(head.script.name)
+		inputsMap.set(scriptKey, result)
+
 		return await evaluateStackRecursive(tail, inputsMap, resultBuffer, result)
 	} catch (e) {
 		console.error(`Error executing script: ${e}`)
