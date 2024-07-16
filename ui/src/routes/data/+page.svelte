@@ -250,7 +250,7 @@
 					<td><Button on:click={(e) => removeRow(rowIndex)} icon={mdiDelete}></Button></td>
 					{#each cellsForRow(row) as cell}
 						
-						<td class="px-6 py-2 border-b border-gray-300 text-center">
+						<td class="px-6 py-2 border-b border-gray-300 text-center min-w-40">
 
 							<Tooltip title={cell.type.name + "=" + JSON.stringify(cell.value)}>
 								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
@@ -258,7 +258,7 @@
 								{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
 									<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={availableValues(cell)} bind:value={cell.values} />
 								{:else if cell.type.type === SchemaFieldTypeEnum.Text}
-									<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg px-2 py-4 text-left text-lg" />
+									<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg text-left text-lg  min-w-80" />
 								{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}
 										<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
 								{:else}
