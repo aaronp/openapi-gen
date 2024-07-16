@@ -1,11 +1,27 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
+	import { api } from '$lib/session'
+	import type { Script } from './generated'
+	import { EverySheet } from '$lib/util/cache'
+
 	 export let scriptName : string = ''
-	 let created = new Date()
-	 onMount(() => {
-		created = new Date()
+	 let created = new Date().getMilliseconds()
+	 let loadedScript: Script = {
+			name: '',
+			input: EverySheet,
+			script: '',
+			autoSave: false
+		}
+	 let script: Script
+	 onMount(async () => {
+		console.log('creating with ' + scriptName)
+		created = new Date().getMilliseconds()
+		
+		loadedScript = await api.getScript({ name : scriptName })
+		script = loadedScript
 	 })
+
 </script>
 
-<h1>Script: {scriptName}</h1>
-<h2>created: {created}</h2>
+scriptName : {scriptName}
+<h1>Script: <pre>{JSON.stringify(loadedScript)}</pre></h1>

@@ -100,17 +100,22 @@
 			snackbarOpen = false
 		}, duration)
 	}
+	
 </script>
 
 scriptNameValid: {scriptNameValid}
+currentTab: {currentTab}
+<div>
+	tabOptions:<pre>{JSON.stringify(tabOptions, null, 2)}</pre>
+</div>
 <Tabs
 	class="bg-muted mt-2 rounded"
 	placement="top"
 	bind:options={tabOptions}
-	on:change={(e) => (currentTab = e.detail.value)}
+	bind:value={currentTab}
 >
 	{#each tabOptions as option (option.value)}
-		<Tab selected={currentTab === option.value}>
+		<Tab selected={currentTab === option.value} on:click={() => (currentTab = option.value)}>
 			{option.label}
 
 			<Icon
@@ -134,7 +139,9 @@ scriptNameValid: {scriptNameValid}
 
 	<svelte:fragment slot="content">
 		<div class="flex flex-col">
-			<ScriptEditor bind:scriptName={currentTab} />
+			{#key currentTab}
+				<ScriptEditor bind:scriptName={currentTab} />
+			{/key}
 		</div>
 
 		<Dialog bind:open={confirmDeleteOpen}>
