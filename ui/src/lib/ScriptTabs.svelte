@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte'
-	import { scriptSelect, api } from '$lib/session'
-	import type { Script } from './generated'
+	import { api } from '$lib/session'
 
-	import { inputSources, EverySheet } from '$lib/util/cache'
-	import { SelectField, Drawer, Dialog, Tabs, Tab, Icon, Button, type MenuOption, Toggle, TextField } from 'svelte-ux'
+	import { EverySheet } from '$lib/util/cache'
+	import { Drawer, Dialog, Tabs, Tab, Icon, Button, type MenuOption, Toggle, TextField } from 'svelte-ux'
 	import { mdiCancel, mdiClose, mdiCreation, mdiPlus, mdiUpdate } from '@mdi/js'
 	import ScriptEditor from './ScriptEditor.svelte'
 
@@ -13,7 +12,6 @@
 	}
 
 	let scriptNames: string[] = []
-
 
 	// tab stuff
 	let newTabDialogOpen = false
@@ -51,14 +49,13 @@
 		return scriptNames
 	}
 
-	async function onNewScriptInput(e: Event) {
-		console.log(e.key)
-		if (e.key === "Enter" && scriptNameValid) { 
-			onAddNewScript()
+	async function onNewScriptInput(e) {
+		if (e?.key === 'Enter' && scriptNameValid) {
+			await onAddNewScript()
+			newTabDialogOpen = false
 		}
 	}
 	async function onAddNewScript() {
-
 		// showSaveDiaglog()
 		// const s = newScript()
 		// s.name = name
@@ -71,6 +68,7 @@
 		await api.saveScript({ script })
 
 		newScriptName = 'NewScript.json' // reset
+		currentTab = newScriptNameTrimmed
 		await relistScripts()
 	}
 
@@ -88,20 +86,18 @@
 			snackbarOpen = false
 		}, duration)
 	}
-	
+
+	async function onScriptRename(event) {
+		showSnackbar('onScriptRename ' + event)
+		await relistScripts()
+	}
 </script>
 
 scriptNameValid: {scriptNameValid}
 currentTab: {currentTab}
 <div>
-	tabOptions:<pre>{JSON.stringify(tabOptions, null, 2)}</pre>
 </div>
-<Tabs
-	class="bg-muted mt-2 rounded"
-	placement="top"
-	bind:options={tabOptions}
-	bind:value={currentTab}
->
+<Tabs class="bg-muted mt-2 rounded" placement="top" bind:options={tabOptions} bind:value={currentTab}>
 	{#each tabOptions as option (option.value)}
 		<Tab selected={currentTab === option.value} on:click={() => (currentTab = option.value)}>
 			{option.label}
@@ -118,17 +114,20 @@ currentTab: {currentTab}
 	{/each}
 
 	<Toggle let:on={open} let:toggleOn let:toggleOff>
-
-		<Tab on:click={(e) => {newTabDialogOpen = true; toggleOn}}>
+		<Tab
+			on:click={(e) => {
+				newTabDialogOpen = true
+				toggleOn
+			}}
+		>
 			<Icon data={mdiPlus} class="rounded-full p-0.5 hover:bg-surface-content/5" />
 		</Tab>
-	  </Toggle>
-	  
+	</Toggle>
 
 	<svelte:fragment slot="content">
 		<div class="flex flex-col">
 			{#key currentTab}
-				<ScriptEditor bind:scriptName={currentTab} />
+				<ScriptEditor on:renameEvent={onScriptRename} bind:scriptName={currentTab} />
 			{/key}
 		</div>
 
@@ -142,16 +141,24 @@ currentTab: {currentTab}
 	</svelte:fragment>
 </Tabs>
 
-
 <Dialog bind:open={newTabDialogOpen}>
-    <div slot="title">New Script</div>
-	<TextField on:change={onNewScriptInput} autofocus class="p-2" hint={scriptNameValid ? '' : 'Name cannot contain spaces'} error={!scriptNameValid} bind:value={newScriptName} label="Script Name" />
-    <div slot="actions" class="p-2">
-      <Button disabled={!scriptNameValid} on:click={onAddNewScript} variant="fill" color="primary" icon={mdiCreation}>Ok</Button>
-	  <Button variant="fill-outline" color="secondary" icon={mdiCancel}>Close</Button>
-    </div>
+	<div slot="title">New Script</div>
+	<TextField
+		on:keydown={(e) => onNewScriptInput(e)}
+		autofocus
+		class="p-2"
+		hint={scriptNameValid ? '' : 'Name cannot contain spaces'}
+		error={!scriptNameValid}
+		bind:value={newScriptName}
+		label="Script Name"
+	/>
+	<div slot="actions" class="p-2">
+		<Button disabled={!scriptNameValid} on:click={onAddNewScript} variant="fill" color="primary" icon={mdiCreation}
+			>Ok</Button
+		>
+		<Button variant="fill-outline" color="secondary" icon={mdiCancel}>Close</Button>
+	</div>
 </Dialog>
-
 
 <Drawer bind:open={snackbarOpen} placement="bottom" class="h-32">
 	<h1 class="text-center py-8">{snackbarMessage}</h1>
@@ -159,4 +166,3 @@ currentTab: {currentTab}
 		<Button on:click={() => (snackbarOpen = false)}>Close</Button>
 	</div>
 </Drawer>
-
