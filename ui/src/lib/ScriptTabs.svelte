@@ -74,18 +74,6 @@
 		await relistScripts()
 	}
 
-	
-	async function onRenameScript() {
-		// console.log(`Renaming script oldName=${currentTab} to newName=${newScriptName}`)
-
-		// try {
-		// 	const result = await api.renameScript({ name: currentTab, newName: newScriptName })
-		// } catch (e) {
-		// 	showSnackbar('Rename errored with ' + e, 15000)
-		// }
-
-		await relistScripts()
-	}
 	async function onDoRemoveScript(tab: string) {
 		await api.deleteScript({ name: tab })
 		showSnackbar('Deleted ' + tab)

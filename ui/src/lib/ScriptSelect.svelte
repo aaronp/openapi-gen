@@ -98,7 +98,7 @@
 		console.log(`Renaming script oldName=${currentTab} to newName=${script.name}`)
 
 		try {
-			const result = await api.renameScript({ name: currentTab, newName: script.name })
+			const result = await api.renameScript({ old: currentTab, _new: script.name })
 		} catch (e) {
 			showSnackbar('Rename errored with ' + e, 15000)
 		}

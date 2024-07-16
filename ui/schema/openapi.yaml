@@ -77,18 +77,18 @@ paths:
                 items:
                   type: string
 
-  /api/rename/{name}/{newName}:
+  /api/rename/{old}/{new}:
     post:
       summary: Rename spreadsheet
       operationId: renameSpreadsheet
       parameters:
-        - name: name
+        - name: old
           in: path
           required: true
           description: Name of the spreadsheet
           schema:
             type: string
-        - name: newName
+        - name: new
           in: path
           required: true
           description: New name of the spreadsheet
@@ -111,18 +111,18 @@ paths:
         '400':
           description: Invalid request body
 
-  /api/renamescript/{name}/{newName}:
+  /api/renamescript/{old}/{new}:
     post:
       summary: Rename script
       operationId: renameScript
       parameters:
-        - name: name
+        - name: old
           in: path
           required: true
           description: Name of the script
           schema:
             type: string
-        - name: newName
+        - name: new
           in: path
           required: true
           description: New name of the script
