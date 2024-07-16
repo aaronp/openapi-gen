@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Cell, Row, SaveSpreadsheetRequest, Settings, Spreadsheet } from '$lib/generated/index'
+	import type { Cell, Row, SaveSpreadsheetRequest, SchemaField, Settings, Spreadsheet } from '$lib/generated/index'
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 	import { api, latestSettings, latestSheet } from '$lib/session'
 
@@ -162,6 +162,29 @@
 
 		await relistSpreadsheets()
 	}
+
+
+	function cellsForRow(row : Row) {
+		return settings.fields.map((field) => {
+			const cell = row.cells.find((c) => {
+				if (c.type.name === field.name) {
+					return c
+				}
+			})
+
+			// the settings have changed since we last loaded the spreadsheet
+			if (!cell) {
+				const newCell =  emptyCell(field)
+				row.cells.push(newCell)
+				return newCell
+			} else {
+				return cell
+			}
+		})
+	}
+	function emptyCell(field : SchemaField) : Cell {
+		return { type: field, value: '', values: [] }
+	}
 </script>
 
 <div>
@@ -225,10 +248,11 @@
 			{#each spreadsheet.rows as row, rowIndex}
 				<tr>
 					<td><Button on:click={(e) => removeRow(rowIndex)} icon={mdiDelete}></Button></td>
-					{#each row.cells as cell}
+					{#each cellsForRow(row) as cell}
+						
 						<td class="px-6 py-2 border-b border-gray-300 text-center">
 
-							<Tooltip title={cell.type.name}>
+							<Tooltip title={cell.type.name + "=" + JSON.stringify(cell.value)}>
 								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
 									<SelectField on:change={(e) => onChange(cell)} options={availableValues(cell)} bind:value={cell.value}  />									
 								{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
@@ -238,9 +262,7 @@
 								{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}
 										<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
 								{:else}
-								<span >
-									<Input debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm px-2 py-2 text-left text-lg" />
-								</span>
+									<TextField debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg" />
 								{/if}
 							</Tooltip>
 						</td>
