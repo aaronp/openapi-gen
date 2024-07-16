@@ -93,10 +93,6 @@
 	}
 </script>
 
-scriptNameValid: {scriptNameValid}
-currentTab: {currentTab}
-<div>
-</div>
 <Tabs class="bg-muted mt-2 rounded" placement="top" bind:options={tabOptions} bind:value={currentTab}>
 	{#each tabOptions as option (option.value)}
 		<Tab selected={currentTab === option.value} on:click={() => (currentTab = option.value)}>

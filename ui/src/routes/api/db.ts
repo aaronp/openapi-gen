@@ -60,7 +60,7 @@ export function listSpreadsheets(): string[] {
 	}
 }
 
-export function readScript(filename: string): Settings {
+export function readScript(filename: string): Script {
 	try {
 		const fqn = filename.endsWith('.json') ? filename : `${filename}.json`
 		const fullPath = path.join(scriptsDir(), fqn)
@@ -68,7 +68,10 @@ export function readScript(filename: string): Settings {
 	} catch (e) {
 		console.error('ERROR reading script', e)
 		return {
-			fields: []
+			name: '',
+			script: '',
+			input: '',
+			autoSave : false
 		}
 	}
 }
@@ -111,6 +114,9 @@ export function readSpreadsheet(name: string): Spreadsheet {
 export function renameSheet(name: string, newName: string): string {
 	const oldPath = spreadsheetPath(name)
 	const newPath = spreadsheetPath(newName)
+
+	
+
 	fs.renameSync(oldPath, newPath)
 	console.log(`Renamed sheet from ${oldPath} to ${resolved(newPath)}`)
 	return newPath
@@ -146,10 +152,14 @@ export function saveScript(filename: string, data: Script) {
 }
 
 export function renameScript(name: string, newName: string): string {
-	const oldPath = scriptsPath(name)
-	const newPath = scriptsPath(newName)
-	fs.renameSync(oldPath, newPath)
-	console.log(`Renamed script from ${oldPath} to ${resolved(newPath)}`)
+
+	// ensure the name is consistent w/ the filename
+	const script = readScript(name)
+	script.name = newName
+	const newPath = saveScript(newName, script)
+	deleteScript(name)
+
+	console.log(`Renamed script from ${name} to ${resolved(newPath)}`)
 	return newPath
 }
 export function saveSettings(data: Settings) {

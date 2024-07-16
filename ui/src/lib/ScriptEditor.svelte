@@ -5,36 +5,39 @@
 	import { inputSources, EverySheet } from '$lib/util/cache'
 	import { SelectField, Drawer, Button, type MenuOption, Checkbox, TextField } from 'svelte-ux'
 	import { mdiUpdate } from '@mdi/js'
+	import { createEventDispatcher } from 'svelte'
 
-	 export let scriptName : string = ''
-	 let created = new Date().getMilliseconds()
+	const dispatch = createEventDispatcher()
 
-	 // HACK - for some reason, despite the display saying otherwise, the loadedScript.name and script.name
-	 // are IDENTICAL, so we capture the original name here
-	 let originalScriptName = ''
-	 let loadedScript: Script = {
-			name: '',
-			input: EverySheet,
-			script: '',
-			autoSave: false
-		}
-	 let script: Script = loadedScript
+	export let scriptName: string = ''
+	let created = new Date().getMilliseconds()
 
-	 let sources: MenuOption[] = []
-	 let inputSource : MenuOption = { label : '', value : ''}
+	// HACK - for some reason, despite the display saying otherwise, the loadedScript.name and script.name
+	// are IDENTICAL, so we capture the original name here
+	let originalScriptName = ''
+	let loadedScript: Script = {
+		name: '',
+		input: EverySheet,
+		script: '',
+		autoSave: false
+	}
+	let script: Script = loadedScript
+
+	let sources: MenuOption[] = []
+	let inputSource: MenuOption = { label: '', value: '' }
 
 	// used for showing snackbars
 	let snackbarOpen = false
 	let snackbarMessage = ''
 
-	 onMount(async () => {
+	onMount(async () => {
 		console.log('creating with ' + scriptName)
 		created = new Date().getMilliseconds()
-		
-		reloadScript(scriptName)
-	 })
 
-	 function showSnackbar(message: string, duration: number = 1000) {
+		reloadScript(scriptName)
+	})
+
+	function showSnackbar(message: string, duration: number = 1000) {
 		snackbarMessage = message
 		snackbarOpen = true
 		window.setTimeout(() => {
@@ -42,41 +45,37 @@
 		}, duration)
 	}
 
-	 async function onSave() {
+	const onSave = async () => save()
+
+	async function save() {
 		if (script.input === script.name) {
 			showSnackbar(`script ${script.name} depends on itself!`, 8000)
 		} else if (!script.name) {
 			showSnackbar(`Script name cannot be empty`, 8000)
-		} else if (!script.input) {
-			// BUG - we should reload the script
-			script = await api.getScript({ name: script.name })
-			showSnackbar(`ScriptSelect Bug: Script input cannot be empty, reloading... `)
 		} else {
 			const response = await api.saveScript({ script })
 			showSnackbar(response.message ?? `Saved ${script.name}`)
-			await reloadScript(script.name)
+			// await reloadScript(script.name)
 		}
 	}
 
-
 	async function reloadScript(name: string) {
-
 		loadedScript = await api.getScript({ name })
 		originalScriptName = loadedScript.name
 		script = loadedScript
-		
+
 		sources = await inputSources(name)
 		inputSource = sources.find((s) => s.value === loadedScript.input) ?? sources[0]
 	}
 
-
-	async function onRenameScript(oldName : string, newName: string) {
+	async function onRenameScript(oldName: string, newName: string) {
 		try {
-			alert(originalScriptName +'; loadedScript.name=' + loadedScript.name + ', script.name=' + script.name + ', o='+oldName + ', n=' +newName)
 			const requestParameters = { old: oldName, _new: newName }
-			alert(JSON.stringify(requestParameters))
+
 			const result = await api.renameScript(requestParameters)
-			showSnackbar('Rename returned ' + result, 15000)
+			dispatch('renameEvent', { oldName, newName });
+
+			showSnackbar('Rename returned ' + JSON.stringify(result), 15000)
 		} catch (e) {
 			showSnackbar('Rename errored with ' + e, 15000)
 		}
@@ -116,7 +115,13 @@
 	</div>
 
 	<!-- Input -->
-	<SelectField class="pt-2" on:change={onInputSourceChange}  bind:selected={inputSource} options={sources} label="Input" />
+	<SelectField
+		class="pt-2"
+		on:change={onInputSourceChange}
+		bind:selected={inputSource}
+		options={sources}
+		label="Input"
+	/>
 
 	<Checkbox class="pt-8" bind:checked={script.autoSave} label="Auto Save">Auto-Save</Checkbox>
 
@@ -136,7 +141,6 @@
 
 	<slot />
 </div>
-
 
 <Drawer bind:open={snackbarOpen} placement="bottom" class="h-32">
 	<h1 class="text-center py-8">{snackbarMessage}</h1>
