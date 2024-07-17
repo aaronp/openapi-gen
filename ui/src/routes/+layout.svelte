@@ -85,7 +85,6 @@
 				<slot />
 			</TwoCols>
 		{:else}
-
 			<Toggle let:on={open} let:toggle let:toggleOff>
 				<Drawer {open} on:close={toggleOff} persistent class="w-[60vw] m-2 dark:bg-secondary-900 bg-secondary-100 pl-4">
 					<div class=""><CodePanel /></div>

@@ -368,6 +368,9 @@ components:
     ScriptResult:
       type: object
       properties:
+        dir:
+          type: string
+          description: The directory to save under, if specified
         name:
           type: string
           description: Name of the script result

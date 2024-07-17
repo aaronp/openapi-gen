@@ -93,7 +93,15 @@ function spreadsheetPath(filename: string) {
 	return path.join(spreadsheetsDir(), fqn)
 }
 
-const resultsPath = (filename: string) => path.join(outputDir(), filename)
+const resultsPath = (dir : string | undefined, filename: string) => {
+	if (dir) {
+		const saveDir = path.join(outputDir(), dir)
+		fs.mkdirSync(saveDir, { recursive: true })
+		return path.join(saveDir, filename)
+	} else {
+		return path.join(outputDir(), filename)
+	}
+}
 
 const scriptsPath = (filename: string) =>
 	path.join(scriptsDir(), filename.endsWith('.json') ? filename : `${filename}.json`)
@@ -180,7 +188,7 @@ export function saveSpreadsheet(data: Spreadsheet) {
 }
 
 export function saveResults(data: ScriptResult) {
-	const fqn = resultsPath(data.name)
+	const fqn = resultsPath(data.dir, data.name)
 	console.log(`Saving results to ${resolved(fqn)}`)
 	fs.writeFileSync(fqn, data.content)
 }

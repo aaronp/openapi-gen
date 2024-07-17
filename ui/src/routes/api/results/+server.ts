@@ -8,7 +8,7 @@ export async function POST({ request }: Request) {
 		.json()
 		.then((data: ScriptResult) => {
 			const name = data.name
-			console.log(`Saving results ${name}: `)
+			console.log(`Saving results ${data.dir ?? ''}/${name}: `)
 			try {
 				const path = saveResults(data)
 				return Response.json({ path, message: 'Results saved' })

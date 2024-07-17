@@ -31,7 +31,6 @@
 	let snackbarOpen = false
 	let snackbarMessage = ''
 
-	let sources: MenuOption[] = []
 	onMount(async () => {
 		const all = await relistScripts()
 		currentTab = all[0]

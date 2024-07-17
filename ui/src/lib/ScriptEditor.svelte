@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import type { Script, Spreadsheet } from '$lib/generated'
-	import { inputSources, EverySheet } from '$lib/util/cache'
+	import type { Script, Spreadsheet, ScriptResult } from '$lib/generated'
+	import { inputSources, EverySheet, AllSheets } from '$lib/util/cache'
 	import { SelectField, Drawer, Button, type MenuOption, Checkbox, TextField } from 'svelte-ux'
-	import { mdiUpdate, mdiPlay } from '@mdi/js'
+	import { mdiUpdate, mdiPlay, mdiDisc } from '@mdi/js'
 	import { createEventDispatcher } from 'svelte'
 	import { upstreamDependencies, type StackElement } from '$lib/util/cache'
 	import { evaluateStack, type StackResult } from '$lib/util/execute'
@@ -40,7 +40,10 @@
 	let callStack: StackElement[] = []
 	let latestResult: StackResult[] = []
 
+	let latestSpreadsheetValue : Spreadsheet | undefined = undefined
+
 	latestSheet.subscribe(async (value) => {
+		latestSpreadsheetValue = value as Spreadsheet
 		sheet = sheetAsJson(value as Spreadsheet)
 		callStack = []
 		latestResult = []
@@ -70,7 +73,7 @@
 			showSnackbar(`Script name cannot be empty`, 8000)
 		} else {
 			const response = await api.saveScript({ script })
-			showSnackbar(response.message ?? `Saved ${script.name}`)
+			// showSnackbar(response.message ?? `Saved ${script.name}`)
 		}
 	}
 
@@ -107,6 +110,27 @@
 		await api.saveScript({ script: input })
 		callStack = await upstreamDependencies(input, sheet)
 		latestResult = await evaluateStack(callStack)
+
+		if (script.autoSave) {
+			await onSaveResults()
+		}
+	}
+
+	async function onSaveResults() {
+		// get the result from the last element in the call stack -- that's our result to save
+		const last = latestResult[latestResult.length - 1]
+
+		// we save to the input source's directory, unless it's the 'AllSheets', in which case it doesn't use a dir
+		var dir : string | undefined = undefined
+		if (script.input != AllSheets) {
+			dir = latestSpreadsheetValue?.name
+		}
+		const scriptResult: ScriptResult = {
+			dir,
+			name: last.element.script.name,
+			content: JSON.stringify(last.result)
+		}
+		await api.saveScriptResult({ scriptResult })
 	}
 </script>
 
@@ -155,6 +179,10 @@
 	<Button on:click={onSave} variant="fill" color="primary">Save</Button>
 
 	<Button variant="fill-light" on:click={onRun} icon={mdiPlay}>Run</Button>
+
+	{#if latestResult.length > 0}
+		<Button variant="fill-light" on:click={onSaveResults} icon={mdiDisc}>Save Results</Button>
+	{/if}
 
 	{#if callStack.length > 0}
 		<CallStack stack={latestResult} />

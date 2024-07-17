@@ -17,7 +17,7 @@
 
 	onMount(async () => {
 		settings = await api.getSettings()
-		
+
 		resetFieldValueMap()
 		latestSettings.set(settings)
 	})
@@ -57,7 +57,6 @@
 	}
 
 	async function onFieldNameChange(field: SchemaField, event) {
-
 		valuesByFieldName.set(event.detail.value, field?.availableValues?.join(', ') ?? '')
 		valuesByFieldName = valuesByFieldName
 		save()
@@ -103,7 +102,7 @@
 		settings.fields.splice(index, 1)
 		settings = settings
 		save()
-     }
+	}
 	function onMoveUp(field: SchemaField, index: number) {
 		const above = settings.fields[index - 1]
 		settings.fields[index - 1] = field
@@ -125,7 +124,6 @@
 
 	{#each settings.fields as field, index}
 		<div class="flex items-center">
-
 			<!-- Up and Down Icons -->
 			<div class="flex flex-col items-center h-16 justify-center space-y-1">
 				<svg
@@ -135,21 +133,21 @@
 					viewBox="0 0 24 24"
 					aria-label="Move Up"
 				>
-				{#if index > 0}
-					<path d="M7 14l5-5 5 5H7z"></path>
+					{#if index > 0}
+						<path d="M7 14l5-5 5 5H7z"></path>
 					{/if}
 				</svg>
-					<svg
-						on:click|preventDefault={(e) => onMoveDown(field, index)}
-						class="w-12 h-20 hover-pointer"
-						fill="currentColor"
-						viewBox="0 0 24 24"
-						aria-label="Move Down"
-					>
+				<svg
+					on:click|preventDefault={(e) => onMoveDown(field, index)}
+					class="w-12 h-20 hover-pointer"
+					fill="currentColor"
+					viewBox="0 0 24 24"
+					aria-label="Move Down"
+				>
 					{#if index < settings.fields.length - 1}
 						<path d="M7 10l5 5 5-5H7z"></path>
-						{/if}
-					</svg>
+					{/if}
+				</svg>
 			</div>
 
 			<div class="flex gap-2">
@@ -180,7 +178,11 @@
 				</div>
 			</div>
 			<!-- Delete Button -->
-			<Button variant="fill-light" on:click={onDelete(field, index)} class="flex items-center justify-center mx-2 text-red-600 hover:bg-red-200 rounded">
+			<Button
+				variant="fill-light"
+				on:click={onDelete(field, index)}
+				class="flex items-center justify-center mx-2 text-red-600 hover:bg-red-200 rounded"
+			>
 				<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
 					<path d={mdiDelete}></path>
 				</svg>
@@ -189,14 +191,14 @@
 		{#if field.type === SchemaFieldTypeEnum.OneOf || field.type === SchemaFieldTypeEnum.AnyOf}
 			<div>
 				<TextField
-				label="Values"
-				replace="values"
-				debounceChange
-				class="pl-14 py-2 mb-8 h-9 text-lg w-1/2"
-				value={valuesByFieldName.get(field.name)}
-				on:change={(e) => onUpdateValues(field, e.detail.value)}
-				on:keypress={(e) => onEnterCheck(field, e)}
-			/>
+					label="Values"
+					replace="values"
+					debounceChange
+					class="pl-14 py-2 mb-8 h-9 text-lg w-1/2"
+					value={valuesByFieldName.get(field.name)}
+					on:change={(e) => onUpdateValues(field, e.detail.value)}
+					on:keypress={(e) => onEnterCheck(field, e)}
+				/>
 			</div>
 		{/if}
 	{/each}

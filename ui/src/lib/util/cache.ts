@@ -5,7 +5,7 @@ import { sheetAsJson } from './sheetAsJson'
 // the cache key for 'applies to all sheets', but as individual inputs
 export const EverySheet = 'any sheet'
 // the key for 'all the sheets' - e.g. an array of all the values
-const AllSheets = 'sheets'
+export const AllSheets = 'sheets'
 
 export type StackElement = {
 	key: string

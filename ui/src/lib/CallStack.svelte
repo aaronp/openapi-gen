@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { type ScriptResult } from '$lib/generated'
 	import { type StackResult } from '$lib/util/execute'
-	import { Button, Icon } from 'svelte-ux'
-	import { mdiAlert, mdiCheckCircle, mdiDisc } from '@mdi/js'
-	import { api } from './session'
+	import { Icon } from 'svelte-ux'
+	import { mdiAlert, mdiCheckCircle } from '@mdi/js'
 	import DownArrow from './DownArrow.svelte'
 
 	export let stack: StackResult[] = []
@@ -17,15 +15,6 @@
 			icon: elm.error ? mdiAlert : mdiCheckCircle
 		}
 	})
-
-	async function onSaveResults() {
-		const last = stack[stack.length - 1]
-		const scriptResult: ScriptResult = {
-			name: last.element.script.name,
-			content: JSON.stringify(last.result)
-		}
-		await api.saveScriptResult({ scriptResult })
-	}
 </script>
 
 <div class="h-[40vh]" style="overflow:auto">
@@ -50,9 +39,3 @@
 		{/if}
 	{/each}
 </div>
-
-{#if callStackArray.length > 0}
-	<div class="py-2">
-		<Button variant="fill-light" on:click={onSaveResults} icon={mdiDisc}>Save Results</Button>
-	</div>
-{/if}
