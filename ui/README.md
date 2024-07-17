@@ -33,9 +33,3 @@ This repo was created as an easier way to have a 'source of truth' for business 
 - produce tests/validation
 - ...
 
-# TODO
-
-- CSV import
-- test saving
-  - fine-tune/fix script names w/ different output types (e.g. openapi.yaml.json)
-- fix weird script tab (sometimes input source gets wiped?)
