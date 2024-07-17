@@ -71,7 +71,7 @@ export function readScript(filename: string): Script {
 			name: '',
 			script: '',
 			input: '',
-			autoSave : false
+			autoSave: false
 		}
 	}
 }
@@ -112,7 +112,6 @@ export function readSpreadsheet(name: string): Spreadsheet {
 }
 
 export function renameSheet(name: string, newName: string): string {
-
 	// const oldPath = spreadsheetPath(name)
 	// const newPath = spreadsheetPath(newName)
 
@@ -158,7 +157,6 @@ export function saveScript(filename: string, data: Script) {
 }
 
 export function renameScript(name: string, newName: string): string {
-
 	// ensure the name is consistent w/ the filename
 	const script = readScript(name)
 	script.name = newName

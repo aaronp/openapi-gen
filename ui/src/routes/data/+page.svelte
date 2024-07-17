@@ -3,7 +3,7 @@
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 	import { api, latestSettings, latestSheet } from '$lib/session'
 
-	import { Drawer, Dialog, Tabs, Tab, Icon, Button, Input, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip } from 'svelte-ux'
+	import { Drawer, Dialog, Tabs, Tab, Icon, Button, Input, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip, Field } from 'svelte-ux'
 
 	import { onMount } from 'svelte'
 	import { mdiClose, mdiDelete, mdiPlus, mdiUpdate } from '@mdi/js'
@@ -252,17 +252,17 @@
 						
 						<td class="px-6 py-2 border-b border-gray-300 text-center min-w-40">
 
-							<Tooltip title={cell.type.name + "=" + JSON.stringify(cell.value)}>
+							<Tooltip title={cell.type.name + "=" + JSON.stringify(cell.value)}>q
 								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
 									<SelectField on:change={(e) => onChange(cell)} options={availableValues(cell)} bind:value={cell.value}  />									
 								{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
 									<MultiSelectField formatSelected={(e) => cell.value} rounded bind:label={cell.value}  on:change={(e) => onMultiselectChange(e, cell)} options={availableValues(cell)} bind:value={cell.values} />
 								{:else if cell.type.type === SchemaFieldTypeEnum.Text}
-									<TextField on:change={(e) => onChange(cell)} debounceChange multiline bind:value={cell.value} class=" rounded shadow-lg text-left text-lg  min-w-80" />
+									<TextField debounceChange on:change={(e) => onChange(cell)} multiline bind:value={cell.value} class=" rounded shadow-lg text-left text-lg  min-w-80" />
 								{:else if cell.type.type === SchemaFieldTypeEnum.Boolean}
 										<Checkbox on:change={(e) => onChange(cell)} bind:checked={cell.value} />
 								{:else}
-									<TextField debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg" />
+									<TextField debounceChange on:change={(e) => onChange(cell)}  bind:value={cell.value} class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg" />										
 								{/if}
 							</Tooltip>
 						</td>

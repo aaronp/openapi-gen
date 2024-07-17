@@ -9,11 +9,10 @@
 		Tooltip,
 		settings,
 		ThemeInit,
-		ThemeSelect,
-		ThemeSwitch
+		ThemeSelect
 	} from 'svelte-ux'
 
-	import { mdiClose, mdiCog, mdiDatabase, mdiDebugStepInto, mdiDebugStepOver, mdiScript, mdiWeb } from '@mdi/js'
+	import { mdiClose, mdiCog, mdiDatabase, mdiTable, mdiScript, mdiWeb } from '@mdi/js'
 
 	import { page } from '$app/stores'
 	import '../app.postcss'
@@ -51,8 +50,8 @@
 <AppLayout>
 	<svelte:fragment slot="nav">
 		<div class="grid grid-rows-[auto_auto_1fr] h-screen">
-			<div class="self-start"><NavItem path="/data" text="Data" icon={mdiDatabase} currentUrl={$page.url} /></div>
-			<div class="self-start"><NavItem path="/settings" text="Settings" icon={mdiCog} currentUrl={$page.url} /></div>
+			<div class="self-start"><NavItem path="/data" text="Sheets" icon={mdiTable} currentUrl={$page.url} /></div>
+			<div class="self-start"><NavItem path="/settings" text="Columns" icon={mdiCog} currentUrl={$page.url} /></div>
 			<div class="self-end pl-4 pb-20">...</div>
 		</div>
 	</svelte:fragment>

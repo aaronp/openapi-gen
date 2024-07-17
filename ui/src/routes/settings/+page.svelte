@@ -6,7 +6,7 @@
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 
 	import { tick, onMount } from 'svelte'
-	import { Field, Button, Input, SelectField, type MenuOption } from 'svelte-ux'
+	import { Field, TextField, Button, Input, SelectField, type MenuOption } from 'svelte-ux'
 	let settings: Settings = {
 		fields: []
 	}
@@ -98,11 +98,13 @@
 			<div class="flex gap-2">
 				<div class="items-center text-lg">
 					<Field label="Name" let:id class="pl-2 w-80">
-						<Input
+						<TextField
 							class="h-9 text-lg"
 							{id}
 							replace="fieldname"
 							autofocus
+							debounceChange
+							on:change={async (e) => save()}
 							bind:value={field.name}
 							on:keypress={(e) => onEnterCheck(field, e)}
 						/>
@@ -121,16 +123,15 @@
 				</div>
 			</div>
 			{#if field.type === SchemaFieldTypeEnum.OneOf || field.type === SchemaFieldTypeEnum.AnyOf}
-				<Field label="Values" let:id class="pl-2 py-2 w-80 ">
-					<Input
-						{id}
-						replace="values"
-						class="h-9 text-lg"
-						value={valuesByFieldName.get(field.name)}
-						on:change={(e) => onUpdateValues(field, e.detail.value)}
-						on:keypress={(e) => onEnterCheck(field, e)}
-					/>
-				</Field>
+				<TextField
+					label="Values"
+					replace="values"
+					debounceChange
+					class="px-2 py-2 mb-8 h-9 text-lg w-5/6"
+					value={valuesByFieldName.get(field.name)}
+					on:change={(e) => onUpdateValues(field, e.detail.value)}
+					on:keypress={(e) => onEnterCheck(field, e)}
+				/>
 			{/if}
 		</div>
 		<div class="p-2"></div>

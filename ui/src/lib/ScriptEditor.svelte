@@ -29,7 +29,6 @@
 	let sources: MenuOption[] = []
 	let inputSource: MenuOption = { label: '', value: '' }
 
-
 	// needed to listen to the latest input
 	let sheet = {}
 
@@ -89,7 +88,7 @@
 			const requestParameters = { old: oldName, _new: newName }
 
 			const result = await api.renameScript(requestParameters)
-			dispatch('renameEvent', { oldName, newName });
+			dispatch('renameEvent', { oldName, newName })
 
 			showSnackbar('Rename returned ' + JSON.stringify(result), 15000)
 		} catch (e) {
