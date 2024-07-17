@@ -17,12 +17,17 @@
 
 	onMount(async () => {
 		settings = await api.getSettings()
-		settings.fields.forEach((field) => {
-			valuesByFieldName.set(field.name, field?.availableValues?.join(', ') ?? '')
-		})
+		
+		resetFieldValueMap()
 		latestSettings.set(settings)
 	})
 
+	function resetFieldValueMap() {
+		valuesByFieldName.clear()
+		settings.fields.forEach((field) => {
+			valuesByFieldName.set(field.name, field?.availableValues?.join(', ') ?? '')
+		})
+	}
 	function asOption(name: string): MenuOption {
 		return { label: name, value: name }
 	}
@@ -36,8 +41,6 @@
 		asOption(SchemaFieldTypeEnum.OneOf),
 		asOption(SchemaFieldTypeEnum.AnyOf)
 	]
-
-	let selected = options[0].value
 
 	async function save() {
 		latestSettings.set(settings)
@@ -53,10 +56,17 @@
 		newElm?.setSelectionRange(0, 100)
 	}
 
+	async function onFieldNameChange(field: SchemaField, event) {
+
+		valuesByFieldName.set(event.detail.value, field?.availableValues?.join(', ') ?? '')
+		valuesByFieldName = valuesByFieldName
+		save()
+	}
 	function onEnterCheck(field: SchemaField, event) {
 		if (event.key === 'Enter') {
 			onAddField()
 		}
+		resetFieldValueMap()
 		debouncedSave()
 	}
 
@@ -151,7 +161,7 @@
 							replace="fieldname"
 							autofocus
 							debounceChange
-							on:change={async (e) => save()}
+							on:change={async (e) => onFieldNameChange(field, e)}
 							bind:value={field.name}
 							on:keypress={(e) => onEnterCheck(field, e)}
 						/>

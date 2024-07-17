@@ -117,7 +117,6 @@
 	
 	function onTabChange(value : string) {
 		currentTab = value
-		console.log("onTabChange", value)
 		reloadSpreadsheet(value)
 		spreadsheet.name = value
 		
@@ -154,7 +153,7 @@
 		const oldName = spreadsheet.name
 		const newName = currentTab
 		try {
-			const result = await api.renameSpreadsheet({name : oldName, newName : newName})
+			const result = await api.renameSpreadsheet({old : oldName, _new : newName})
 			showSnackbar(result.message ?? `Renamed ${oldName} to ${newName}`)
 		} catch (e) {
 			showSnackbar("Rename errored with " + e, 15000)
