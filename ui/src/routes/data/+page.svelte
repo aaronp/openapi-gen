@@ -55,11 +55,22 @@
 
 		onSave()
 	}
+	function pruneColumns(spreadsheet : Spreadsheet) {
+		spreadsheet.rows.forEach((row) => {
+			row.cells = row.cells.filter((cell) => {
+				// remove any cells that are no longer in the settings
+				return settings.fields.find((f) => f.name === cell.type.name)
+			})
+		})
+	}
 	async function onSave() {
 		// this is a hack -- our spreadhseet name seems to get out of step w/ our tabs :-( 
 		spreadsheet.name = currentTab
 		console.log(`onSave >${spreadsheet.name}<`)
 		if (spreadsheet.name) {
+
+			pruneColumns(spreadsheet)
+
 			latestSheet.set(spreadsheet)
 			await api.saveSpreadsheet({ spreadsheet })
 		}

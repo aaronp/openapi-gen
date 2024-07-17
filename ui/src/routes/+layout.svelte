@@ -84,18 +84,20 @@
 			<TwoCols>
 				<slot />
 			</TwoCols>
+		{:else}
+
+			<Toggle let:on={open} let:toggle let:toggleOff>
+				<Drawer {open} on:close={toggleOff} persistent class="w-[60vw] m-2 dark:bg-secondary-900 bg-secondary-100 pl-4">
+					<div class=""><CodePanel /></div>
+					<div slot="actions">
+						<Button icon={mdiClose} class="m-2 w-96" on:click={toggleOff}>Close</Button>
+					</div>
+				</Drawer>
+				<slot />
+				{#if $page.url.toString().endsWith('data')}
+					<Button class="my-2" icon={mdiScript} variant="fill-light" on:click={toggle}>Script</Button>
+				{/if}
+			</Toggle>
 		{/if}
-		<Toggle let:on={open} let:toggle let:toggleOff>
-			<Drawer {open} on:close={toggleOff} persistent class="w-[60vw] m-2 dark:bg-secondary-900 bg-secondary-100 pl-4">
-				<div class=""><CodePanel /></div>
-				<div slot="actions">
-					<Button icon={mdiClose} class="m-2 w-96" on:click={toggleOff}>Close</Button>
-				</div>
-			</Drawer>
-			<slot />
-			{#if $page.url.toString().endsWith('data')}
-				<Button class="my-2" icon={mdiScript} variant="fill-light" on:click={toggle}>Script</Button>
-			{/if}
-		</Toggle>
 	</main>
 </AppLayout>
