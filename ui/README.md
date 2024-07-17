@@ -15,7 +15,7 @@ This way you can choose how you want to mount the relevant directories for your 
 ```
 mkdir d8a
 mkdir out
-docker run -p 3000:3000 -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest
+mkdir latest
 ```
 
 Or, if you want to mess with the port:

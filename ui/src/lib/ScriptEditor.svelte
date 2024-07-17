@@ -112,6 +112,10 @@
 		script.input = inputSource?.value
 	}
 
+	async function onScriptChange(e: Event) {
+		refresh()
+	}
+
 	async function onRun() {
 		const input: Script = script as Script
 		await api.saveScript({ script: input })
@@ -179,6 +183,7 @@
 			debounceChange={500}
 			multiline
 			bind:value={script.script}
+			on:change={onScriptChange}
 			class="w-full text-left text-lg h-20"
 		/>
 	</div>

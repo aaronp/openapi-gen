@@ -58,7 +58,7 @@
 		const script = {
 			name: newScriptNameTrimmed,
 			input: EverySheet, // <-- can be the sheet names, another script, or 'sheets' for all the sheet data
-			script: 'console.log(input)',
+			script: 'input',
 			autoSave: false
 		}
 		await api.saveScript({ script })
@@ -117,12 +117,13 @@
 	</Toggle>
 
 	<svelte:fragment slot="content">
-		<div class="flex flex-col">
-			{#key currentTab}
-				<ScriptEditor on:renameEvent={onScriptRename} bind:scriptName={currentTab} />
-			{/key}
-		</div>
-
+		{#if currentTab}
+			<div class="flex flex-col">
+				{#key currentTab}
+					<ScriptEditor on:renameEvent={onScriptRename} bind:scriptName={currentTab} />
+				{/key}
+			</div>
+		{/if}
 		<Dialog bind:open={confirmDeleteOpen}>
 			<div slot="title">Do you want to delete "{deleteTab}"</div>
 			<div slot="actions">
