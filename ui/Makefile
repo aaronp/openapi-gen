@@ -1,5 +1,5 @@
 IMAGE:=kindservices/openapi-gen-ui
-VERSION=1.0.3
+VERSION=1.0.4
 
 dev: install api-gen
 	npm run dev
