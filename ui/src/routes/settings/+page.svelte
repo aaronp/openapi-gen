@@ -181,7 +181,7 @@
 			<Button
 				variant="fill-light"
 				on:click={onDelete(field, index)}
-				class="flex items-center justify-center mx-2 text-red-600 hover:bg-red-200 rounded"
+				class="flex items-center justify-center mx-2 text-primary-600 hover:bg-primary-200 rounded"
 			>
 				<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
 					<path d={mdiDelete}></path>

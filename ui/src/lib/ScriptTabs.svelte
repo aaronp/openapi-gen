@@ -55,9 +55,6 @@
 		}
 	}
 	async function onAddNewScript() {
-		// showSaveDiaglog()
-		// const s = newScript()
-		// s.name = name
 		const script = {
 			name: newScriptNameTrimmed,
 			input: EverySheet, // <-- can be the sheet names, another script, or 'sheets' for all the sheet data

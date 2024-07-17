@@ -17,7 +17,7 @@
 	import { page } from '$app/stores'
 	import '../app.postcss'
 	import TwoCols from '$lib/TwoCols.svelte'
-	import CodePanel from '$lib/CodePanel.svelte'
+	import ScriptTabs from '$lib/ScriptTabs.svelte'
 
 	let stickyCode = false
 	settings({
@@ -87,7 +87,7 @@
 		{:else}
 			<Toggle let:on={open} let:toggle let:toggleOff>
 				<Drawer {open} on:close={toggleOff} persistent class="w-[60vw] m-2 dark:bg-secondary-900 bg-secondary-100 pl-4">
-					<div class=""><CodePanel /></div>
+					<div ><ScriptTabs /></div>
 					<div slot="actions">
 						<Button icon={mdiClose} class="m-2 w-96" on:click={toggleOff}>Close</Button>
 					</div>

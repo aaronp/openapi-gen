@@ -45,9 +45,19 @@
 	latestSheet.subscribe(async (value) => {
 		latestSpreadsheetValue = value as Spreadsheet
 		sheet = sheetAsJson(value as Spreadsheet)
+		
+		refresh()
+	})
+
+
+	async function refresh() {
 		callStack = []
 		latestResult = []
-	})
+
+		if (latestSpreadsheetValue && script.script && script.autoSave) {
+			onRun()
+		}
+	}
 
 	onMount(async () => {
 		reloadScript(scriptName)
@@ -73,7 +83,6 @@
 			showSnackbar(`Script name cannot be empty`, 8000)
 		} else {
 			const response = await api.saveScript({ script })
-			// showSnackbar(response.message ?? `Saved ${script.name}`)
 		}
 	}
 
@@ -92,8 +101,6 @@
 
 			const result = await api.renameScript(requestParameters)
 			dispatch('renameEvent', { oldName, newName })
-
-			showSnackbar('Rename returned ' + JSON.stringify(result), 15000)
 		} catch (e) {
 			showSnackbar('Rename errored with ' + e, 15000)
 		}
@@ -165,7 +172,7 @@
 	<Checkbox class="pt-8" bind:checked={script.autoSave} label="Auto Save">Auto-Save</Checkbox>
 
 	<!--  Script  -->
-	<div class="h-60 pt-2 pb-2" style="overflow: auto">
+	<div class="h-60 pt-2" style="overflow: auto">
 		<h1 class="text-lg font-bold">Script:</h1>
 		<TextField
 			classes={{ input: 'h-40', container: 'h-40' }}
@@ -176,11 +183,13 @@
 		/>
 	</div>
 
-	<Button on:click={onSave} variant="fill" color="primary">Save</Button>
+	{#if !script?.autoSave}
+		<Button on:click={onSave} variant="fill" color="primary">Save</Button>
+	{/if}
 
 	<Button variant="fill-light" on:click={onRun} icon={mdiPlay}>Run</Button>
 
-	{#if latestResult.length > 0}
+	{#if latestResult.length > 0 && !script?.autoSave}
 		<Button variant="fill-light" on:click={onSaveResults} icon={mdiDisc}>Save Results</Button>
 	{/if}
 
