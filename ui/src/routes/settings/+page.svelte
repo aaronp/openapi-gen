@@ -5,6 +5,8 @@
 	import { debounce } from '$lib/util/debounce'
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 
+	import { mdiDelete } from '@mdi/js'
+
 	import { tick, onMount } from 'svelte'
 	import { Field, TextField, Button, Input, SelectField, type MenuOption } from 'svelte-ux'
 	let settings: Settings = {
@@ -86,6 +88,16 @@
 
 		save()
 	}
+
+	function onMoveUp(field : SchemaField, index : number) {
+		
+	}
+	function onDelete(field : SchemaField, index : number) {
+
+	}
+	function onMoveDown(field : SchemaField, index : number) {
+
+	}
 </script>
 
 <div class="m-2">
@@ -94,6 +106,29 @@
 	</header>
 
 	{#each settings.fields as field, index}
+
+<div class="flex items-center space-x-4 p-2">
+    <!-- Delete Button -->
+    <button class="flex items-center justify-center p-2 text-red-600 hover:bg-red-200 rounded">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d={mdiDelete}></path>
+        </svg>
+    </button>
+
+    <!-- Up and Down Icons -->
+    <div class="flex flex-col items-center h-10 justify-center space-y-1">
+        <svg on:click|preventDefault={(e) => onMoveUp(field, index)} class="w-4 h-4 hover-pointer" fill="currentColor" viewBox="0 0 24 24"  aria-label="Move Up">
+            <path d="M7 14l5-5 5 5H7z"></path>
+        </svg>
+        <svg on:click|preventDefault={(e) => onMoveDown(field, index)} class="w-4 h-4 hover-pointer" fill="currentColor" viewBox="0 0 24 24" aria-label="Move Down">
+            <path d="M7 10l5 5 5-5H7z"></path>
+        </svg>
+    </div>
+
+
+
+
+	</div>
 		<div class="dark:bg-gray-700 bg-gray-200 p-2">
 			<div class="flex gap-2">
 				<div class="items-center text-lg">
@@ -139,3 +174,9 @@
 
 	<Button class="p-2" color="primary" variant="fill" rounded on:click={onAddField}>Add Field</Button>
 </div>
+
+<style>
+    .hover-pointer:hover {
+        cursor: pointer
+    }
+</style>
