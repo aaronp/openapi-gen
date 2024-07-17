@@ -89,14 +89,22 @@
 		save()
 	}
 
-	function onMoveUp(field : SchemaField, index : number) {
-		
+	function onDelete(field: SchemaField, index: number) {
+		settings.fields.splice(index, 1)
+		settings = settings
+		save()
+     }
+	function onMoveUp(field: SchemaField, index: number) {
+		const above = settings.fields[index - 1]
+		settings.fields[index - 1] = field
+		settings.fields[index] = above
+		save()
 	}
-	function onDelete(field : SchemaField, index : number) {
-
-	}
-	function onMoveDown(field : SchemaField, index : number) {
-
+	function onMoveDown(field: SchemaField, index: number) {
+		const below = settings.fields[index + 1]
+		settings.fields[index] = below
+		settings.fields[index + 1] = field
+		save()
 	}
 </script>
 
@@ -106,35 +114,39 @@
 	</header>
 
 	{#each settings.fields as field, index}
+		<div class="flex items-center">
 
-<div class="flex items-center space-x-4 p-2">
-    <!-- Delete Button -->
-    <button class="flex items-center justify-center p-2 text-red-600 hover:bg-red-200 rounded">
-        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d={mdiDelete}></path>
-        </svg>
-    </button>
+			<!-- Up and Down Icons -->
+			<div class="flex flex-col items-center h-16 justify-center space-y-1">
+				<svg
+					on:click|preventDefault={(e) => onMoveUp(field, index)}
+					class="w-12 h-20 hover-pointer"
+					fill="currentColor"
+					viewBox="0 0 24 24"
+					aria-label="Move Up"
+				>
+				{#if index > 0}
+					<path d="M7 14l5-5 5 5H7z"></path>
+					{/if}
+				</svg>
+					<svg
+						on:click|preventDefault={(e) => onMoveDown(field, index)}
+						class="w-12 h-20 hover-pointer"
+						fill="currentColor"
+						viewBox="0 0 24 24"
+						aria-label="Move Down"
+					>
+					{#if index < settings.fields.length - 1}
+						<path d="M7 10l5 5 5-5H7z"></path>
+						{/if}
+					</svg>
+			</div>
 
-    <!-- Up and Down Icons -->
-    <div class="flex flex-col items-center h-10 justify-center space-y-1">
-        <svg on:click|preventDefault={(e) => onMoveUp(field, index)} class="w-4 h-4 hover-pointer" fill="currentColor" viewBox="0 0 24 24"  aria-label="Move Up">
-            <path d="M7 14l5-5 5 5H7z"></path>
-        </svg>
-        <svg on:click|preventDefault={(e) => onMoveDown(field, index)} class="w-4 h-4 hover-pointer" fill="currentColor" viewBox="0 0 24 24" aria-label="Move Down">
-            <path d="M7 10l5 5 5-5H7z"></path>
-        </svg>
-    </div>
-
-
-
-
-	</div>
-		<div class="dark:bg-gray-700 bg-gray-200 p-2">
 			<div class="flex gap-2">
 				<div class="items-center text-lg">
-					<Field label="Name" let:id class="pl-2 w-80">
+					<Field label="Name" let:id class="pl-2">
 						<TextField
-							class="h-9 text-lg"
+							class="h-9 text-lg w-96"
 							{id}
 							replace="fieldname"
 							autofocus
@@ -157,26 +169,33 @@
 					</Field>
 				</div>
 			</div>
-			{#if field.type === SchemaFieldTypeEnum.OneOf || field.type === SchemaFieldTypeEnum.AnyOf}
-				<TextField
-					label="Values"
-					replace="values"
-					debounceChange
-					class="px-2 py-2 mb-8 h-9 text-lg w-5/6"
-					value={valuesByFieldName.get(field.name)}
-					on:change={(e) => onUpdateValues(field, e.detail.value)}
-					on:keypress={(e) => onEnterCheck(field, e)}
-				/>
-			{/if}
+			<!-- Delete Button -->
+			<Button variant="fill-light" on:click={onDelete(field, index)} class="flex items-center justify-center mx-2 text-red-600 hover:bg-red-200 rounded">
+				<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+					<path d={mdiDelete}></path>
+				</svg>
+			</Button>
 		</div>
-		<div class="p-2"></div>
+		{#if field.type === SchemaFieldTypeEnum.OneOf || field.type === SchemaFieldTypeEnum.AnyOf}
+			<div>
+				<TextField
+				label="Values"
+				replace="values"
+				debounceChange
+				class="pl-14 py-2 mb-8 h-9 text-lg w-1/2"
+				value={valuesByFieldName.get(field.name)}
+				on:change={(e) => onUpdateValues(field, e.detail.value)}
+				on:keypress={(e) => onEnterCheck(field, e)}
+			/>
+			</div>
+		{/if}
 	{/each}
 
-	<Button class="p-2" color="primary" variant="fill" rounded on:click={onAddField}>Add Field</Button>
+	<Button class="ml-14 mt-4" color="primary" variant="fill" rounded on:click={onAddField}>Add Field</Button>
 </div>
 
 <style>
-    .hover-pointer:hover {
-        cursor: pointer
-    }
+	.hover-pointer:hover {
+		cursor: pointer;
+	}
 </style>

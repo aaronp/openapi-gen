@@ -252,7 +252,7 @@
 						
 						<td class="px-6 py-2 border-b border-gray-300 text-center min-w-40">
 
-							<Tooltip title={cell.type.name + "=" + JSON.stringify(cell.value)}>q
+							<Tooltip title={cell.type.name + "=" + JSON.stringify(cell.value)}>
 								{#if cell.type.type === SchemaFieldTypeEnum.OneOf}
 									<SelectField on:change={(e) => onChange(cell)} options={availableValues(cell)} bind:value={cell.value}  />									
 								{:else if cell.type.type === SchemaFieldTypeEnum.AnyOf}
