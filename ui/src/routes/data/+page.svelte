@@ -3,7 +3,7 @@
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 	import { api, latestSettings, latestSheet } from '$lib/session'
 
-	import { Drawer, Dialog, Tabs, Tab, Icon, Button, Input, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip, Field } from 'svelte-ux'
+	import { Drawer, Dialog, Tabs, Tab, Icon, Button, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip, Field } from 'svelte-ux'
 
 	import { onMount } from 'svelte'
 	import { mdiClose, mdiDelete, mdiPlus, mdiUpdate } from '@mdi/js'

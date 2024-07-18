@@ -9,7 +9,8 @@
 		Tooltip,
 		settings,
 		ThemeInit,
-		ThemeSelect
+		ThemeSelect,
+		TextField
 	} from 'svelte-ux'
 
 	import { mdiClose, mdiCog, mdiTable, mdiScript, mdiWeb, mdiFileUpload } from '@mdi/js'
@@ -22,7 +23,6 @@
 
 	let openImport = false
 	
-
 	let stickyCode = false
 	settings({
 		components: {
@@ -49,6 +49,9 @@
 
 	function onImport() {
 		openImport = true
+	}
+	function onCloseImport() {
+		openImport = false
 	}
 </script>
 
@@ -91,7 +94,6 @@
 	</AppBar>
 
 	<main class="p-2">
-		openImport= {openImport}
 		{#if stickyCode}
 			<TwoCols>
 				<slot />
@@ -111,11 +113,15 @@
 			</Toggle>
 		{/if}
 
+		<Drawer bind:open={openImport} placement="right" class="w-96">
+			<h1 class="text-center py-8h-5/6">Import</h1>
+			<div>
+				<TextField debounceChange multiline class=" rounded shadow-lg text-left text-lg  min-w-80" />
+			</div>
+			<div slot="actions">
+				<Button on:click={onCloseImport}>Close</Button>
+			</div>
+		</Drawer>
+		
 	</main>
 </AppLayout>
-<Dialog bind:openImport>
-	<div slot="title">Import Fields</div>
-	<div slot="actions">
-	  <Button variant="fill" color="primary">Close</Button>
-	</div>
-  </Dialog>

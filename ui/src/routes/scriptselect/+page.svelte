@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ScriptTabs from '$lib/ScriptTabs.svelte'
+	import ImportData from '$lib/ImportData.svelte'
 </script>
 
-<ScriptTabs />
+<ImportData />
