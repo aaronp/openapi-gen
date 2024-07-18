@@ -40,15 +40,14 @@
 	let callStack: StackElement[] = []
 	let latestResult: StackResult[] = []
 
-	let latestSpreadsheetValue : Spreadsheet | undefined = undefined
+	let latestSpreadsheetValue: Spreadsheet | undefined = undefined
 
 	latestSheet.subscribe(async (value) => {
 		latestSpreadsheetValue = value as Spreadsheet
 		sheet = sheetAsJson(value as Spreadsheet)
-		
+
 		refresh()
 	})
-
 
 	async function refresh() {
 		callStack = []
@@ -132,7 +131,7 @@
 		const last = latestResult[latestResult.length - 1]
 
 		// we save to the input source's directory, unless it's the 'AllSheets', in which case it doesn't use a dir
-		var dir : string | undefined = undefined
+		var dir: string | undefined = undefined
 		if (script.input != AllSheets) {
 			dir = latestSpreadsheetValue?.name
 		}

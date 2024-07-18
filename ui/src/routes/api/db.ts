@@ -93,7 +93,7 @@ function spreadsheetPath(filename: string) {
 	return path.join(spreadsheetsDir(), fqn)
 }
 
-const resultsPath = (dir : string | undefined, filename: string) => {
+const resultsPath = (dir: string | undefined, filename: string) => {
 	if (dir) {
 		const saveDir = path.join(outputDir(), dir)
 		fs.mkdirSync(saveDir, { recursive: true })

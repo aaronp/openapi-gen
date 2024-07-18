@@ -23,7 +23,7 @@
 	import ImportData from '$lib/ImportData.svelte'
 
 	let openImport = false
-	
+
 	let stickyCode = false
 	settings({
 		components: {
@@ -72,7 +72,6 @@
 
 	<AppBar title="Data Definitions">
 		<div slot="actions" class="flex gap-3">
-
 			<Tooltip title="Import" placement="left" offset={2}>
 				<Button icon={mdiFileUpload} rounded on:click={(e) => onImport()} target="_blank" />
 			</Tooltip>
@@ -106,7 +105,7 @@
 		{:else}
 			<Toggle let:on={open} let:toggle let:toggleOff>
 				<Drawer {open} on:close={toggleOff} persistent class="w-[60vw] m-2 dark:bg-secondary-900 bg-secondary-100 pl-4">
-					<div ><ScriptTabs /></div>
+					<div><ScriptTabs /></div>
 					<div slot="actions">
 						<Button icon={mdiClose} class="m-2 w-96" on:click={toggleOff}>Close</Button>
 					</div>
@@ -121,12 +120,11 @@
 		<Drawer bind:open={openImport} placement="right" class="w-96">
 			<h1 class="text-center py-8h-5/6">Import</h1>
 			<div>
-				<ImportData on:onImportComplete={onImportComplete}/>
+				<ImportData on:onImportComplete={onImportComplete} />
 			</div>
 			<div slot="actions">
 				<Button on:click={onCloseImport}>Close</Button>
 			</div>
 		</Drawer>
-		
 	</main>
 </AppLayout>

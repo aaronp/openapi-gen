@@ -32,4 +32,3 @@ This repo was created as an easier way to have a 'source of truth' for business 
 - generate front-end user interfaces
 - produce tests/validation
 - ...
-

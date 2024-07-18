@@ -34,7 +34,7 @@ RUN ulimit -c unlimited
 
 LABEL maintainer="Aaron Pritzlaff <aaron@kindservices.co.uk>"
 LABEL usage="docker run -p 3000:3000 -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest"
-LABEL version="1.1.0"
+LABEL version="1.1.1"
 LABEL org.opencontainers.image.source="https://github.com/aaronp/openapi-gen"
 LABEL org.opencontainers.image.url="https://kindservices.co.uk"
 LABEL license="Apache-2.0"
