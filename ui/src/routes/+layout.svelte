@@ -20,6 +20,7 @@
 	import '../app.postcss'
 	import TwoCols from '$lib/TwoCols.svelte'
 	import ScriptTabs from '$lib/ScriptTabs.svelte'
+	import ImportData from '$lib/ImportData.svelte'
 
 	let openImport = false
 	
@@ -51,6 +52,10 @@
 		openImport = true
 	}
 	function onCloseImport() {
+		openImport = false
+	}
+	function onImportComplete(msg) {
+		alert('onImport Complete ' + msg)
 		openImport = false
 	}
 </script>
@@ -116,7 +121,7 @@
 		<Drawer bind:open={openImport} placement="right" class="w-96">
 			<h1 class="text-center py-8h-5/6">Import</h1>
 			<div>
-				<TextField debounceChange multiline class=" rounded shadow-lg text-left text-lg  min-w-80" />
+				<ImportData on:onImportComplete={onImportComplete}/>
 			</div>
 			<div slot="actions">
 				<Button on:click={onCloseImport}>Close</Button>

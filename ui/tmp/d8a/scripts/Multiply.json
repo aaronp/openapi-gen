@@ -1,6 +1,0 @@
-{
-  "name": "Multiply",
-  "script": "input.flatMap(r => [r,r])",
-  "input": "NewScript",
-  "autoSave": true
-}

@@ -2,6 +2,9 @@
     import {  parseCSV } from "./util/parseCsv"
 	import type { CSV } from "./util/parseCsv"
     import {  TextField, Button } from 'svelte-ux'
+	import { api } from '$lib/session'
+	import { SchemaFieldTypeEnum, type Cell, type SchemaField, type Settings, type Spreadsheet } from "./generated"
+    import { createEventDispatcher } from 'svelte';
 
     let fileName = ''
     let csv : CSV = {
@@ -11,6 +14,8 @@
     let warningMessage = ""
   
     let fileContent = 'Drag and drop your CSV file here'
+
+    const dispatch = createEventDispatcher();
 
     function handleDrop(event) {
       event.preventDefault()
@@ -46,7 +51,41 @@
 
 
     async function onDoImport(event) {
-
+        const response1 = await importSettings()
+        const response2 = await importSheet()
+        dispatch('onImportComplete', { csv })
+    }
+    async function importSheet() {
+        const sheetRows = csv.rows.map((row) => {
+            return {
+                cells: row.cells.map((value, index) => {
+                    const cell : Cell = {
+                        type: asSchemaField(csv.header[index]),
+                        value: value, // this warning is one we have to live with
+                        values: []
+                    }
+                    return cell
+                })
+            }
+        })
+        const spreadsheet : Spreadsheet = { name: fileName, rows: sheetRows }
+        return await api.saveSpreadsheet({ spreadsheet })
+    }
+    const asSchemaField = (name : string ) : SchemaField => {
+        return{
+            name ,
+            type: SchemaFieldTypeEnum.String,
+            availableValues: []
+        }
+    }
+    async function importSettings() {
+        const settingsFields = csv.header.map((name) => {
+            return asSchemaField(name)
+        })
+        const settings : Settings = {
+            fields : settingsFields
+        }
+        return await api.updateSettings({ settings })
     }
   
     function handleDragOver(event) {
