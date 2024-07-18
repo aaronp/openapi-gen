@@ -12,12 +12,16 @@
 		ThemeSelect
 	} from 'svelte-ux'
 
-	import { mdiClose, mdiCog, mdiDatabase, mdiTable, mdiScript, mdiWeb } from '@mdi/js'
+	import { mdiClose, mdiCog, mdiTable, mdiScript, mdiWeb, mdiFileUpload } from '@mdi/js'
 
+	import { Dialog } from 'svelte-ux'
 	import { page } from '$app/stores'
 	import '../app.postcss'
 	import TwoCols from '$lib/TwoCols.svelte'
 	import ScriptTabs from '$lib/ScriptTabs.svelte'
+
+	let openImport = false
+	
 
 	let stickyCode = false
 	settings({
@@ -43,7 +47,9 @@
 		stickyCode = !stickyCode
 	}
 
-	export let data
+	function onImport() {
+		openImport = true
+	}
 </script>
 
 <ThemeInit />
@@ -58,6 +64,11 @@
 
 	<AppBar title="Data Definitions">
 		<div slot="actions" class="flex gap-3">
+
+			<Tooltip title="Import" placement="left" offset={2}>
+				<Button icon={mdiFileUpload} rounded on:click={(e) => onImport()} target="_blank" />
+			</Tooltip>
+
 			<Tooltip title="Scripts" placement="left" offset={2}>
 				<Button icon={mdiScript} rounded on:click={toggleCodePanel} target="_blank" />
 			</Tooltip>
@@ -80,6 +91,7 @@
 	</AppBar>
 
 	<main class="p-2">
+		openImport= {openImport}
 		{#if stickyCode}
 			<TwoCols>
 				<slot />
@@ -98,5 +110,12 @@
 				{/if}
 			</Toggle>
 		{/if}
+
 	</main>
 </AppLayout>
+<Dialog bind:openImport>
+	<div slot="title">Import Fields</div>
+	<div slot="actions">
+	  <Button variant="fill" color="primary">Close</Button>
+	</div>
+  </Dialog>

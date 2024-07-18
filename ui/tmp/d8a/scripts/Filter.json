@@ -1,0 +1,6 @@
+{
+  "name": "Filter",
+  "script": "input.map(r => r.toUpperCase())",
+  "input": "Multiply",
+  "autoSave": true
+}

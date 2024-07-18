@@ -1,0 +1,6 @@
+{
+  "name": "NewScript.json",
+  "script": "input.filter(r => r.date).map(r => r.name)",
+  "input": "any sheet",
+  "autoSave": true
+}
