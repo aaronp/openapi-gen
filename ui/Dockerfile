@@ -33,7 +33,7 @@ COPY --from=build /app/node_modules ./node_modules
 RUN ulimit -c unlimited
 
 LABEL maintainer="Aaron Pritzlaff <aaron@kindservices.co.uk>"
-LABEL usage="docker run -p 3000:3000 -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest"
+LABEL usage="docker run -p 3000:3000 -v `pwd`/scripts:/app/imports -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest"
 LABEL version="1.1.1"
 LABEL org.opencontainers.image.source="https://github.com/aaronp/openapi-gen"
 LABEL org.opencontainers.image.url="https://kindservices.co.uk"
@@ -42,6 +42,6 @@ LABEL vendor="Kind Services Ltd"
 
 
 
-VOLUME ["/app/data", "/app/output"]
+VOLUME ["/app/data", "/app/output", "/app/imports"]
 
 ENTRYPOINT ["node", "build"]

@@ -1,4 +1,16 @@
-import type { Schema, Field } from './types'
+type Schema = {
+	name: string
+	version?: string
+	fields: Array<Field>
+}
+
+type Field = {
+	name: string
+	fieldName?: string
+	type: 'string' | 'date' | 'email' | 'decimal' | 'int'
+	required?: boolean
+}
+
 
 const emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
 
@@ -55,7 +67,7 @@ const getFieldNames = (fields: Array<Field>): string[] => {
 	return fields.map((field) => asIdentifier(field))
 }
 
-export const toCamelCase = (input: string): string => {
+const toCamelCase = (input: string): string => {
 	// Remove non-alphanumeric characters and split by space or underscore
 	let words = input.replace(/[^a-zA-Z0-9 ]/g, '').split(/[\s_]+/)
 
@@ -70,7 +82,7 @@ export const toCamelCase = (input: string): string => {
 	return camelCaseString
 }
 
-export const asIdentifier = (input: Field) => input?.fieldName ?? toCamelCase(input.name)
+const asIdentifier = (input: Field) => input?.fieldName ?? toCamelCase(input.name)
 
 // input.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
 
@@ -197,7 +209,7 @@ function getRouteForName(name: string) {
 }
 
 // Function to generate the OpenAPI spec
-export const generateOpenApiSpec = (schemas: Schema[]) => {
+const generateOpenApiSpec = (schemas: Schema[]) => {
 	const paths: { [key: string]: any } = {}
 	const components: { [key: string]: any } = { schemas: {} }
 

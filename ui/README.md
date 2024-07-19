@@ -21,7 +21,7 @@ mkdir latest
 Or, if you want to mess with the port:
 
 ```
-docker run -e PORT=1234 -p 8080:1234 -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest
+docker run -e PORT=1234 -p 8080:1234 -v `pwd`/scripts:/app/imports -v `pwd`/d8a:/app/data -v `pwd`/out:/app/output docker.io/kindservices/openapi-gen-ui:latest
 ```
 
 # About

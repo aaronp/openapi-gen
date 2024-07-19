@@ -138,13 +138,18 @@
 			...script,
 			script : include + '\n' + script.script
 		}
-		alert(scriptWithPrelude.script)
 		callStack = await upstreamDependencies(scriptWithPrelude, sheet)
 
 		latestResult = await evaluateStack(callStack)
 
 		if (script.autoSave) {
 			await onSaveResults()
+		}
+	}
+
+	async function onToggleAutosave(e : Event) {
+		if (script.autoSave) {
+			await onRun()
 		}
 	}
 
@@ -194,10 +199,16 @@
 		label="Input"
 	/>
 
-	<Checkbox class="pt-8" bind:checked={script.autoSave} label="Auto Save">Auto-Save</Checkbox>
+	<Checkbox class="pt-8" on:change={onToggleAutosave} bind:checked={script.autoSave} label="Auto Save">Auto-Save</Checkbox>
 
+	<div>
+		<!-- imports/generateOpenApi.ts -->
+		<TextField placeholder="generateOpenApi.ts" label="Script Include: (filename in imports dir)" debounceChange={500} bind:value={script.include} on:change={onScriptChange}
+		class="pt-2 w-full text-left text-lg"/>
+	</div>
+	
 	<!--  Script  -->
-	<div class="h-60 pt-2" style="overflow: auto">
+	<div class="h-60 pt-2" style="overflow: auto" >
 		<h1 class="text-lg font-bold">Script:</h1>
 		<TextField
 			classes={{ input: 'h-40', container: 'h-40' }}

@@ -1,5 +1,6 @@
 import * as ts from 'typescript'
 import type { StackElement } from './cache'
+import { toCamelCase as toCamelCaseImport } from './sheetAsJson'
 
 export type StackResult = {
 	element: StackElement
@@ -42,6 +43,8 @@ export function executeCodeWithInput(code: string, inputs: Map<string, any>) {
 				iframe.contentWindow[key] = value
 			}
 		})
+
+		iframe.contentWindow.toCamelCase = toCamelCaseImport
 
 		console.log(`\COMPILED:`)
 		console.log(`\t${code}`)
