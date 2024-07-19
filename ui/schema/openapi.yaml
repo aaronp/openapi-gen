@@ -191,6 +191,32 @@ paths:
                 $ref: '#/components/schemas/Spreadsheet'
         '400':
           description: Invalid request
+  /api/script-import/{name}:
+    get:
+      summary: Get the imported script
+      operationId: getScriptImport
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A content of the import
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScriptImport'
+        '404':
+          description: Import snippet not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
   /api/scripts:
     get:
       summary: List all script names
@@ -344,6 +370,20 @@ components:
           additionalProperties: true
         type:
           $ref: '#/components/schemas/SchemaField'
+    ScriptImport:
+      type: object
+      properties:
+        importName:
+          type: string
+          description: The name of the import (e.g. the filename)
+          example: "toOpenApi.ts"
+        script:
+          type: string
+          description: The content of the script
+          example: "type Foo = { }"
+      required:
+        - importName
+        - script
     Script:
       type: object
       description: The script inputs will be the name of the sheet, or 'sheets' as a special value for an array of all sheet values, or else the name of another script
@@ -351,12 +391,16 @@ components:
         name:
           type: string
           description: This should be the script output (e.g. openApi.yaml, schema.json, ui.json, etc)
+        include:
+          type: string
+          description: An optional script to include / import into the snippet.
         script:
           type: string
           description: the typescript code
         input:
           type: string
-          description: the input for the script
+          description: the input key for the script (e.g. the name of another script, a sheet name, or 'sheets')
+          example: "sheets"
         autoSave:
           type: boolean
           description: If set, the script output will be saved. Otherwise it's assumed it'll be used by another script

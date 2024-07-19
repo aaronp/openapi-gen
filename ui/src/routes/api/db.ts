@@ -4,6 +4,7 @@ import type { Settings, Spreadsheet, Script, ScriptResult } from '../../lib/gene
 
 const DataDir = process.env.DATA_DIR || './data'
 const OutputDir = process.env.OUTPUT_DIR || './output'
+const ImportDir = process.env.IMPORT_DIR || './imports'
 
 const resolved = (name: string) => {
 	if (fs.existsSync(name)) {
@@ -11,6 +12,12 @@ const resolved = (name: string) => {
 	} else {
 		return name
 	}
+}
+
+
+export function importDir(): string {
+	fs.mkdirSync(ImportDir, { recursive: true })
+	return ImportDir
 }
 
 export function dataDir(): string {
@@ -73,6 +80,16 @@ export function readScript(filename: string): Script {
 			input: '',
 			autoSave: false
 		}
+	}
+}
+
+export function readScriptImport(filename: string): string | undefined {
+	try {
+		const fullPath = path.join(importDir(), filename)
+		return fs.readFileSync(fullPath, 'utf-8')
+	} catch (e) {
+		console.error('ERROR reading script import', e)
+		return undefined
 	}
 }
 

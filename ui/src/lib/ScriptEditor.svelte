@@ -118,7 +118,29 @@
 	async function onRun() {
 		const input: Script = script as Script
 		await api.saveScript({ script: input })
-		callStack = await upstreamDependencies(input, sheet)
+		var include : string = ''
+		if (script.include) {
+			try {
+				const result = await api.getScriptImport({ name: script.include })
+				if (!result ) {
+					showSnackbar(`Could not find script ${script.include}`, 8000)
+					return
+				} else {
+					include = result.script
+				}
+			} catch (e) {
+				showSnackbar(`Couldn't find your import: ${script.include}`, 8000)
+				return
+			}
+		} 
+
+		const scriptWithPrelude : Script = {
+			...script,
+			script : include + '\n' + script.script
+		}
+		alert(scriptWithPrelude.script)
+		callStack = await upstreamDependencies(scriptWithPrelude, sheet)
+
 		latestResult = await evaluateStack(callStack)
 
 		if (script.autoSave) {

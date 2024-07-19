@@ -55,7 +55,6 @@
 		openImport = false
 	}
 	function onImportComplete(msg) {
-		alert('onImport Complete ' + msg)
 		openImport = false
 	}
 </script>

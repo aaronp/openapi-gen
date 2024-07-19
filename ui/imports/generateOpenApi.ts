@@ -204,9 +204,6 @@ export const generateOpenApiSpec = (schemas: Schema[]) => {
 	schemas.forEach((schema) => {
 		const { name, fields } = schema
 
-		// const version = v ? `/${v}` : '0.0.1'
-
-		// paths[`/data/${asIdentifier(name)}/${version}/{id}`] = getRouteForName(name)
 		paths[`/data/${toCamelCase(name)}/{id}`] = getRouteForName(name)
 		paths[`/data/${toCamelCase(name)}`] = queryRouteForName(name)
 
