@@ -2,8 +2,9 @@ FROM node:22 AS build
 
 WORKDIR /app
 
+# --memory 4g
 # Install Java (required for openapi-generator-cli)
-RUN apt-get clean && apt-get update && apt-get install -y default-jre-headless --allow-unauthenticated --allow-insecure-repositories
+RUN apt-get update --allow-unauthenticated --allow-insecure-repositories && apt-get install -y default-jre-headless
 
 # Install openapi-generator-cli
 RUN npm install -g @openapitools/openapi-generator-cli
