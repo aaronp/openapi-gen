@@ -4,7 +4,7 @@ WORKDIR /app
 
 # --memory 4g
 # Install Java (required for openapi-generator-cli)
-RUN apt-get update --allow-unauthenticated --allow-insecure-repositories && apt-get install -y default-jre-headless
+RUN apt-get update --allow-unauthenticated --allow-insecure-repositories && apt-get install -y --no-install-recommends default-jre-headless
 
 # Install openapi-generator-cli
 RUN npm install -g @openapitools/openapi-generator-cli
