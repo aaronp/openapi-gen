@@ -199,7 +199,7 @@
 
 <div>
 	<div class="flex">
-		<div class="px-2 pt-1 text-lg mb-12">Sheet:</div>
+		<div class="px-2 pt-1 text-lg mb-4">Sheet:</div>
 		<div >
 			<TextField bind:value={currentTab} />
 		</div>
@@ -207,6 +207,9 @@
 			<Button disabled={(spreadsheet?.name?.length ?? 0) < 1}  on:click={onRenameSheet} icon={mdiUpdate} >Rename</Button>
 		</div>
 	</div>
+
+<Button class="mb-4" color="primary" variant="fill" rounded on:click={onAdd}>Add Row</Button>
+
 </div>
 
 <Tabs  placement="top" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
@@ -293,7 +296,6 @@
 	</svelte:fragment>
 	
 </Tabs>
-
 
 <Button class="p-2 m-2" color="primary" variant="fill" rounded on:click={onAdd}>Add Row</Button>
 

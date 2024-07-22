@@ -84,7 +84,7 @@
 	}
 
 	async function onScriptRename(event) {
-		showSnackbar('onScriptRename ' + event)
+		// showSnackbar('onScriptRename ' + event)
 		await relistScripts()
 	}
 </script>
