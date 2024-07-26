@@ -212,7 +212,7 @@
 
 </div>
 
-<Tabs  placement="top" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
+<Tabs placement="top" bind:options={tabOptions} on:change={(e) => (currentTab = e.detail.value)}>
 
 	{#each tabOptions as option (option.value)}
 	<Tab

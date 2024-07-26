@@ -118,12 +118,12 @@
 </script>
 
 <div class="m-2">
-	<header class="bg-secondary-100 text-black dark:text-white p-4 my-4">
-		<h1 class="text-2xl font-bold">Sheet Settings</h1>
+	<header class="bg-secondary-300 text-black dark:text-white p-4 my-4 ">
+		<h1 class="text-2xl font-bold">Columns</h1>
 	</header>
 
 	{#each settings.fields as field, index}
-		<div class="flex items-center">
+		<div class="flex items-center pt-2">
 			<!-- Up and Down Icons -->
 			<div class="flex flex-col items-center h-16 justify-center space-y-1">
 				<svg
