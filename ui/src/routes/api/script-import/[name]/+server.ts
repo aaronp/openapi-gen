@@ -8,12 +8,12 @@ export async function GET({ request }: Request) {
 
 	const script = readScriptImport(importName)
 	if (script) {
-		const result : ScriptImport = {
+		const result: ScriptImport = {
 			importName,
-			script,
+			script
 		}
 		return Response.json(result)
 	} else {
-		return Response.json({ importName, message: 'not found' }, { status: 404})
+		return Response.json({ importName, message: 'not found' }, { status: 404 })
 	}
 }

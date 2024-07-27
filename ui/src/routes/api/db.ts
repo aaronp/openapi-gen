@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import type { Settings, Spreadsheet, Script, ScriptResult } from '../../lib/generated/models'
+import type { Spreadsheet, Script, ScriptResult } from '../../lib/generated/models'
 
 const DataDir = process.env.DATA_DIR || './data'
 const OutputDir = process.env.OUTPUT_DIR || './output'
@@ -13,7 +13,6 @@ const resolved = (name: string) => {
 		return name
 	}
 }
-
 
 export function importDir(): string {
 	fs.mkdirSync(ImportDir, { recursive: true })
@@ -41,7 +40,6 @@ function scriptsDir(): string {
 	fs.mkdirSync(dir, { recursive: true })
 	return dir
 }
-const settingsPath = () => path.join(dataDir(), 'settings.json')
 
 export function saveData(dirname: string, filename: string, data: string | NodeJS.ArrayBufferView) {
 	const saveDir = path.join(outputDir(), dirname)
@@ -152,17 +150,6 @@ export function renameSheet(name: string, newName: string): string {
 	return newPath
 }
 
-export function readSettings(): Settings {
-	try {
-		return JSON.parse(fs.readFileSync(settingsPath(), 'utf-8'))
-	} catch (e) {
-		console.error('ERROR reading settings', e)
-		return {
-			fields: []
-		}
-	}
-}
-
 export function deleteScript(filename: string) {
 	const fullPath = scriptsPath(filename)
 	if (fs.existsSync(fullPath)) {
@@ -190,11 +177,6 @@ export function renameScript(name: string, newName: string): string {
 
 	console.log(`Renamed script from ${name} to ${resolved(newPath)}`)
 	return newPath
-}
-export function saveSettings(data: Settings) {
-	const fqn = settingsPath()
-	console.log(`Saving settings to ${resolved(fqn)}`)
-	fs.writeFileSync(fqn, JSON.stringify(data, null, 2))
 }
 
 export function saveSpreadsheet(data: Spreadsheet) {

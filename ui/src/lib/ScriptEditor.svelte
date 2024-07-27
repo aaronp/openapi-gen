@@ -118,11 +118,11 @@
 	async function onRun() {
 		const input: Script = script as Script
 		await api.saveScript({ script: input })
-		var include : string = ''
+		var include: string = ''
 		if (script.include) {
 			try {
 				const result = await api.getScriptImport({ name: script.include })
-				if (!result ) {
+				if (!result) {
 					showSnackbar(`Could not find script ${script.include}`, 8000)
 					return
 				} else {
@@ -132,11 +132,11 @@
 				showSnackbar(`Couldn't find your import: ${script.include}`, 8000)
 				return
 			}
-		} 
+		}
 
-		const scriptWithPrelude : Script = {
+		const scriptWithPrelude: Script = {
 			...script,
-			script : include + '\n' + script.script
+			script: include + '\n' + script.script
 		}
 		callStack = await upstreamDependencies(scriptWithPrelude, sheet)
 
@@ -147,7 +147,7 @@
 		}
 	}
 
-	async function onToggleAutosave(e : Event) {
+	async function onToggleAutosave(e: Event) {
 		if (script.autoSave) {
 			await onRun()
 		}
@@ -199,16 +199,24 @@
 		label="Input"
 	/>
 
-	<Checkbox class="pt-8" on:change={onToggleAutosave} bind:checked={script.autoSave} label="Auto Save">Auto-Save</Checkbox>
+	<Checkbox class="pt-8" on:change={onToggleAutosave} bind:checked={script.autoSave} label="Auto Save"
+		>Auto-Save</Checkbox
+	>
 
 	<div>
 		<!-- imports/generateOpenApi.ts -->
-		<TextField placeholder="generateOpenApi.ts" label="Script Include: (filename in imports dir)" debounceChange={500} bind:value={script.include} on:change={onScriptChange}
-		class="pt-2 w-full text-left text-lg"/>
+		<TextField
+			placeholder="generateOpenApi.ts"
+			label="Script Include: (filename in imports dir)"
+			debounceChange={500}
+			bind:value={script.include}
+			on:change={onScriptChange}
+			class="pt-2 w-full text-left text-lg"
+		/>
 	</div>
-	
+
 	<!--  Script  -->
-	<div class="h-60 pt-2" style="overflow: auto" >
+	<div class="h-60 pt-2" style="overflow: auto">
 		<h1 class="text-lg font-bold">Script:</h1>
 		<TextField
 			classes={{ input: 'h-40', container: 'h-40' }}

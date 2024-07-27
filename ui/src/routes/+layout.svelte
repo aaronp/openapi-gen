@@ -14,7 +14,20 @@
 		Dialog
 	} from 'svelte-ux'
 
-	import { mdiClose, mdiCog, mdiTable, mdiScript, mdiWeb, mdiFileUpload, mdiPlus, mdiPencil, mdiCancel, mdiCreation } from '@mdi/js'
+	import {
+		mdiClose,
+		mdiCog,
+		mdiTable,
+		mdiScript,
+		mdiWeb,
+		mdiFileUpload,
+		mdiPlus,
+		mdiPencil,
+		mdiCancel,
+		mdiCreation,
+		mdiDelete,
+		mdiContentDuplicate
+	} from '@mdi/js'
 	import { onMount } from 'svelte'
 	import { api } from '$lib/session'
 
@@ -27,9 +40,8 @@
 	import AddSheet from '$lib/AddSheet.svelte'
 
 	let openImport = false
-	let spreadsheets : string[] = []
+	let spreadsheets: string[] = []
 	let stickyCode = false
-
 
 	settings({
 		components: {
@@ -57,7 +69,7 @@
 			if (parts[parts.length - 2] == 'data') {
 				return parts[parts.length - 1]
 			}
-		} 
+		}
 		return undefined
 	}
 
@@ -65,15 +77,15 @@
 		relistSpreadsheets()
 	})
 
-	let editSheet : string = ''
+	let editSheet: string = ''
 	let addSheet = false
 
-	function onEditSheet(name : string) {
+	function onEditSheet(name: string) {
 		editSheet = name
 	}
 	async function relistSpreadsheets(): Promise<string[]> {
 		const all = await api.listSpreadsheets()
-		spreadsheets = all.length < 1 ? ["New"] : all
+		spreadsheets = all.length < 1 ? ['New'] : all
 
 		// side-effects on renaming/adding sheets
 		editSheet = ''
@@ -100,33 +112,46 @@
 	function onAddSheet() {
 		addSheet = true
 	}
-
 </script>
 
 <ThemeInit />
 <AppLayout>
 	<svelte:fragment slot="nav">
-		<div class="grid ">
+		<div class="grid">
 			<div class="self-start"><NavItem path="/data" text="Sheets" icon={mdiTable} currentUrl={$page.url} /></div>
-			<div class="self-start"><NavItem path="/settings" text="Columns" icon={mdiCog} currentUrl={$page.url} /></div>
 
 			{#each spreadsheets as sheetName}
-			<div class="relative border-gray-300 cursor-pointer group">
-				<div class="self-start"><NavItem path="/data/{sheetName}" text={sheetName} icon={mdiTable} currentUrl={$page.url} /></div>
-				<Button icon={mdiPencil} class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block" on:click={(e) => onEditSheet(sheetName)}>
-				  Edit
-				</Button>
-			  </div>
-			
+				<div class="relative border-gray-300 cursor-pointer group">
+					<div class="self-start">
+						<NavItem path="/data/{sheetName}" text={sheetName} icon={mdiTable} currentUrl={$page.url} />
+					</div>
+					<Button
+						icon={mdiPencil}
+						class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
+						on:click={(e) => onEditSheet(sheetName)}
+					></Button>
+					<Button
+						icon={mdiDelete}
+						class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
+						on:click={(e) => onEditSheet(sheetName)}
+					></Button>
+					<Button
+						icon={mdiContentDuplicate}
+						class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
+						on:click={(e) => onEditSheet(sheetName)}
+					></Button>
+				</div>
 			{/each}
-			<div class="self-start ml-2 text-white "><Button icon={mdiPlus} rounded target="_blank" on:click={onAddSheet}>Add</Button></div>
+			<div class="self-start ml-2 text-white">
+				<Button icon={mdiPlus} rounded target="_blank" on:click={onAddSheet}>Add</Button>
+			</div>
 		</div>
 	</svelte:fragment>
 
-	<AppBar title={currentSheetName ?? "Data Definitions"} >
+	<AppBar title={currentSheetName ?? 'Data Definitions'}>
 		<div slot="actions" class="flex gap-3">
 			<Tooltip title="Import" placement="left" offset={2}>
-				<Button icon={mdiFileUpload} rounded on:click={(e) => onImport()} target="_blank"  />
+				<Button icon={mdiFileUpload} rounded on:click={(e) => onImport()} target="_blank" />
 			</Tooltip>
 
 			<Tooltip title="Scripts" placement="left" offset={2}>
@@ -171,11 +196,15 @@
 		{/if}
 
 		{#if editSheet != ''}
-			<RenameSheet sheet={editSheet} on:onClose={(e) => relistSpreadsheets()} on:onRename={(e) => relistSpreadsheets()}/>
+			<RenameSheet
+				sheet={editSheet}
+				on:onClose={(e) => relistSpreadsheets()}
+				on:onRename={(e) => relistSpreadsheets()}
+			/>
 		{/if}
 
 		{#if addSheet}
-			<AddSheet on:onAdd={(e) => relistSpreadsheets()}/>
+			<AddSheet on:onAdd={(e) => relistSpreadsheets()} />
 		{/if}
 
 		<Drawer bind:open={openImport} placement="right" class="w-96">
@@ -187,6 +216,5 @@
 				<Button on:click={onCloseImport}>Close</Button>
 			</div>
 		</Drawer>
-
 	</main>
 </AppLayout>

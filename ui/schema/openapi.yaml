@@ -5,31 +5,6 @@ info:
   version: 1.0.0
 
 paths:
-  /api/settings:
-    get:
-      summary: Get settings
-      operationId: getSettings
-      responses:
-        '200':
-          description: A JSON object containing application settings
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Settings'
-    post:
-      summary: Update settings
-      operationId: updateSettings
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Settings'
-      responses:
-        '200':
-          description: Settings updated successfully
-        '400':
-          description: Invalid request body
   /api/results:
     post:
       summary: Save a ScriptResult
@@ -296,7 +271,7 @@ paths:
           description: Script not found
 components:
   schemas:
-    Settings:
+    Columns:
       type: object
       required:
         - fields
@@ -340,6 +315,8 @@ components:
       properties:
         name:
           type: string
+        columns:
+          $ref: '#/components/schemas/Columns'
         rows:
           type: array
           items:
@@ -368,19 +345,19 @@ components:
         value:
           type: object
           additionalProperties: true
-        type:
-          $ref: '#/components/schemas/SchemaField'
+        fieldName:
+          type: string
     ScriptImport:
       type: object
       properties:
         importName:
           type: string
           description: The name of the import (e.g. the filename)
-          example: "toOpenApi.ts"
+          example: 'toOpenApi.ts'
         script:
           type: string
           description: The content of the script
-          example: "type Foo = { }"
+          example: 'type Foo = { }'
       required:
         - importName
         - script
@@ -400,7 +377,7 @@ components:
         input:
           type: string
           description: the input key for the script (e.g. the name of another script, a sheet name, or 'sheets')
-          example: "sheets"
+          example: 'sheets'
         autoSave:
           type: boolean
           description: If set, the script output will be saved. Otherwise it's assumed it'll be used by another script

@@ -11,7 +11,6 @@ type Field = {
 	required?: boolean
 }
 
-
 const emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
 
 // Function to transform a single field to its OpenAPI representation
