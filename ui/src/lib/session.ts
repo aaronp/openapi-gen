@@ -1,8 +1,7 @@
-import { writable, derived } from 'svelte/store'
+import { writable } from 'svelte/store'
 import { DefaultApi, Configuration, type Script } from '$lib/generated'
 
 import { EverySheet, type StackElement } from '$lib/util/cache'
-export const latestSettings = writable({})
 
 export const latestSheet = writable({})
 

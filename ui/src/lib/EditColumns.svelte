@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SchemaField, Settings } from '$lib/generated/index'
+	import type { SchemaField, Columns } from '$lib/generated/index'
 	import { api, latestSettings } from '$lib/session'
 
 	import { debounce } from '$lib/util/debounce'
@@ -9,14 +9,15 @@
 
 	import { tick, onMount } from 'svelte'
 	import { Field, TextField, Button, Input, SelectField, type MenuOption } from 'svelte-ux'
-	let settings: Settings = {
+	let settings: Columns = {
 		fields: []
 	}
 
 	let valuesByFieldName = new Map<string, string>()
 
 	onMount(async () => {
-		settings = await api.getSettings()
+		// TODO- FIXME
+		// settings = await api.getSettings()
 
 		resetFieldValueMap()
 		latestSettings.set(settings)
@@ -44,7 +45,9 @@
 
 	async function save() {
 		latestSettings.set(settings)
-		await api.updateSettings({ settings })
+
+		// FIXME
+		// await api.updateSettings({ settings })
 		settings = settings
 	}
 	const debouncedSave = debounce(save, 4000)

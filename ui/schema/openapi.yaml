@@ -310,6 +310,7 @@ components:
     Spreadsheet:
       type: object
       required:
+        - columns
         - rows
         - name
       properties:
@@ -335,7 +336,7 @@ components:
     Cell:
       type: object
       required:
-        - type
+        - fieldName
       properties:
         # values is used if the type is anyOf
         values:

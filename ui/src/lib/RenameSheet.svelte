@@ -8,6 +8,9 @@
 
 	export let renameDialogueOpen = true
 	export let sheet = ''
+	export let action : 'rename' | 'delete' | 'copy'
+
+    $: title = (action == 'rename') ? 'Rename' : ((action == 'delete') ? 'Delete' : 'Copy')
 	let newSheetName = sheet
 
 	$: scriptNameValid = newSheetName && sheet != newSheetName
@@ -37,7 +40,7 @@
 
 renameDialogueOpen: {renameDialogueOpen}
 <Dialog bind:open={renameDialogueOpen}>
-	<div slot="title">Rename '{sheet}'</div>
+	<div slot="title">{title} '{sheet}'</div>
 	<TextField
 		on:keydown={(e) => onRenameSheetKeyDown(e)}
 		autofocus

@@ -18,8 +18,8 @@ export const toCamelCase = (input: string): string => {
 function asRecord(row: Row) {
 	return row.cells.reduce(
 		(acc, cell) => {
-			const key = toCamelCase(cell.type.name)
-			acc[key] = cell.type.type == SchemaFieldTypeEnum.AnyOf ? cell.values : cell.value
+			const key = toCamelCase(cell.fieldName)
+			acc[key] = cell.fieldName == SchemaFieldTypeEnum.AnyOf ? cell.values : cell.value
 			return acc
 		},
 		{} as { [key: string]: any }

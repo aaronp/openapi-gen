@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Cell, Row, SaveSpreadsheetRequest, SchemaField, Settings, Spreadsheet } from '$lib/generated/index'
+	import type { Cell, Row, SaveSpreadsheetRequest, SchemaField, Columns, Spreadsheet } from '$lib/generated/index'
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
-	import { api, latestSettings, latestSheet } from '$lib/session'
+	import { api, latestSheet } from '$lib/session'
 
 	import { Drawer, Dialog, Tabs, Tab, Icon, Button, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip, Field } from 'svelte-ux'
 
@@ -10,8 +10,6 @@
 	
 	
 	onMount(async () => {
-		settings = await api.getSettings()
-		latestSettings.set(settings)
 		
 		const all = await relistSpreadsheets()
 		
@@ -36,13 +34,13 @@
 		rows: []
 	}
 	
-	let settings: Settings = {
+	let columns: Columns = {
 		fields: []
 	}
 	function newRow(): Row {
-		const cells = settings.fields.map((field) => {
+		const cells = columns.fields.map((field) => {
 			const cell: Cell = {
-				type: field,
+				fieldName: field.name,
 				value: '', // ignore
 				values: []
 			}
@@ -59,7 +57,7 @@
 		spreadsheet.rows.forEach((row) => {
 			row.cells = row.cells.filter((cell) => {
 				// remove any cells that are no longer in the settings
-				return settings.fields.find((f) => f.name === cell.type.name)
+				return columns.fields.find((f) => f.name === cell.fieldName)
 			})
 		})
 	}
@@ -88,7 +86,8 @@
 		spreadsheet = await api.getSpreadsheet({name : n})
 		spreadsheet.rows.forEach((row) => {
 			row.cells.forEach((cell) => {
-				if (cell.type.type === SchemaFieldTypeEnum.AnyOf) {
+				const fieldType = spreadsheet.columns?.fields.find((f) => f.name == cell.fieldName)
+				if (fieldType?.type === SchemaFieldTypeEnum.AnyOf) {
 					if (!cell.value) {
 						// ignore
 						cell.value = (cell?.values ?? []).join(',')
@@ -157,7 +156,7 @@
 	}
 
 	function availableValues(cell : Cell) {
-		const field = settings.fields.find((f) => f.name === cell.type.name) ?? cell.type
+		const field = spreadsheet.columns.fields.find((f) => f.name === cell.type.name) ?? cell.type
 		// return (cell.type.availableValues ?? []).map((v) => asOption(v)) 
 		return (field.availableValues ?? []).map((v) => asOption(v))
 	}

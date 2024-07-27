@@ -78,10 +78,20 @@
 	})
 
 	let editSheet: string = ''
+	let editAction : 'copy' | 'delete' | 'rename' = 'rename'
 	let addSheet = false
 
 	function onEditSheet(name: string) {
 		editSheet = name
+		editAction = 'rename'
+	}
+	function onDeleteSheet(name: string) {
+		editSheet = name
+		editAction = 'delete'
+	}
+	function onCopySheet(name: string) {
+		editSheet = name
+		editAction = 'copy'
 	}
 	async function relistSpreadsheets(): Promise<string[]> {
 		const all = await api.listSpreadsheets()
@@ -127,18 +137,19 @@
 					</div>
 					<Button
 						icon={mdiPencil}
-						class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
+						class="absolute top-1/2 right-20 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
 						on:click={(e) => onEditSheet(sheetName)}
 					></Button>
+
 					<Button
 						icon={mdiDelete}
-						class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
-						on:click={(e) => onEditSheet(sheetName)}
+						class="absolute top-1/2 right-12 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
+						on:click={(e) => onDeleteSheet(sheetName)}
 					></Button>
 					<Button
 						icon={mdiContentDuplicate}
 						class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
-						on:click={(e) => onEditSheet(sheetName)}
+						on:click={(e) => onCopySheet(sheetName)}
 					></Button>
 				</div>
 			{/each}
@@ -198,6 +209,7 @@
 		{#if editSheet != ''}
 			<RenameSheet
 				sheet={editSheet}
+				action={editAction}
 				on:onClose={(e) => relistSpreadsheets()}
 				on:onRename={(e) => relistSpreadsheets()}
 			/>
