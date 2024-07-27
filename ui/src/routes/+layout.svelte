@@ -212,7 +212,7 @@
 		{/if}
 
 		{#if addSheet}
-			<AddSheet on:onAdd={(e) => relistSpreadsheets()} />
+			<AddSheet on:onClose={(e) => relistSpreadsheets()} on:onAdd={(e) => relistSpreadsheets()} />
 		{/if}
 
 		<Drawer bind:open={openImport} placement="right" class="w-96">

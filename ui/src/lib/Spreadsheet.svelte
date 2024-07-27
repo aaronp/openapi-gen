@@ -5,19 +5,16 @@
 
     import { onMount } from 'svelte'
 
-    import { page } from '$app/stores';
-
     let spreadsheet: Spreadsheet = {
         name :  '',
         rows: [],
         columns: []
     }
 
-    export let sheet;
-    $: ({ params: { sheet } } = $page);
-
+    export let id;
+    
     onMount(async () => {
-        await reloadSpreadsheet(sheet)
+        await reloadSpreadsheet(id)
     });
 
     function newRow(): Row {
@@ -54,6 +51,6 @@
     }
 </script>
   
-  <h1>Sheet from page store: {sheet}</h1>
+  <h1>Sheet from page store: {id}</h1>
   <pre>{JSON.stringify(spreadsheet, null, 2)}</pre>
   

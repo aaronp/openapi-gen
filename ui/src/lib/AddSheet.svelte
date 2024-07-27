@@ -11,9 +11,14 @@
 	let newSheetName = 'NewSheet'
 
 	$: scriptNameValid = newSheetName
+	$: isOpen = addDialogueOpen ? true : onClose()
 
+	async function onClose() {
+		dispatch('onClose')
+		false
+	}
 	async function onAddSheet() {
-		const spreadsheet: Spreadsheet = { name: newSheetName, rows: [] }
+		const spreadsheet: Spreadsheet = { name: newSheetName, rows: [], columns: [] }
 
 		await api.saveSpreadsheet({ spreadsheet })
 
