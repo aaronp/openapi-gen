@@ -52,6 +52,40 @@ paths:
                 items:
                   type: string
 
+  /api/copy/{old}/{new}:
+    post:
+      summary: Copy spreadsheet
+      operationId: copySpreadsheet
+      parameters:
+        - name: old
+          in: path
+          required: true
+          description: Name of the spreadsheet
+          schema:
+            type: string
+        - name: new
+          in: path
+          required: true
+          description: New name of the spreadsheet
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON array of spreadsheet names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  spreadsheets:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid request body
+
   /api/rename/{old}/{new}:
     post:
       summary: Rename spreadsheet
@@ -271,15 +305,6 @@ paths:
           description: Script not found
 components:
   schemas:
-    Columns:
-      type: object
-      required:
-        - fields
-      properties:
-        fields:
-          type: array
-          items:
-            $ref: '#/components/schemas/SchemaField'
 
     # remember - this types are just for what users can put in as metadata values
     SchemaField:
@@ -317,7 +342,9 @@ components:
         name:
           type: string
         columns:
-          $ref: '#/components/schemas/Columns'
+          type: array
+          items:
+            $ref: '#/components/schemas/SchemaField'
         rows:
           type: array
           items:

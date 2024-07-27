@@ -9,9 +9,7 @@
 		Tooltip,
 		settings,
 		ThemeInit,
-		ThemeSelect,
-		TextField,
-		Dialog
+		ThemeSelect
 	} from 'svelte-ux'
 
 	import {
@@ -23,8 +21,6 @@
 		mdiFileUpload,
 		mdiPlus,
 		mdiPencil,
-		mdiCancel,
-		mdiCreation,
 		mdiDelete,
 		mdiContentDuplicate
 	} from '@mdi/js'
@@ -36,7 +32,7 @@
 	import TwoCols from '$lib/TwoCols.svelte'
 	import ScriptTabs from '$lib/ScriptTabs.svelte'
 	import ImportData from '$lib/ImportData.svelte'
-	import RenameSheet from '$lib/RenameSheet.svelte'
+	import EditSheet from '$lib/EditSheet.svelte'
 	import AddSheet from '$lib/AddSheet.svelte'
 
 	let openImport = false
@@ -137,18 +133,18 @@
 					</div>
 					<Button
 						icon={mdiPencil}
-						class="absolute top-1/2 right-20 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
+						class="absolute top-1/2 right-20 transform -translate-y-1/2 bg-blue-500 text-white py-1 rounded hidden group-hover:block"
 						on:click={(e) => onEditSheet(sheetName)}
 					></Button>
 
 					<Button
 						icon={mdiDelete}
-						class="absolute top-1/2 right-12 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
+						class="absolute top-1/2 right-10 transform -translate-y-1/2 bg-blue-500 text-white py-1 rounded hidden group-hover:block"
 						on:click={(e) => onDeleteSheet(sheetName)}
 					></Button>
 					<Button
 						icon={mdiContentDuplicate}
-						class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block"
+						class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-blue-500 text-white py-1 rounded hidden group-hover:block"
 						on:click={(e) => onCopySheet(sheetName)}
 					></Button>
 				</div>
@@ -159,7 +155,7 @@
 		</div>
 	</svelte:fragment>
 
-	<AppBar title={currentSheetName ?? 'Data Definitions'}>
+	<AppBar title='Data Definitions'>
 		<div slot="actions" class="flex gap-3">
 			<Tooltip title="Import" placement="left" offset={2}>
 				<Button icon={mdiFileUpload} rounded on:click={(e) => onImport()} target="_blank" />
@@ -207,11 +203,11 @@
 		{/if}
 
 		{#if editSheet != ''}
-			<RenameSheet
+			<EditSheet
 				sheet={editSheet}
 				action={editAction}
 				on:onClose={(e) => relistSpreadsheets()}
-				on:onRename={(e) => relistSpreadsheets()}
+				on:onEdit={(e) => relistSpreadsheets()}
 			/>
 		{/if}
 

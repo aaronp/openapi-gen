@@ -3,7 +3,7 @@
 	import type { CSV } from './util/parseCsv'
 	import { TextField, Button } from 'svelte-ux'
 	import { api } from '$lib/session'
-	import { SchemaFieldTypeEnum, type Cell, type SchemaField, type Columns, type Spreadsheet } from './generated'
+	import { SchemaFieldTypeEnum, type Cell, type SchemaField, type Spreadsheet } from './generated'
 	import { createEventDispatcher } from 'svelte'
 
 	let fileName = ''
@@ -50,7 +50,6 @@
 	}
 
 	async function onDoImport(event) {
-		// const response1 = await importSettings()
 		const response2 = await importSheet()
 		dispatch('onImportComplete', { csv })
 	}
@@ -67,7 +66,12 @@
 				})
 			}
 		})
-		const spreadsheet: Spreadsheet = { name: fileName, rows: sheetRows }
+
+		const columns = csv.header.map((name) => {
+			return asSchemaField(name)
+		})
+
+		const spreadsheet: Spreadsheet = { name: fileName, rows: sheetRows, columns }
 		return await api.saveSpreadsheet({ spreadsheet })
 	}
 	const asSchemaField = (name: string): SchemaField => {
@@ -76,17 +80,6 @@
 			type: SchemaFieldTypeEnum.String,
 			availableValues: []
 		}
-	}
-	async function importSettings() {
-		const settingsFields = csv.header.map((name) => {
-			return asSchemaField(name)
-		})
-		const columns: Columns = {
-			fields: settingsFields
-		}
-
-		// FIXME
-		// return await api.updateSettings({ settings })
 	}
 
 	function handleDragOver(event) {

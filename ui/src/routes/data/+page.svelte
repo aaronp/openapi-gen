@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Cell, Row, SaveSpreadsheetRequest, SchemaField, Columns, Spreadsheet } from '$lib/generated/index'
+	import type { Cell, Row, SaveSpreadsheetRequest, SchemaField, Spreadsheet } from '$lib/generated/index'
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 	import { api, latestSheet } from '$lib/session'
 
@@ -31,12 +31,10 @@
 	$: tabOptions = spreadsheets.map((s) => asOption(s))
 	let spreadsheet: Spreadsheet = {
 		name :  '',
-		rows: []
+		rows: [],
+		columns: []
 	}
 	
-	let columns: Columns = {
-		fields: []
-	}
 	function newRow(): Row {
 		const cells = columns.fields.map((field) => {
 			const cell: Cell = {
@@ -57,7 +55,7 @@
 		spreadsheet.rows.forEach((row) => {
 			row.cells = row.cells.filter((cell) => {
 				// remove any cells that are no longer in the settings
-				return columns.fields.find((f) => f.name === cell.fieldName)
+				return spreadsheet.columns.find((f) => f.name === cell.fieldName)
 			})
 		})
 	}
@@ -86,7 +84,7 @@
 		spreadsheet = await api.getSpreadsheet({name : n})
 		spreadsheet.rows.forEach((row) => {
 			row.cells.forEach((cell) => {
-				const fieldType = spreadsheet.columns?.fields.find((f) => f.name == cell.fieldName)
+				const fieldType = spreadsheet.columns?.find((f) => f.name == cell.fieldName)
 				if (fieldType?.type === SchemaFieldTypeEnum.AnyOf) {
 					if (!cell.value) {
 						// ignore

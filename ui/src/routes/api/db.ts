@@ -134,18 +134,18 @@ export function readSpreadsheet(name: string): Spreadsheet {
 	}
 }
 
-export function renameSheet(name: string, newName: string): string {
-	// const oldPath = spreadsheetPath(name)
-	// const newPath = spreadsheetPath(newName)
-
-	// this is a bit sketchy (renames)
-	// save and delete seem more consistent
+export function copySheet(name: string, newName: string): string {
 	const renamed = readSpreadsheet(name)
 	renamed.name = newName
 	const newPath = saveSpreadsheet(renamed)
+
+	console.log(`Copied sheet from ${name} to ${resolved(newPath)}`)
+	return newPath
+}
+export function renameSheet(name: string, newName: string): string {
+	const newPath = copySheet(name, newName)
 	deleteSpreadsheet(name)
 
-	// fs.renameSync(oldPath, newPath)
 	console.log(`Renamed sheet from ${name} to ${resolved(newPath)}`)
 	return newPath
 }
