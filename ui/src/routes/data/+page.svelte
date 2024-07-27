@@ -97,6 +97,9 @@
 			})
 		})
 
+		// always add a "next row" empty row at the bottom
+		spreadsheet.rows = [...spreadsheet.rows, newRow()]
+
 		if (!spreadsheet.name)  {
 			spreadsheet.name = currentTab
 		}

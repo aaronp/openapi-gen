@@ -13,9 +13,10 @@
 		TextField
 	} from 'svelte-ux'
 
-	import { mdiClose, mdiCog, mdiTable, mdiScript, mdiWeb, mdiFileUpload } from '@mdi/js'
+	import { mdiClose, mdiCog, mdiTable, mdiScript, mdiWeb, mdiFileUpload, mdiPlus, mdiPencil } from '@mdi/js'
+	import { onMount } from 'svelte'
+	import { api } from '$lib/session'
 
-	import { Dialog } from 'svelte-ux'
 	import { page } from '$app/stores'
 	import '../app.postcss'
 	import TwoCols from '$lib/TwoCols.svelte'
@@ -23,7 +24,7 @@
 	import ImportData from '$lib/ImportData.svelte'
 
 	let openImport = false
-
+	let spreadsheets : string[] = []
 	let stickyCode = false
 	settings({
 		components: {
@@ -43,6 +44,16 @@
 		}
 	})
 
+	onMount(() => {
+		relistSpreadsheets()
+	})
+
+	async function relistSpreadsheets(): Promise<string[]> {
+		const all = await api.listSpreadsheets()
+		spreadsheets = all.length < 1 ? ["New"] : all
+		return spreadsheets
+	}
+
 	function toggleCodePanel() {
 		console.log('layout:toggleCodePanel ', stickyCode)
 		stickyCode = !stickyCode
@@ -57,22 +68,37 @@
 	function onImportComplete(msg) {
 		openImport = false
 	}
+
+	function onAddSheet() {
+		alert('on add sheet');
+	}
 </script>
 
 <ThemeInit />
 <AppLayout>
 	<svelte:fragment slot="nav">
-		<div class="grid grid-rows-[auto_auto_1fr] h-screen">
+		<div class="grid ">
 			<div class="self-start"><NavItem path="/data" text="Sheets" icon={mdiTable} currentUrl={$page.url} /></div>
 			<div class="self-start"><NavItem path="/settings" text="Columns" icon={mdiCog} currentUrl={$page.url} /></div>
-			<div class="self-end pl-4 pb-20">...</div>
+
+			{#each spreadsheets as sheetName}
+			<div class="relative border-gray-300 cursor-pointer group">
+				<div class="self-start"><NavItem path="/data/{sheetName}" text={sheetName} icon={mdiTable} currentUrl={$page.url} /></div>
+				<Button icon={mdiPencil} class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded hidden group-hover:block">
+				  Edit
+				</Button>
+			  </div>
+			
+			{/each}
+			<div class="self-start ml-2"><Button  icon={mdiPlus} rounded target="_blank" on:click={onAddSheet}>Add</Button></div>
 		</div>
 	</svelte:fragment>
 
 	<AppBar title="Data Definitions">
+		spreadsheets: {JSON.stringify(spreadsheets)}
 		<div slot="actions" class="flex gap-3">
 			<Tooltip title="Import" placement="left" offset={2}>
-				<Button icon={mdiFileUpload} rounded on:click={(e) => onImport()} target="_blank" />
+				<Button icon={mdiFileUpload} rounded on:click={(e) => onImport()} target="_blank"  />
 			</Tooltip>
 
 			<Tooltip title="Scripts" placement="left" offset={2}>
