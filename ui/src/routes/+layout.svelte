@@ -121,6 +121,7 @@
 </script>
 
 <ThemeInit />
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval';">
 <AppLayout>
 	<svelte:fragment slot="nav">
 		<div class="grid">
