@@ -63,16 +63,16 @@
   });
 </script>
 
-<div class="w-full overflow-auto bg-gray-100 p-4 border">
+<div class="w-full overflow-auto p-1 border">
   <table class="border-collapse " style={`width: ${tableWidth}px;`}>
     <thead>
-        <tr class="bg-gray-200" >
+        <tr class="dark:bg-gray-800 bg-gray-200" >
             {#each columns as column, index}
                 <th class="border p-2 resizable-column" style={`width: ${col.width}px;`}>
                     <div class="flex justify-between items-center">
-                        <span>{column.label} {column.width}</span>
+                        <span>{column.label}</span>
                         <div
-                            class="resizer bg-gray-400"
+                            class="resizer dark:bg-gray-900 bg-gray-400"
                             on:mousedown={(event) => handleMouseDown(event, column)}
                         ></div>
                     </div>
@@ -82,7 +82,7 @@
     </thead>
     <tbody>
         {#each data as row}
-            <tr class="even:bg-gray-100">
+            <tr class="even:dark:bg-gray-500 even:bg-gray-100">
                 {#each columns as col}
                     {@const key = col.label}
                     <td class="border p-2"  style={`width: ${col.width}px;`}>{key} : {row[key]?.toString()}</td>
