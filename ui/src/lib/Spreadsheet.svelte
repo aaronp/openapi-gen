@@ -3,12 +3,11 @@
 	import { api } from '$lib/session'
 	import { SchemaFieldTypeEnum } from '$lib/generated/index'
 
-	import { Button, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip } from 'svelte-ux'
+	import { Button, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip, Toggle, ResponsiveMenu, MenuItem } from 'svelte-ux'
 
-	import { mdiDelete, mdiPlus } from '@mdi/js'
+	import { mdiArrowLeft, mdiArrowRight, mdiArrowUp, mdiArrowDown, mdiContentDuplicate, mdiCopyleft, mdiDelete, mdiPanLeft, mdiPencil, mdiPlus } from '@mdi/js'
 	import { onMount } from 'svelte'
-	import { Schema } from 'js-yaml'
-
+	
 	type ColHeader = {
 		width: number
 		schema: SchemaField
@@ -21,15 +20,8 @@
 			availableValues: []
 		}
 	}
-	const col = (label: string, width: number = 150): ColHeader => {
-		return { width, schema: newSchema(label) }
-	}
 
-	$: columns = spreadsheet.columns.map((c) => {
-		return { width: 200, schema: c }
-	})
-
-	$: tableWidth = columns.map((c) => c.width).reduce((acc, v) => acc + v, 0)
+	$: tableWidth = spreadsheet.columns.map((c) => c.width).reduce((acc, v) => acc + v, 0)
 
 	let isResizing = false
 	let currentColumn: ColHeader | null = null
@@ -49,7 +41,7 @@
 		const dx = event.pageX - startX
 		const newWidth = startWidth + dx
 		currentColumn.width = Math.max(newWidth, 100)
-		columns = [...columns]
+		spreadsheet.columns = [...spreadsheet.columns]
 	}
 
 	function handleMouseUp() {
@@ -78,11 +70,12 @@
 	}
 
 	function newRow(): Row {
-		const cells = spreadsheet.columns.map((field) => newCell(field.name))
+		const cells = spreadsheet.columns.map((col) => newCell(col.schema.name))
 		return { cells: cells }
 	}
 
-	const typeFor = (fieldName: string): SchemaField => spreadsheet.columns.find((f) => f.name == fieldName)!
+	const typeFor = (fieldName: string): SchemaField => spreadsheet.columns.find((c) => c.schema.name == fieldName)!
+
 	async function reloadSpreadsheet(n: string) {
 		spreadsheet = await api.getSpreadsheet({ name: n })
 		spreadsheet.rows.forEach((row) => {
@@ -102,18 +95,13 @@
 	}
 
 	function cellsForRow(row: Row) {
-		return columns.map((c, i) => [c, cellForRow(row, c, i)])
+		return spreadsheet.columns.map((c, i) => [c, cellForRow(row, c, i)])
 	}
 	function cellForRow(row: Row, col: ColHeader, colIndex : number): Cell {
 		const field = col.schema
 
 		// TODO - use a different datastructure for this (a map on field names or else just re-order when the columns change)
 		const cell = row.cells[colIndex]
-		// const cell = row.cells.find((c) => {
-		// 	if (c.fieldName === field.name) {
-		// 		return c
-		// 	}
-		// })
 
 		// the settings have changed since we last loaded the spreadsheet
 		if (!cell) {
@@ -130,17 +118,13 @@
 		cell.values = detail.value
 		cell.value = detail.value.join(',')
 
-		onChange(cell)
-	}
-
-	function conditionallyAddRow(rowIndex : number) {
-		if (rowIndex == spreadsheet.rows.length - 1) {
-			spreadsheet.rows = [...spreadsheet.rows, newRow()]
-		}
+		onChange(cell, rowIndex)
 	}
 
 	function onChange(cell: Cell, rowIndex : number) {
-		conditionallyAddRow(rowIndex)
+		if (rowIndex == spreadsheet.rows.length - 1) {
+			spreadsheet.rows = [...spreadsheet.rows, newRow()]
+		}
 		onSave()
 	}
 	async function onSave() {
@@ -166,7 +150,7 @@
 	}
 
 	const onAddColumn = () => {
-		spreadsheet.columns = [...spreadsheet.columns, newSchema('New')]
+		spreadsheet.columns = [...spreadsheet.columns, { width : 200, schema : newSchema(`Col ${spreadsheet.columns.length}`)}]
 	}
 </script>
 
@@ -182,10 +166,27 @@
 			{#if spreadsheet.rows.length > 0}
 				<tr class="dark:bg-gray-800 bg-gray-200">
 					<th></th>
-					{#each columns as col}
-						<th class="border p-2 resizable-column" style={`width: ${col.width}px;`}>
+					{#each spreadsheet.columns as col}
+						<th class="border resizable-column" style={`width: ${col.width}px;`}>
 							<div class="flex justify-between items-center">
-								<span>{col.schema.name} ({col.width})</span>
+								<Toggle let:on={open} let:toggle let:toggleOff>
+									<Button on:click={toggle} class="w-full">
+										<span>{col.schema.name}</span>
+									  <ResponsiveMenu
+										{open}
+										on:close={toggleOff}
+										menuProps={{ autoPlacement: true, matchWidth: true }}
+									  >
+									    <MenuItem><Button icon={mdiPencil} >Edit</Button></MenuItem>
+										<MenuItem><Button icon={mdiArrowUp} >Sort Ascending</Button></MenuItem>
+										<MenuItem><Button icon={mdiArrowDown} >Sort Descending</Button></MenuItem>
+										<MenuItem><Button icon={mdiArrowRight} >Swap Right</Button></MenuItem>
+										<MenuItem><Button icon={mdiArrowLeft} >Swap Left</Button></MenuItem>
+										<MenuItem><Button icon={mdiContentDuplicate} >Duplicate</Button></MenuItem>
+									  </ResponsiveMenu>
+									</Button>
+								  </Toggle>
+
 								<div
 									class="resizer dark:bg-gray-900 bg-gray-400"
 									on:mousedown={(event) => handleMouseDown(event, col)}

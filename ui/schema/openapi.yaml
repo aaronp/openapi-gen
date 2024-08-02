@@ -306,6 +306,16 @@ paths:
 components:
   schemas:
     # remember - this types are just for what users can put in as metadata values
+    Column:
+      type: object
+      required:
+        - width
+        - schema
+      properties:
+        width:
+          type: integer
+        schema:
+          $ref: '#/components/schemas/SchemaField'
     SchemaField:
       type: object
       required:
@@ -343,7 +353,7 @@ components:
         columns:
           type: array
           items:
-            $ref: '#/components/schemas/SchemaField'
+            $ref: '#/components/schemas/Column'
         rows:
           type: array
           items:
