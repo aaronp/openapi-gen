@@ -71,9 +71,6 @@
         await reloadSpreadsheet(id)
     });
 
-	const newCol = (nameName : string) => {
-		return {}
-	}
 	const newCell = (fieldName :string) : Cell => {
 		return {
                 fieldName : fieldName,
