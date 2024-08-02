@@ -1,8 +1,18 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte"
 
-  let columns = ["Name", "Age", "Occupation"]
-  let data = [
+
+  type Col = {
+    width : number,
+    label : string
+  }
+  
+  const col = (label : string, width : number = 150) : Col => {
+    return { label : label, width }
+  }
+
+  let columns: Col[] = [col("Name"), col("Age"), col("Occupation")]
+  let data  = [
       { Name: "John Doe", Age: 28, Occupation: "Developer" },
       { Name: "Jane Smith", Age: 34, Occupation: "Designer" },
       { Name: "Sam Johnson", Age: 25, Occupation: "Manager" },
@@ -24,6 +34,8 @@
 
   const movingColumn = () => document.querySelectorAll(".resizable-column")[currentColumnIndex]
   const rightColumn = () => document.querySelectorAll(".resizable-column")[currentColumnIndex + 1]
+
+  const colSize = (idx : number) => document.querySelectorAll(".resizable-column")[idx]?.style?.width
 
   function handleMouseMove(event) {
       if (!isResizing) return;
@@ -56,7 +68,7 @@
           {#each columns as column, index}
               <th class="border p-2 resizable-column">
                   <div class="flex justify-between items-center">
-                      <span>{column}</span>
+                      <span>{column.label} {colSize(index)}</span>
                       {#if index < columns.length - 1}
                       <div
                           class="resizer bg-gray-400"
@@ -72,7 +84,8 @@
       {#each data as row}
           <tr class="even:bg-gray-100">
               {#each columns as column}
-                  <td class="border p-2">{row[column]}</td>
+                  {@const key = column.label}
+                  <td class="border p-2">{key} : {row[key]}</td>
               {/each}
           </tr>
       {/each}
