@@ -74,7 +74,7 @@
 	})
 
 	let editSheet: string = ''
-	let editAction : 'copy' | 'delete' | 'rename' = 'rename'
+	let editAction: 'copy' | 'delete' | 'rename' = 'rename'
 	let addSheet = false
 
 	function onEditSheet(name: string) {
@@ -121,7 +121,7 @@
 </script>
 
 <ThemeInit />
-<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval';">
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval';" />
 <AppLayout>
 	<svelte:fragment slot="nav">
 		<div class="grid">
@@ -156,7 +156,7 @@
 		</div>
 	</svelte:fragment>
 
-	<AppBar title='Data Definitions'>
+	<AppBar title="Data Definitions">
 		<div slot="actions" class="flex gap-3">
 			<Tooltip title="Import" placement="left" offset={2}>
 				<Button icon={mdiFileUpload} rounded on:click={(e) => onImport()} target="_blank" />

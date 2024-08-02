@@ -305,7 +305,6 @@ paths:
           description: Script not found
 components:
   schemas:
-
     # remember - this types are just for what users can put in as metadata values
     SchemaField:
       type: object

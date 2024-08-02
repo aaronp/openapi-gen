@@ -8,17 +8,17 @@
 
 	export let renameDialogueOpen = true
 	export let sheet = ''
-	export let action : 'rename' | 'delete' | 'copy'
+	export let action: 'rename' | 'delete' | 'copy'
 
 	function capitalize(text: string): string {
-    if (!text) return text;
-    return text.charAt(0).toUpperCase() + text.slice(1);
-}
+		if (!text) return text
+		return text.charAt(0).toUpperCase() + text.slice(1)
+	}
 
-    $: title = (action == 'rename') ? 'Rename' : ((action == 'delete') ? 'Delete' : 'Copy')
+	$: title = action == 'rename' ? 'Rename' : action == 'delete' ? 'Delete' : 'Copy'
 	let newSheetName = sheet
 
-	$: icon = (action === 'delete') ? mdiDelete : ((action === 'rename') ? mdiPencil : mdiContentDuplicate)
+	$: icon = action === 'delete' ? mdiDelete : action === 'rename' ? mdiPencil : mdiContentDuplicate
 	$: buttonLabel = capitalize(action)
 	$: scriptNameValid = newSheetName && (action != 'rename' || sheet != newSheetName)
 
@@ -32,7 +32,7 @@
 		if (action === 'rename') {
 			await api.renameSpreadsheet(request)
 		} else if (action === 'delete') {
-			await api.deleteSpreadsheet({ name : sheet })
+			await api.deleteSpreadsheet({ name: sheet })
 		} else if (action === 'copy') {
 			await api.copySpreadsheet(request)
 		}
@@ -55,17 +55,10 @@
 <Dialog bind:open={renameDialogueOpen}>
 	<div slot="title">{title} '{sheet}'</div>
 	{#if action != 'delete'}
-		<TextField
-			on:keydown={(e) => onDoStuffKeyDown(e)}
-			autofocus
-			class="p-2"
-			bind:value={newSheetName}
-			label="Sheet"
-		/>
+		<TextField on:keydown={(e) => onDoStuffKeyDown(e)} autofocus class="p-2" bind:value={newSheetName} label="Sheet" />
 	{/if}
 	<div slot="actions" class="p-2">
-		<Button disabled={!scriptNameValid} on:click={onDoStuff} variant="fill" color="primary" icon={icon}
-			>{buttonLabel}</Button
+		<Button disabled={!scriptNameValid} on:click={onDoStuff} variant="fill" color="primary" {icon}>{buttonLabel}</Button
 		>
 		<Button variant="fill-outline" color="secondary" icon={mdiCancel}>Close</Button>
 	</div>
