@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte"
 
-
   type Col = {
     width : number,
     label : string
@@ -19,7 +18,6 @@
   ];
 
   $: tableWidth = columns.map(c => c.width).reduce((acc, v) => acc + v, 0)
-
 
   let isResizing = false
   let currentColumn: Col | null = null;
@@ -40,7 +38,6 @@
       const newWidth = startWidth + dx
       currentColumn.width = Math.max(newWidth, 100)
       columns = [...columns]
-      mx = event.movementX
       
   }
 
@@ -49,19 +46,22 @@
       currentColumn = null
   }
 
-  onMount(() => {
-    if (window) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
-    }
-  });
-  onDestroy(() => {
-    if (window){
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    }
-  });
+  // onMount(() => {
+  //   if (window) {
+  //     window.addEventListener("mousemove", handleMouseMove);
+  //     window.addEventListener("mouseup", handleMouseUp);
+  //   }
+  // });
+  // onDestroy(() => {
+  //   if (window){
+  //     window.removeEventListener("mousemove", handleMouseMove);
+  //     window.removeEventListener("mouseup", handleMouseUp);
+  //   }
+  // });
 </script>
+
+
+<svelte:window on:mousemove={handleMouseMove} on:mouseup={handleMouseUp} />
 
 <div class="w-full overflow-auto p-1 border">
   <table class="border-collapse " style={`width: ${tableWidth}px;`}>
