@@ -18,82 +18,84 @@
       { Name: "Sam Johnson", Age: 25, Occupation: "Manager" },
   ];
 
+  $: tableWidth = columns.map(c => c.width).reduce((acc, v) => acc + v, 0)
+
+
   let isResizing = false
-  let currentColumnIndex : number = -1
+  let currentColumn: Col | null = null;
   let startX = 0
   let startWidth = 0
-  let startWidthRight = 0
 
-  function handleMouseDown(event, index) {
+  function handleMouseDown(event, col : Col) {
+      console.log('onMouseDown ', col)
       isResizing = true
-      currentColumnIndex = index
+      currentColumn = col
       startX = event.pageX
-      startWidth = event.target.parentElement.offsetWidth
-      startWidthRight = rightColumn().style.width
+      startWidth = col.width
   }
 
-  const movingColumn = () => document.querySelectorAll(".resizable-column")[currentColumnIndex]
-  const rightColumn = () => document.querySelectorAll(".resizable-column")[currentColumnIndex + 1]
-
-  const colSize = (idx : number) => document.querySelectorAll(".resizable-column")[idx]?.style?.width
-
   function handleMouseMove(event) {
-      if (!isResizing) return;
+      if (!isResizing || !currentColumn) return;
       const dx = event.pageX - startX
-      movingColumn().style.width = `${startWidth + dx}px`;
-      rightColumn().style.width = `${startWidthRight - dx}px`;
+      const newWidth = startWidth + dx
+      currentColumn.width = Math.max(newWidth, 100)
+      columns = [...columns]
+      mx = event.movementX
+      
   }
 
   function handleMouseUp() {
-      isResizing = false;
+      isResizing = false
+      currentColumn = null
   }
 
   onMount(() => {
+    if (window) {
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
+    }
   });
   onDestroy(() => {
+    if (window){
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
+    }
   });
 </script>
 
-<!-- <svelte:window on:mousemove={handleMouseMove} on:mousedown={handleMouseUp}/> -->
-
-<div>startWidth: {startWidth}</div>
-<div>startWidthRight: {startWidthRight}</div>
-<table class="min-w-full border-collapse">
-  <thead>
-      <tr class="bg-gray-200">
-          {#each columns as column, index}
-              <th class="border p-2 resizable-column">
-                  <div class="flex justify-between items-center">
-                      <span>{column.label} {colSize(index)}</span>
-                      {#if index < columns.length - 1}
-                      <div
-                          class="resizer bg-gray-400"
-                          on:mousedown={(event) => handleMouseDown(event, index)}
-                      ></div>
-                      {/if}
-                  </div>
-              </th>
-          {/each}
-      </tr>
-  </thead>
-  <tbody>
-      {#each data as row}
-          <tr class="even:bg-gray-100">
-              {#each columns as column}
-                  {@const key = column.label}
-                  <td class="border p-2">{key} : {row[key]}</td>
-              {/each}
-          </tr>
-      {/each}
-  </tbody>
-</table>
+<div class="w-full overflow-auto bg-gray-100 p-4 border">
+  <table class="border-collapse " style={`width: ${tableWidth}px;`}>
+    <thead>
+        <tr class="bg-gray-200" >
+            {#each columns as column, index}
+                <th class="border p-2 resizable-column" style={`width: ${col.width}px;`}>
+                    <div class="flex justify-between items-center">
+                        <span>{column.label} {column.width}</span>
+                        <div
+                            class="resizer bg-gray-400"
+                            on:mousedown={(event) => handleMouseDown(event, column)}
+                        ></div>
+                    </div>
+                </th>
+            {/each}
+        </tr>
+    </thead>
+    <tbody>
+        {#each data as row}
+            <tr class="even:bg-gray-100">
+                {#each columns as col}
+                    {@const key = col.label}
+                    <td class="border p-2"  style={`width: ${col.width}px;`}>{key} : {row[key]?.toString()}</td>
+                {/each}
+            </tr>
+        {/each}
+    </tbody>
+  </table>
+</div>
 
 
 <style>
+
   .resizable-column {
       position: relative;
       overflow: hidden;
