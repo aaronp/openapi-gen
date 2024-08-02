@@ -50,7 +50,7 @@
 	}
 
 	async function onDoImport(event) {
-		const response2 = await importSheet()
+		await importSheet()
 		dispatch('onImportComplete', { csv })
 	}
 	async function importSheet() {
@@ -68,10 +68,14 @@
 		})
 
 		const columns = csv.header.map((name) => {
-			return asSchemaField(name)
+			return {
+				width: 200,
+				schema: asSchemaField(name)
+			}
 		})
 
-		const spreadsheet: Spreadsheet = { name: fileName, rows: sheetRows, columns }
+		const name = fileName ? fileName : new Date().toISOString()
+		const spreadsheet: Spreadsheet = { name, rows: sheetRows, columns }
 		return await api.saveSpreadsheet({ spreadsheet })
 	}
 	const asSchemaField = (name: string): SchemaField => {
@@ -85,12 +89,23 @@
 	function handleDragOver(event) {
 		event.preventDefault()
 	}
+
+	function reparse() {
+		csv = parseCSV(fileContent)
+	}
 </script>
 
 <h2 class="text-lg">CSV Content to import</h2>
 <h3 class="text-sm">(type or drag-and-drop a file)</h3>
 <div class="drop-area" on:drop={handleDrop} on:dragover={handleDragOver}>
-	<TextField classes={{ input: 'h-96', container: 'h-96' }} multiline label="CSV" bind:value={fileContent} />
+	<TextField
+		debounceChange
+		on:change={reparse}
+		classes={{ input: 'h-96', container: 'h-96' }}
+		multiline
+		label="CSV"
+		bind:value={fileContent}
+	/>
 </div>
 
 {#if warningMessage}

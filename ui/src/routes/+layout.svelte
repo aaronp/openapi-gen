@@ -58,6 +58,7 @@
 	})
 
 	$: currentSheetName = sheetNameFromUrl()
+
 	const sheetNameFromUrl = () => {
 		const url = $page.url.toString()
 		const parts = url.split('/')
@@ -112,6 +113,7 @@
 		openImport = false
 	}
 	function onImportComplete(msg) {
+		relistSpreadsheets()
 		openImport = false
 	}
 
@@ -151,12 +153,12 @@
 				</div>
 			{/each}
 			<div class="self-start ml-2 text-white">
-				<Button icon={mdiPlus} rounded target="_blank" on:click={onAddSheet}>Add</Button>
+				<Button icon={mdiPlus} rounded target="_blank" on:click={onAddSheet}>New Sheet</Button>
 			</div>
 		</div>
 	</svelte:fragment>
 
-	<AppBar title="Data Definitions">
+	<AppBar title="Data Definition">
 		<div slot="actions" class="flex gap-3">
 			<Tooltip title="Import" placement="left" offset={2}>
 				<Button icon={mdiFileUpload} rounded on:click={(e) => onImport()} target="_blank" />
