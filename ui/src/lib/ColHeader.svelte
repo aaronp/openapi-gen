@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { SchemaFieldTypeEnum, type SchemaField } from '$lib/generated/index'
-	import { mdiArrowLeft, mdiArrowRight, mdiCheck, mdiPencil } from '@mdi/js'
+	import { mdiArrowLeft, mdiArrowRight, mdiCheck, mdiDelete, mdiTrashCan, mdiPencil } from '@mdi/js'
 	import { createEventDispatcher } from 'svelte'
-	import { Dialog, Button, Field, SelectField, TextField, type MenuOption } from 'svelte-ux'
+	import { Dialog, Button, Field, SelectField, TextField, type MenuOption, Toggle } from 'svelte-ux'
 
 	const dispatch = createEventDispatcher()
 
@@ -60,6 +60,11 @@
 		}
 	}
 
+	function onDelete() {
+		showMenu = false
+		dispatch('delete')
+	}
+
 	function onMove(isLeft: boolean) {
 		showMenu = false
 		if (isLeft) {
@@ -89,6 +94,18 @@
 		<Button icon={mdiArrowLeft} on:click={(e) => onMove(true)}></Button>
 		<Button icon={mdiArrowRight} on:click={(e) => onMove(false)}></Button>
 		<Button icon={mdiPencil} on:click={(e) => (dialogueOpen = true)}></Button>
+
+		<Toggle let:on={open} let:toggle let:toggleOff>
+			<Button icon={mdiTrashCan} on:click={toggle} color="danger">Delete</Button>
+			<Dialog {open} on:close={toggleOff}>
+				<div slot="title">Remove column {schema.name}?</div>
+				<div class="px-6 py-3">This cannot be undone.</div>
+				<div slot="actions">
+					<Button icon={mdiDelete} on:click={() => onDelete()} variant="fill" color="danger">Yes, delete item</Button>
+					<Button>Cancel</Button>
+				</div>
+			</Dialog>
+		</Toggle>
 	</div>
 </div>
 

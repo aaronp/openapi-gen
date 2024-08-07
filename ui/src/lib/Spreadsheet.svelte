@@ -1,10 +1,19 @@
 <script lang="ts">
 	import type { Cell, Row, SchemaField, Spreadsheet, Column } from '$lib/generated/index'
 	import { api } from '$lib/session'
-	import { SchemaFieldTypeEnum } from '$lib/generated/index'
+	import { SchemaFieldTypeEnum, SortingDirectionEnum } from '$lib/generated/index'
 	import ColHeader from '$lib/ColHeader.svelte'
 
-	import { Button, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip } from 'svelte-ux'
+	import {
+		Button,
+		SelectField,
+		MultiSelectField,
+		type MenuOption,
+		Checkbox,
+		TextField,
+		Tooltip,
+		NumberStepper
+	} from 'svelte-ux'
 
 	import { mdiDelete, mdiPlus, mdiArrowDownThin, mdiArrowUpThin } from '@mdi/js'
 	import { onMount } from 'svelte'
@@ -12,7 +21,7 @@
 	const newSchema = (label: string): SchemaField => {
 		return {
 			name: label,
-			type: SchemaFieldTypeEnum.Text,
+			type: SchemaFieldTypeEnum.String,
 			availableValues: []
 		}
 	}
@@ -61,17 +70,16 @@
 		await reloadSpreadsheet(id)
 	})
 
-	const newCell = (fieldName: string): Cell => {
+	const newCell = (): Cell => {
 		return {
-			fieldName: fieldName,
 			value: '', // ignore
 			values: []
 		}
 	}
 
 	function newRow(): Row {
-		const cells = spreadsheet.columns.map((col) => newCell(col.schema.name))
-		return { cells: cells.length == 0 ? [...cells, newCell('Col 1')] : cells }
+		const cells = spreadsheet.columns.map((col) => newCell())
+		return { cells: cells.length == 0 ? [...cells, newCell()] : cells }
 	}
 
 	async function reloadSpreadsheet(n: string) {
@@ -105,14 +113,14 @@
 
 		// the settings have changed since we last loaded the spreadsheet
 		if (!cell) {
-			const newCell = emptyCell(field)
+			const newCell = emptyCell()
 			row.cells.push(newCell)
 			return newCell
 		} else {
 			return cell
 		}
 	}
-	const emptyCell = (field: SchemaField) => newCell(field.name)
+	const emptyCell = () => newCell()
 
 	function onMultiselectChange({ detail }: CustomEvent, cell: Cell, rowIndex: number) {
 		cell.values = detail.value
@@ -122,11 +130,12 @@
 	}
 
 	const isEmpty = (row: Row) => {
-		const hasAValue = row.cells.some((c) => {
-			c.value || (c.values?.length ?? 0 > 0) ? true : false
-		})
-		console.log(JSON.stringify(row), ' has a value: ', hasAValue)
-		return !hasAValue
+		for (const c of row.cells) {
+			if (c.value) {
+				return false
+			}
+		}
+		return true
 	}
 
 	function onChange(cell: Cell, rowIndex: number) {
@@ -137,9 +146,11 @@
 	}
 	async function onSave() {
 		if (spreadsheet.name) {
-			// const nonEmpty = spreadsheet.rows.filter((r) => !isEmpty(r))
-			// spreadsheet.rows = nonEmpty
+			const nonEmpty = spreadsheet.rows.filter((r) => !isEmpty(r))
+			const before = spreadsheet.rows
+			spreadsheet.rows = nonEmpty
 			await api.saveSpreadsheet({ spreadsheet })
+			spreadsheet.rows = before
 		}
 	}
 
@@ -164,8 +175,7 @@
 	function asOption(value: string): MenuOption {
 		return { label: value, value: value }
 	}
-	function availableValues(cell: Cell, field: SchemaField) {
-		// return (cell.type.availableValues ?? []).map((v) => asOption(v))
+	function availableValues(field: SchemaField) {
 		return (field.availableValues ?? []).map((v) => asOption(v))
 	}
 
@@ -176,14 +186,61 @@
 		]
 	}
 
-	function onColumnSort(col: Column, ascending: boolean) {}
+	const sortOpacity = (col: Column) => (col.schema.name === spreadsheet?.sort?.fieldName ? 'opacity-100' : 'opacity-25')
+
+	const sortIcon = (col: Column) => {
+		if (sortDirection(col) === SortingDirectionEnum.Ascending) {
+			return mdiArrowUpThin
+		} else {
+			return mdiArrowDownThin
+		}
+	}
+
+	const sortDirection = (col: Column) => {
+		if (col.schema.name === spreadsheet?.sort?.fieldName) {
+			return spreadsheet?.sort?.direction ?? SortingDirectionEnum.Descending
+		}
+		return SortingDirectionEnum.Descending
+	}
+	function onColumnSort(col: Column, colIndex: number) {
+		var dir: SortingDirectionEnum = SortingDirectionEnum.Descending
+		if (col.schema.name === spreadsheet?.sort?.fieldName) {
+			dir =
+				sortDirection(col) == SortingDirectionEnum.Ascending
+					? SortingDirectionEnum.Descending
+					: SortingDirectionEnum.Ascending
+		}
+		spreadsheet.sort = {
+			fieldName: col.schema.name,
+			direction: dir
+		}
+
+		const sorted = spreadsheet.rows
+			.filter((r) => !isEmpty(r))
+			.sort((a, b) => {
+				const left = JSON.stringify(a.cells[colIndex])
+				const right = JSON.stringify(b.cells[colIndex])
+				var result: number = left.localeCompare(right)
+				if (dir == SortingDirectionEnum.Ascending) {
+					result = result * -1
+				}
+				return result
+			})
+
+		const size = sorted.length
+		if (size > 0 && !isEmpty(sorted[size - 1])) {
+			spreadsheet.rows = [...sorted, newRow()]
+		} else {
+			spreadsheet.rows = sorted
+		}
+	}
 
 	function onMoveLeft(col: Column, colIndex: number) {
 		if (colIndex > 0) {
 			swap(colIndex, colIndex - 1)
 		}
 	}
-	function swapArray<A>(values : A[], col1: number, col2: number) {
+	function swapArray<A>(values: A[], col1: number, col2: number) {
 		const c = values[col1]
 		values[col1] = values[col2]
 		values[col2] = c
@@ -202,7 +259,16 @@
 			swap(colIndex, colIndex + 1)
 		}
 	}
+	function onDeleteColumn(col: Column, colIndex: number) {
+		spreadsheet.columns.splice(colIndex, 1)
+		spreadsheet.rows.forEach((row) => {
+			row.cells.splice(colIndex, 1)
+		})
+		spreadsheet = spreadsheet
+		onSave()
+	}
 	function onSchemaUpdated(newSchema: SchemaField, col: Column) {
+		spreadsheet = spreadsheet
 		onSave()
 	}
 </script>
@@ -226,13 +292,14 @@
 								<span class="w-full">
 									<ColHeader
 										schema={col.schema}
+										on:delete={(e) => onDeleteColumn(col, colIndex)}
 										on:moveRight={(e) => onMoveRight(col, colIndex)}
 										on:moveLeft={(e) => onMoveLeft(col, colIndex)}
 										on:schemaUpdated={(e) => onSchemaUpdated(e.detail, col)}
 									/>
 								</span>
-								<span class="w-12 opacity-25">
-									<Button icon={mdiArrowDownThin} on:click={(e) => onColumnSort(col, true)}></Button>
+								<span class="w-12 {sortOpacity(col)}">
+									<Button icon={sortIcon(col)} on:click={(e) => onColumnSort(col, colIndex)}></Button>
 								</span>
 								<div
 									class="resizer dark:bg-gray-900 bg-gray-400"
@@ -252,13 +319,19 @@
 
 					{#each cellsForRow(row) as [col, cell], colIndex}
 						<td id="cell-{rowIndex}-{colIndex}" class="border p-2" style={`width: ${col.width}px;`}>
-							<Tooltip title={col.schema.name + '=' + JSON.stringify(cell.value) + '[' + col.schema.type + ']'}>
-								{@const typ = col.schema}
-								
+							<Tooltip
+								title={col.schema.name +
+									'=' +
+									JSON.stringify(cell.value) +
+									' ...' +
+									JSON.stringify(col.schema.availableValues)}
+							>
+								{@const typ = col.schema.type}
+
 								{#if typ === SchemaFieldTypeEnum.OneOf}
 									<SelectField
 										on:change={(e) => onChange(cell, rowIndex)}
-										options={availableValues(cell, typ)}
+										options={availableValues(col.schema)}
 										bind:value={cell.value}
 									/>
 								{:else if typ === SchemaFieldTypeEnum.AnyOf}
@@ -267,9 +340,13 @@
 										rounded
 										bind:label={cell.value}
 										on:change={(e) => onMultiselectChange(e, cell, rowIndex)}
-										options={availableValues(cell, typ)}
+										options={availableValues(col.schema)}
 										bind:value={cell.values}
 									/>
+								{:else if typ === SchemaFieldTypeEnum.Boolean}
+									<Checkbox on:change={(e) => onChange(cell, rowIndex)} bind:checked={cell.value} />
+								{:else if typ === SchemaFieldTypeEnum.Double}
+									<NumberStepper on:change={(e) => onChange(cell, rowIndex)} class="w-full" bind:value={cell.value} />
 								{:else if typ === SchemaFieldTypeEnum.Text}
 									<TextField
 										debounceChange
@@ -277,10 +354,8 @@
 										on:keydown={(e) => onFieldKeyDown(e, rowIndex, colIndex)}
 										multiline
 										bind:value={cell.value}
-										class=" rounded shadow-lg text-left text-lg  min-w-80"
+										class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg"
 									/>
-								{:else if typ === SchemaFieldTypeEnum.Boolean}
-									<Checkbox on:change={(e) => onChange(cell, rowIndex)} bind:checked={cell.value} />
 								{:else}
 									<TextField
 										debounceChange

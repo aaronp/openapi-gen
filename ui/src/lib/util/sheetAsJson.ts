@@ -15,11 +15,12 @@ export const toCamelCase = (input: string): string => {
 	return camelCaseString
 }
 
-function asRecord(row: Row) {
-	return row.cells.reduce(
-		(acc, cell) => {
-			const key = toCamelCase(cell.fieldName)
-			acc[key] = cell.fieldName == SchemaFieldTypeEnum.AnyOf ? cell.values : cell.value
+function asRecord(sheet: Spreadsheet, row: Row) {
+	return sheet.columns.reduce(
+		(acc, col, i) => {
+			const cell = row.cells[i]
+			const key = toCamelCase(col.schema.name)
+			acc[key] = col.schema.type === SchemaFieldTypeEnum.AnyOf ? cell.values : cell.value
 			return acc
 		},
 		{} as { [key: string]: any }
@@ -32,5 +33,5 @@ function asRecord(row: Row) {
  */
 export function sheetAsJson(sheet: Spreadsheet): { [key: string]: any }[] {
 	const rows = sheet?.rows || []
-	return rows.map((row) => asRecord(row))
+	return rows.map((row) => asRecord(sheet, row))
 }

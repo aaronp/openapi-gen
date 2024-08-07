@@ -102,7 +102,6 @@
 	}
 
 	function toggleCodePanel() {
-		console.log('layout:toggleCodePanel ', stickyCode)
 		stickyCode = !stickyCode
 	}
 
