@@ -47,9 +47,9 @@
 	let options: MenuOption[] = [
 		asOption(SchemaFieldTypeEnum.String),
 		asOption(SchemaFieldTypeEnum.Text),
-		asOption(SchemaFieldTypeEnum.Integer),
-		asOption(SchemaFieldTypeEnum.Double),
+		asOption(SchemaFieldTypeEnum.Number),
 		asOption(SchemaFieldTypeEnum.Boolean),
+		asOption(SchemaFieldTypeEnum.Script),
 		asOption(SchemaFieldTypeEnum.OneOf),
 		asOption(SchemaFieldTypeEnum.AnyOf)
 	]

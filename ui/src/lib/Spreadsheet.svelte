@@ -344,9 +344,18 @@
 									/>
 								{:else if typ === SchemaFieldTypeEnum.Boolean}
 									<Checkbox on:change={(e) => onChange(cell, rowIndex)} bind:checked={cell.value} />
-								{:else if typ === SchemaFieldTypeEnum.Double}
+								{:else if typ === SchemaFieldTypeEnum.Number}
 									<NumberStepper on:change={(e) => onChange(cell, rowIndex)} class="w-full" bind:value={cell.value} />
 								{:else if typ === SchemaFieldTypeEnum.Text}
+									<TextField
+										debounceChange
+										on:change={(e) => onChange(cell, rowIndex)}
+										on:keydown={(e) => onFieldKeyDown(e, rowIndex, colIndex)}
+										multiline
+										bind:value={cell.value}
+										class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg"
+									/>
+								{:else if typ === SchemaFieldTypeEnum.Script}
 									<TextField
 										debounceChange
 										on:change={(e) => onChange(cell, rowIndex)}

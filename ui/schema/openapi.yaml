@@ -325,14 +325,15 @@ components:
         name:
           type: string
           example: 'fieldName'
-        # isArray:
-        #   type: boolean
-        #   description: Is the value repeated?
-        #   example: false
+        scriptInputs:
+          type: array
+          description: if the type is 'Script', this specifies the other cells which are needed for this script
+          items:
+            type: string
+          example: ['col1', 'col2']
         type:
           type: string
-          # enum: [string, user, id, email, integer, double, price, document, boolean, date, oneOf, anyOf, binary, json, uri]
-          enum: [string, text, integer, double, boolean, oneOf, anyOf]
+          enum: [string, text, number, boolean, script, oneOf, anyOf]
           example: 'string'
         availableValues:
           type: array
