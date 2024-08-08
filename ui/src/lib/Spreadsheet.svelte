@@ -106,9 +106,6 @@
 		return spreadsheet.columns.map((c, i) => [c, cellForRow(row, c, i)])
 	}
 	function cellForRow(row: Row, col: Column, colIndex: number): Cell {
-		const field = col.schema
-
-		// TODO - use a different datastructure for this (a map on field names or else just re-order when the columns change)
 		const cell = row.cells[colIndex]
 
 		// the settings have changed since we last loaded the spreadsheet
@@ -181,9 +178,12 @@
 
 	const onAddColumn = () => {
 		spreadsheet.columns = [
-			...spreadsheet.columns,
-			{ width: 200, schema: newSchema(`Col ${spreadsheet.columns.length + 1}`) }
+			{ width: 200, schema: newSchema(`Col${spreadsheet.columns.length + 1}`) },
+			...spreadsheet.columns
 		]
+		spreadsheet.rows.forEach((r) => {
+			r.cells = [emptyCell(), ...r.cells]
+		})
 	}
 
 	const sortOpacity = (col: Column) => (col.schema.name === spreadsheet?.sort?.fieldName ? 'opacity-100' : 'opacity-25')
@@ -285,7 +285,7 @@
 		<thead>
 			{#if spreadsheet.rows.length > 0}
 				<tr class="dark:bg-gray-800 bg-gray-200">
-					<th></th>
+					<th><Tooltip title="Add Column"><Button icon={mdiPlus} on:click={onAddColumn} /></Tooltip></th>
 					{#each spreadsheet.columns as col, colIndex}
 						<th class="border resizable-column" style={`width: ${col.width}px;`}>
 							<div class="flex justify-between items-center">
@@ -308,7 +308,6 @@
 							</div>
 						</th>
 					{/each}
-					<th><Button icon={mdiPlus} on:click={onAddColumn} /></th>
 				</tr>
 			{/if}
 		</thead>
