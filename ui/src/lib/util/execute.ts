@@ -1,6 +1,6 @@
 import * as ts from 'typescript'
 import type { StackElement } from './cache'
-import { toCamelCase } from './text'
+import { toCamelCase, asIdentifier } from './text'
 
 export type StackResult = {
 	element: StackElement
@@ -38,18 +38,18 @@ export function executeCodeWithInput(code: string, inputs: Map<string, any>) {
 
 	try {
 		inputs.forEach((value, key) => {
-			console.log(`setting input for key: ${JSON.stringify(key)} of type ${typeof key} value: >${value}<`)
 			if (key) {
 				iframe.contentWindow[key] = value
 			}
 		})
 
 		iframe.contentWindow.toCamelCase = toCamelCase
+		iframe.contentWindow.asIdentifier = asIdentifier
 
-		console.log(`\COMPILED:`)
-		console.log(`\t${code}`)
-		console.log(`\tEXECUTING:`)
-		console.log(compiledCode)
+		// console.log(`\COMPILED:`)
+		// console.log(`\t${code}`)
+		// console.log(`\tEXECUTING:`)
+		// console.log(compiledCode)
 
 		return iframe.contentWindow.eval(compiledCode)
 	} finally {
@@ -82,13 +82,12 @@ async function evaluateStackRecursive(
 
 	results.forEach((value, key) => {
 		inputsMap.set(key, value)
-		console.log(`\t${head.input} setting input for key: ${JSON.stringify(key)} of type ${typeof key} value: >${value}<`)
+		// console.log(`\t${head.input} setting input for key: ${JSON.stringify(key)} of type ${typeof key} value: >${value}<`)
 	})
 
 	inputsMap.set('input', lastResult)
 
 	try {
-		console.log(`executing w/ input map of size ${inputsMap.size}`)
 		const result = await executeCodeWithInput(head.script.script, inputsMap)
 
 		resultBuffer.push({

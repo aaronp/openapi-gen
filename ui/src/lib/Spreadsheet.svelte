@@ -40,6 +40,10 @@
 	let startX = 0
 	let startWidth = 0
 
+	// a cache of the columns indexes by the column identifiers
+	let indexByIdentifier: { [key: string]: number } = {}
+
+
 	function handleMouseDown(event, col: Column) {
 		isResizing = true
 		currentColumn = col
@@ -103,6 +107,8 @@
 		if (spreadsheet.rows.length == 0) {
 			spreadsheet.rows = [...spreadsheet.rows, newRow()]
 		}
+
+		indexByIdentifier = colIndexByIdentifier()
 	}
 
 	function cellsForRow(row: Row) {
@@ -148,9 +154,14 @@
 		if (spreadsheet.name) {
 			const nonEmpty = spreadsheet.rows.filter((r) => !isEmpty(r))
 			const before = spreadsheet.rows
-			spreadsheet.rows = nonEmpty
+
+
+			// spreadsheet.rows = nonEmpty
 			await api.saveSpreadsheet({ spreadsheet })
-			spreadsheet.rows = before
+			// spreadsheet.rows = before
+
+			// we may be renaming columns or all sorts
+			indexByIdentifier = colIndexByIdentifier()
 		}
 	}
 
@@ -187,6 +198,8 @@
 		spreadsheet.rows.forEach((r) => {
 			r.cells = [emptyCell(), ...r.cells]
 		})
+
+		indexByIdentifier = colIndexByIdentifier()
 	}
 
 	const sortOpacity = (col: Column) => (col.schema.name === spreadsheet?.sort?.fieldName ? 'opacity-100' : 'opacity-25')
@@ -255,6 +268,7 @@
 			swapArray(row.cells, col1, col2)
 		})
 		spreadsheet = spreadsheet
+
 		onSave()
 	}
 	function onMoveRight(col: Column, colIndex: number) {
@@ -274,23 +288,58 @@
 		spreadsheet = spreadsheet
 		onSave()
 	}
+
+	/**
+	 * @return a map of the column index by the column name identifier (i.e. if the second column 'Foo Bar' corresponds to an entry of 'fooBar' -> 1 )
+	 */
+	function colIndexByIdentifier() {
+		const stringToIndexMap: { [key: string]: number } = {};
+		spreadsheet.columns.forEach((c, i) => {
+			const key = asIdentifier(c.schema.name)
+			stringToIndexMap[key] = i
+		})
+		return stringToIndexMap
+	}
+
+	/**
+	 * Our script cells need to gather their inputs (other cells in the row), 
+	 * and those cells may in turn be scripts (so we have to recurse)
+	 * 
+	 * @param row
+	 * @param key
+	 */
+	function valueOf(row: Row, key : string) {
+		try {
+			const idx = indexByIdentifier[key]
+			const col = spreadsheet.columns[idx]
+			const typ = col.schema.type
+			const cell : Cell = row.cells[idx]
+
+			if (typ === SchemaFieldTypeEnum.Script) {
+				return execScript(row, col, cell)
+			} else if (typ === SchemaFieldTypeEnum.AnyOf || typ === SchemaFieldTypeEnum.OneOf) {
+				return cell.values
+			}
+			return cell.value ?? cell.values
+		} catch (e) {
+			return `error getting ${key} : ${e}`
+		}
+	}
+
 	function execScript(row : Row, col : Column, cell : Cell) {
 		try {
 			const inputsMap = new Map<string, any>()
 
 			col?.schema?.scriptInputs?.forEach((key) => {
-				const idx = spreadsheet.columns.findIndex(c => asIdentifier(c.schema.name) === key)
-				const value : Cell = row.cells[idx] ?? `${key} not found: ${idx}`
-				inputsMap.set(key, value.value)
+				const value = valueOf(row, key)
+				inputsMap.set(key, value)
 			})
 			
-			
+			// the script code is stored as an 'availableValues' in the column
 			const script = col.schema.availableValues?.join('') ?? ''
-			console.log(`Executing  >${script}<`)
-			const result = executeCodeWithInput(script, inputsMap)
-			return result
+			return executeCodeWithInput(script, inputsMap)
 		} catch (e) {
-			return 'Error: ' + e
+			return 'execScript error: ' + e
 		}
 	}
 </script>
@@ -313,16 +362,18 @@
 						<th class="border resizable-column" style={`width: ${col.width}px;`}>
 							<div class="flex justify-between items-center">
 								<span class="w-full">
-									<ColHeader
-									    hasLeft={colIndex > 0}
-										hasRight={colIndex < spreadsheet.columns.length - 1}
-										schema={col.schema}
-										columns={spreadsheet.columns.filter(c => c != col)}
-										on:delete={(e) => onDeleteColumn(col, colIndex)}
-										on:moveRight={(e) => onMoveRight(col, colIndex)}
-										on:moveLeft={(e) => onMoveLeft(col, colIndex)}
-										on:schemaUpdated={(e) => onSchemaUpdated(e.detail, col)}
-									/>
+									{#key col}
+										<ColHeader
+											hasLeft={colIndex > 0}
+											hasRight={colIndex < spreadsheet.columns.length - 1}
+											schema={col.schema}
+											columns={spreadsheet.columns.filter(c => c != col)}
+											on:delete={(e) => onDeleteColumn(col, colIndex)}
+											on:moveRight={(e) => onMoveRight(col, colIndex)}
+											on:moveLeft={(e) => onMoveLeft(col, colIndex)}
+											on:schemaUpdated={(e) => onSchemaUpdated(e.detail, col)}
+										/>
+									{/key}
 								</span>
 								<span class="w-12 {sortOpacity(col)}">
 									<Button icon={sortIcon(col)} on:click={(e) => onColumnSort(col, colIndex)}></Button>
@@ -371,7 +422,14 @@
 								{:else if typ === SchemaFieldTypeEnum.Boolean}
 									<Checkbox on:change={(e) => onChange(cell, rowIndex)} bind:checked={cell.value} />
 								{:else if typ === SchemaFieldTypeEnum.Number}
-									<NumberStepper on:change={(e) => onChange(cell, rowIndex)} class="w-full" bind:value={cell.value} />
+									<!-- <NumberStepper on:change={(e) => onChange(cell, rowIndex)} class="w-full" bind:value={cell.value} /> -->
+										<TextField
+										debounceChange
+										on:change={(e) => onChange(cell, rowIndex)}
+										on:keydown={(e) => onFieldKeyDown(e, rowIndex, colIndex)}
+										bind:value={cell.value}
+										class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg"
+									/>
 								{:else if typ === SchemaFieldTypeEnum.Text}
 									<TextField
 										debounceChange

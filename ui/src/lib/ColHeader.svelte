@@ -75,7 +75,7 @@
 
 	function onEnterCheck(event) {
 		if (event.key === 'Enter') {
-			onUpdateSchema()
+			// onUpdateSchema()
 		}
 	}
 
