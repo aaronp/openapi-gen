@@ -90,18 +90,18 @@
 		class="ml-2 text-left text-lg "
 	/>
 
-	<div class={`absolute left-0 top-full border bg-secondary-800 ${showMenu ? 'flex' : 'hidden'}`}>
+	<div class={`absolute rounded left-0 top-full border bg-primary-100 dark:bg-primary-600 ${showMenu ? 'flex' : 'hidden'}`}>
 		<Button icon={mdiArrowLeft} on:click={(e) => onMove(true)}></Button>
 		<Button icon={mdiArrowRight} on:click={(e) => onMove(false)}></Button>
 		<Button icon={mdiPencil} on:click={(e) => (dialogueOpen = true)}></Button>
 
 		<Toggle let:on={open} let:toggle let:toggleOff>
-			<Button icon={mdiTrashCan} on:click={toggle} color="danger">Delete</Button>
+			<Button icon={mdiTrashCan} on:click={toggle} />
 			<Dialog {open} on:close={toggleOff}>
 				<div slot="title">Remove column {schema.name}?</div>
 				<div class="px-6 py-3">This cannot be undone.</div>
 				<div slot="actions">
-					<Button icon={mdiDelete} on:click={() => onDelete()} variant="fill" color="danger">Yes, delete item</Button>
+					<Button icon={mdiDelete} on:click={() => onDelete()} variant="fill" color="danger">Remove Column</Button>
 					<Button>Cancel</Button>
 				</div>
 			</Dialog>
