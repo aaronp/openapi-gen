@@ -1,6 +1,6 @@
 import * as ts from 'typescript'
 import type { StackElement } from './cache'
-import { toCamelCase as toCamelCaseImport } from './sheetAsJson'
+import { toCamelCase } from './text'
 
 export type StackResult = {
 	element: StackElement
@@ -44,7 +44,7 @@ export function executeCodeWithInput(code: string, inputs: Map<string, any>) {
 			}
 		})
 
-		iframe.contentWindow.toCamelCase = toCamelCaseImport
+		iframe.contentWindow.toCamelCase = toCamelCase
 
 		console.log(`\COMPILED:`)
 		console.log(`\t${code}`)
@@ -55,35 +55,6 @@ export function executeCodeWithInput(code: string, inputs: Map<string, any>) {
 	} finally {
 		tidyUp(iframe)
 	}
-}
-
-export function executeCode(code: string) {
-	// Compile TypeScript to JavaScript
-	const compiledCode = compile(code)
-
-	// Use a sandboxed environment to execute the code
-	const iframe = newSandbox()
-
-	try {
-		return iframe.contentWindow.eval(compiledCode)
-	} finally {
-		tidyUp(iframe)
-	}
-}
-
-export const toCamelCase = (input: string): string => {
-	// Remove non-alphanumeric characters and split by space or underscore
-	let words = input.replace(/[^a-zA-Z0-9 ]/g, '').split(/[\s_]+/)
-
-	// Convert the first word to lowercase
-	let camelCaseString = words[0].toLowerCase()
-
-	// Capitalize the first letter of each subsequent word and append it to the result
-	for (let i = 1; i < words.length; i++) {
-		camelCaseString += words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase()
-	}
-
-	return camelCaseString
 }
 
 // walk the array, filling in the 'result element' from the previous step

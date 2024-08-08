@@ -1,14 +1,31 @@
 <script lang="ts">
-	import { SchemaFieldTypeEnum, type SchemaField } from '$lib/generated/index'
+	import { SchemaFieldTypeEnum, type Column, type SchemaField } from '$lib/generated/index'
 	import { mdiArrowLeft, mdiArrowRight, mdiCheck, mdiDelete, mdiTrashCan, mdiPencil } from '@mdi/js'
 	import { createEventDispatcher } from 'svelte'
-	import { Dialog, Button, Field, SelectField, TextField, type MenuOption, Toggle } from 'svelte-ux'
+	import { Dialog, Button, Field, SelectField, TextField, type MenuOption, Toggle, MultiSelectField } from 'svelte-ux'
+	import { asIdentifier } from './util/text'
 
 	const dispatch = createEventDispatcher()
 
+	export let hasLeft = true
+	export let hasRight = true
+	export let columns: Column[] = [
+		{
+			width : 100, schema: {
+				name : 'Foo',
+				type : SchemaFieldTypeEnum.String,
+			}
+		},
+		{
+			width : 100, schema: {
+				name : 'Bar',
+				type : SchemaFieldTypeEnum.String,
+			}
+		}
+	]
 	export let schema: SchemaField = {
 		name: '',
-		type: SchemaFieldTypeEnum.AnyOf
+		type: SchemaFieldTypeEnum.Script
 	}
 
 	let values = schema?.availableValues?.join(', ') ?? ''
@@ -44,7 +61,9 @@
 		return { label: name, value: name }
 	}
 
-	let options: MenuOption[] = [
+	const inputOptions: MenuOption[] = columns.map((c) => asOption(asIdentifier(c.schema.name)))
+
+	const options: MenuOption[] = [
 		asOption(SchemaFieldTypeEnum.String),
 		asOption(SchemaFieldTypeEnum.Text),
 		asOption(SchemaFieldTypeEnum.Number),
@@ -91,8 +110,12 @@
 	/>
 
 	<div class={`absolute rounded left-0 top-full border bg-primary-100 dark:bg-primary-600 ${showMenu ? 'flex' : 'hidden'}`}>
+		{#if hasLeft}
 		<Button icon={mdiArrowLeft} on:click={(e) => onMove(true)}></Button>
+		{/if}
+		{#if hasRight}
 		<Button icon={mdiArrowRight} on:click={(e) => onMove(false)}></Button>
+		{/if}
 		<Button icon={mdiPencil} on:click={(e) => (dialogueOpen = true)}></Button>
 
 		<Toggle let:on={open} let:toggle let:toggleOff>
@@ -116,19 +139,38 @@
 			<SelectField {options} bind:value={schema.type} />
 		</Field>
 
+		{#if schema?.type === SchemaFieldTypeEnum.Script}
+			<MultiSelectField
+				options={inputOptions}
+				formatSelected={(e) => schema.scriptInputs}
+				label="RowCell"
+				bind:value={schema.scriptInputs}
+				/>
+
+			<TextField
+				label="Script"
+				replace="script"
+				classes={{ input: 'h-40', container: 'h-40' }}
+				debounceChange
+				multiline
+				class="text-lg py-1 my-1"
+				bind:value={values}
+				on:keypress={onEnterCheck}
+			/>
+		{/if}
 		{#if schema?.type === SchemaFieldTypeEnum.OneOf || schema?.type === SchemaFieldTypeEnum.AnyOf}
 			<TextField
 				label="Values"
 				replace="values"
 				debounceChange
 				multiline
-				class="text-lg py-2 my-8"
+				class="text-lg py-1 my-1"
 				bind:value={values}
 				on:keypress={onEnterCheck}
 			/>
 		{/if}
 	</div>
-	<div slot="actions" class="m-10">
+	<div slot="actions" >
 		<Button variant="fill" color="secondary" icon={mdiCheck} on:click={onUpdateSchema}>Ok</Button>
 	</div>
 </Dialog>

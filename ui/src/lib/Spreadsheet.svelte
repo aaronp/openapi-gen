@@ -17,6 +17,9 @@
 
 	import { mdiDelete, mdiPlus, mdiArrowDownThin, mdiArrowUpThin } from '@mdi/js'
 	import { onMount } from 'svelte'
+	import Page from '../routes/+page.svelte'
+	import { executeCodeWithInput } from './util/execute'
+	import { asIdentifier } from './util/text'
 
 	const newSchema = (label: string): SchemaField => {
 		return {
@@ -271,6 +274,25 @@
 		spreadsheet = spreadsheet
 		onSave()
 	}
+	function execScript(row : Row, col : Column, cell : Cell) {
+		try {
+			const inputsMap = new Map<string, any>()
+
+			col?.schema?.scriptInputs?.forEach((key) => {
+				const idx = spreadsheet.columns.findIndex(c => asIdentifier(c.schema.name) === key)
+				const value : Cell = row.cells[idx] ?? `${key} not found: ${idx}`
+				inputsMap.set(key, value.value)
+			})
+			
+			
+			const script = col.schema.availableValues?.join('') ?? ''
+			console.log(`Executing  >${script}<`)
+			const result = executeCodeWithInput(script, inputsMap)
+			return result
+		} catch (e) {
+			return 'Error: ' + e
+		}
+	}
 </script>
 
 <!-- needed for column drag -->
@@ -286,12 +308,16 @@
 			{#if spreadsheet.rows.length > 0}
 				<tr class="dark:bg-gray-800 bg-gray-200">
 					<th><Tooltip title="Add Column"><Button icon={mdiPlus} on:click={onAddColumn} /></Tooltip></th>
+					
 					{#each spreadsheet.columns as col, colIndex}
 						<th class="border resizable-column" style={`width: ${col.width}px;`}>
 							<div class="flex justify-between items-center">
 								<span class="w-full">
 									<ColHeader
+									    hasLeft={colIndex > 0}
+										hasRight={colIndex < spreadsheet.columns.length - 1}
 										schema={col.schema}
+										columns={spreadsheet.columns.filter(c => c != col)}
 										on:delete={(e) => onDeleteColumn(col, colIndex)}
 										on:moveRight={(e) => onMoveRight(col, colIndex)}
 										on:moveLeft={(e) => onMoveLeft(col, colIndex)}
@@ -356,14 +382,11 @@
 										class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg"
 									/>
 								{:else if typ === SchemaFieldTypeEnum.Script}
-									<TextField
-										debounceChange
-										on:change={(e) => onChange(cell, rowIndex)}
-										on:keydown={(e) => onFieldKeyDown(e, rowIndex, colIndex)}
-										multiline
-										bind:value={cell.value}
-										class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg"
-									/>
+									<div
+										class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg">
+										{execScript(row, col, cell)}
+									</div>
+									
 								{:else}
 									<TextField
 										debounceChange
