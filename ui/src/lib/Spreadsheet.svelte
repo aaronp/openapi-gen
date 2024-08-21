@@ -234,8 +234,9 @@
 		const sorted = spreadsheet.rows
 			.filter((r) => !isEmpty(r))
 			.sort((a, b) => {
-				const left = JSON.stringify(a.cells[colIndex])
-				const right = JSON.stringify(b.cells[colIndex])
+
+				const left = valueOfCol(a, colIndex) //JSON.stringify(a.cells[colIndex])
+				const right = valueOfCol(b, colIndex) //JSON.stringify(b.cells[colIndex])
 				var result: number = left.localeCompare(right)
 				if (dir == SortingDirectionEnum.Ascending) {
 					result = result * -1
@@ -311,6 +312,14 @@
 	function valueOf(row: Row, key : string) {
 		try {
 			const idx = indexByIdentifier[key]
+			return valueOfCol(row, idx)
+		} catch (e) {
+			return `error getting ${key} : ${e}`
+		}
+	}
+
+	function valueOfCol(row: Row, idx : number) {
+		try {
 			const col = spreadsheet.columns[idx]
 			const typ = col.schema.type
 			const cell : Cell = row.cells[idx]
@@ -322,7 +331,7 @@
 			}
 			return cell.value ?? cell.values
 		} catch (e) {
-			return `error getting ${key} : ${e}`
+			return `error getting col ${idx} : ${e}`
 		}
 	}
 
@@ -375,9 +384,11 @@
 										/>
 									{/key}
 								</span>
-								<span class="w-12 {sortOpacity(col)}">
-									<Button icon={sortIcon(col)} on:click={(e) => onColumnSort(col, colIndex)}></Button>
-								</span>
+								{#if col.schema.type !== SchemaFieldTypeEnum.Script}
+									<span class="w-12 {sortOpacity(col)}">
+										<Button icon={sortIcon(col)} on:click={(e) => onColumnSort(col, colIndex)}></Button>
+									</span>
+								{/if}
 								<div
 									class="resizer dark:bg-gray-900 bg-gray-400"
 									on:mousedown={(event) => handleMouseDown(event, col)}
