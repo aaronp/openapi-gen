@@ -143,7 +143,7 @@
 			<MultiSelectField
 				options={inputOptions}
 				formatSelected={(e) => schema.scriptInputs}
-				label="RowCell"
+				label="Row Inputs"
 				bind:value={schema.scriptInputs}
 				/>
 

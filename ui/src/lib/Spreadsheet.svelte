@@ -235,8 +235,9 @@
 			.filter((r) => !isEmpty(r))
 			.sort((a, b) => {
 
-				const left = valueOfCol(a, colIndex) //JSON.stringify(a.cells[colIndex])
-				const right = valueOfCol(b, colIndex) //JSON.stringify(b.cells[colIndex])
+				const left = JSON.stringify(valueOfCol(a, colIndex))
+				const right = JSON.stringify(valueOfCol(b, colIndex))
+				// console.log(`${colIndex}: ${left} vs ${right}`)
 				var result: number = left.localeCompare(right)
 				if (dir == SortingDirectionEnum.Ascending) {
 					result = result * -1

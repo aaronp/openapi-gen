@@ -126,7 +126,6 @@
 <AppLayout>
 	<svelte:fragment slot="nav">
 		<div class="grid">
-			<div class="self-start"><NavItem path="/data" text="Sheets" icon={mdiTable} currentUrl={$page.url} /></div>
 
 			{#each spreadsheets as sheetName}
 				<div class="relative border-gray-300 cursor-pointer group">
