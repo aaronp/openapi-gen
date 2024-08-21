@@ -117,7 +117,10 @@
 
 	async function onRun() {
 		const input: Script = script as Script
-		await api.saveScript({ script: input })
+
+		// don't await this - just save async
+		api.saveScript({ script: input })
+
 		var include: string = ''
 		if (script.include) {
 			try {

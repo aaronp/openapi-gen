@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Cell, Row, SchemaField, Spreadsheet, Column } from '$lib/generated/index'
-	import { api } from '$lib/session'
 	import { SchemaFieldTypeEnum, SortingDirectionEnum } from '$lib/generated/index'
 	import ColHeader from '$lib/ColHeader.svelte'
 
+	import { latestSheet, api } from '$lib/session'
 	import {
 		Button,
 		SelectField,
@@ -11,13 +11,11 @@
 		type MenuOption,
 		Checkbox,
 		TextField,
-		Tooltip,
-		NumberStepper
+		Tooltip
 	} from 'svelte-ux'
 
 	import { mdiDelete, mdiPlus, mdiArrowDownThin, mdiArrowUpThin } from '@mdi/js'
 	import { onMount } from 'svelte'
-	import Page from '../routes/+page.svelte'
 	import { executeCodeWithInput } from './util/execute'
 	import { asIdentifier } from './util/text'
 
@@ -91,6 +89,10 @@
 
 	async function reloadSpreadsheet(n: string) {
 		spreadsheet = await api.getSpreadsheet({ name: n })
+
+		console.log('setting latest to ', id)
+		latestSheet.set(spreadsheet)
+
 		spreadsheet.rows.forEach((row) => {
 			row.cells.forEach((cell, i) => {
 				const fieldType = spreadsheet.columns[i].schema
@@ -107,6 +109,7 @@
 		if (spreadsheet.rows.length == 0) {
 			spreadsheet.rows = [...spreadsheet.rows, newRow()]
 		}
+
 
 		indexByIdentifier = colIndexByIdentifier()
 	}
