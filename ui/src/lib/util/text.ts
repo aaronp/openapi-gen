@@ -1,4 +1,3 @@
-
 export const toCamelCase = (input: string): string => {
 	// Remove non-alphanumeric characters and split by space or underscore
 	let words = input.replace(/[^a-zA-Z0-9 ]/g, '').split(/[\s_]+/)

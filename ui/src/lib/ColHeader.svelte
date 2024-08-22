@@ -11,15 +11,17 @@
 	export let hasRight = true
 	export let columns: Column[] = [
 		{
-			width : 100, schema: {
-				name : 'Foo',
-				type : SchemaFieldTypeEnum.String,
+			width: 100,
+			schema: {
+				name: 'Foo',
+				type: SchemaFieldTypeEnum.String
 			}
 		},
 		{
-			width : 100, schema: {
-				name : 'Bar',
-				type : SchemaFieldTypeEnum.String,
+			width: 100,
+			schema: {
+				name: 'Bar',
+				type: SchemaFieldTypeEnum.String
 			}
 		}
 	]
@@ -109,12 +111,14 @@
 		class="ml-2 text-left text-lg "
 	/>
 
-	<div class={`absolute rounded left-0 top-full border bg-primary-100 dark:bg-primary-600 ${showMenu ? 'flex' : 'hidden'}`}>
+	<div
+		class={`absolute rounded left-0 top-full border bg-primary-100 dark:bg-primary-600 ${showMenu ? 'flex' : 'hidden'}`}
+	>
 		{#if hasLeft}
-		<Button icon={mdiArrowLeft} on:click={(e) => onMove(true)}></Button>
+			<Button icon={mdiArrowLeft} on:click={(e) => onMove(true)}></Button>
 		{/if}
 		{#if hasRight}
-		<Button icon={mdiArrowRight} on:click={(e) => onMove(false)}></Button>
+			<Button icon={mdiArrowRight} on:click={(e) => onMove(false)}></Button>
 		{/if}
 		<Button icon={mdiPencil} on:click={(e) => (dialogueOpen = true)}></Button>
 
@@ -145,7 +149,7 @@
 				formatSelected={(e) => schema.scriptInputs}
 				label="Row Inputs"
 				bind:value={schema.scriptInputs}
-				/>
+			/>
 
 			<TextField
 				label="Script"
@@ -170,7 +174,7 @@
 			/>
 		{/if}
 	</div>
-	<div slot="actions" >
+	<div slot="actions">
 		<Button variant="fill" color="secondary" icon={mdiCheck} on:click={onUpdateSchema}>Ok</Button>
 	</div>
 </Dialog>

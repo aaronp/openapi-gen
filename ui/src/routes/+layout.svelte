@@ -126,7 +126,6 @@
 <AppLayout>
 	<svelte:fragment slot="nav">
 		<div class="grid">
-
 			{#each spreadsheets as sheetName}
 				<div class="relative border-gray-300 cursor-pointer group">
 					<div class="self-start">

@@ -4,22 +4,12 @@
 	import ColHeader from '$lib/ColHeader.svelte'
 
 	import { latestSheetData, api } from '$lib/session'
-	import {
-		Button,
-		SelectField,
-		MultiSelectField,
-		type MenuOption,
-		Checkbox,
-		TextField,
-		Tooltip
-	} from 'svelte-ux'
+	import { Button, SelectField, MultiSelectField, type MenuOption, Checkbox, TextField, Tooltip } from 'svelte-ux'
 
 	import { mdiDelete, mdiPlus, mdiArrowDownThin, mdiArrowUpThin } from '@mdi/js'
 	import { onMount } from 'svelte'
-	import { executeCodeWithInput } from './util/execute'
-	import { asIdentifier, toCamelCase } from './util/text'
 	import type { SheetData } from './session'
-	import Page from '../routes/+page.svelte'
+	import { calcSheetAsJson, colIndexByIdentifier, execScript, valueOfCol } from './util/sheetAsJson'
 
 	const newSchema = (label: string): SchemaField => {
 		return {
@@ -32,7 +22,7 @@
 	$: tableWidth = spreadsheet.columns.map((c) => c.width).reduce((acc, v) => acc + v, 0)
 
 	// the ID of the spreadsheet
-	export let id : any
+	export let id: any
 
 	// used for dragging columns
 	let isResizing = false
@@ -42,7 +32,6 @@
 
 	// a cache of the columns indexes by the column identifiers
 	let indexByIdentifier: { [key: string]: number } = {}
-
 
 	function handleMouseDown(event, col: Column) {
 		isResizing = true
@@ -89,31 +78,10 @@
 		return { cells: cells.length == 0 ? [...cells, newCell()] : cells }
 	}
 
-	function asRecord(sheet: Spreadsheet, row: Row) : { [key: string]: any } {
-		return sheet.columns.reduce(
-			(acc, col, i) => {
-				const key = toCamelCase(col.schema.name)
-				acc[key] = valueOfCol(row, i)
-				return acc
-			},
-			{} as { [key: string]: any }
-		)
-	}
-
-	/**
-	 * @param sheet the sheet to turn into a JSON object
-	 * @returns the JSON object
-	 */
-	function sheetAsJson(sheet: Spreadsheet): { [key: string]: any }[] {
-		const rows = sheet?.rows || []
-		return rows.map((row) => asRecord(sheet, row))
-	}
-
 	function broadcastUpdate() {
-		
-		const sheetData : SheetData = {
-			sheet : spreadsheet,
-			data : sheetAsJson(spreadsheet)
+		const sheetData: SheetData = {
+			sheet: spreadsheet,
+			data: calcSheetAsJson(spreadsheet, indexByIdentifier)
 		}
 		latestSheetData.set(sheetData)
 	}
@@ -123,7 +91,6 @@
 		spreadsheet = await api.getSpreadsheet({ name: n })
 
 		broadcastUpdate()
-
 
 		spreadsheet.rows.forEach((row) => {
 			row.cells.forEach((cell, i) => {
@@ -142,8 +109,7 @@
 			spreadsheet.rows = [...spreadsheet.rows, newRow()]
 		}
 
-
-		indexByIdentifier = colIndexByIdentifier()
+		indexByIdentifier = colIndexByIdentifier(spreadsheet)
 	}
 
 	function cellsForRow(row: Row) {
@@ -192,9 +158,9 @@
 
 			// spreadsheet.rows = nonEmpty
 			await api.saveSpreadsheet({ spreadsheet })
-		
+
 			// we may be renaming columns or all sorts
-			indexByIdentifier = colIndexByIdentifier()
+			indexByIdentifier = colIndexByIdentifier(spreadsheet)
 
 			broadcastUpdate()
 		}
@@ -234,7 +200,7 @@
 			r.cells = [emptyCell(), ...r.cells]
 		})
 
-		indexByIdentifier = colIndexByIdentifier()
+		indexByIdentifier = colIndexByIdentifier(spreadsheet)
 	}
 
 	const sortOpacity = (col: Column) => (col.schema.name === spreadsheet?.sort?.fieldName ? 'opacity-100' : 'opacity-25')
@@ -269,9 +235,8 @@
 		const sorted = spreadsheet.rows
 			.filter((r) => !isEmpty(r))
 			.sort((a, b) => {
-
-				const left = JSON.stringify(valueOfCol(a, colIndex))
-				const right = JSON.stringify(valueOfCol(b, colIndex))
+				const left = JSON.stringify(valueOfCol(spreadsheet, indexByIdentifier, a, colIndex))
+				const right = JSON.stringify(valueOfCol(spreadsheet, indexByIdentifier, b, colIndex))
 				// console.log(`${colIndex}: ${left} vs ${right}`)
 				var result: number = left.localeCompare(right)
 				if (dir == SortingDirectionEnum.Ascending) {
@@ -328,67 +293,6 @@
 		onSave()
 	}
 
-	/**
-	 * @return a map of the column index by the column name identifier (i.e. if the second column 'Foo Bar' corresponds to an entry of 'fooBar' -> 1 )
-	 */
-	function colIndexByIdentifier() {
-		const stringToIndexMap: { [key: string]: number } = {};
-		spreadsheet.columns.forEach((c, i) => {
-			const key = asIdentifier(c.schema.name)
-			stringToIndexMap[key] = i
-		})
-		return stringToIndexMap
-	}
-
-	/**
-	 * Our script cells need to gather their inputs (other cells in the row), 
-	 * and those cells may in turn be scripts (so we have to recurse)
-	 * 
-	 * @param row
-	 * @param key
-	 */
-	function valueOf(row: Row, key : string) {
-		try {
-			const idx = indexByIdentifier[key]
-			return valueOfCol(row, idx)
-		} catch (e) {
-			return `error getting ${key} : ${e}`
-		}
-	}
-
-	function valueOfCol(row: Row, idx : number) {
-		try {
-			const col = spreadsheet.columns[idx]
-			const typ = col.schema.type
-			const cell : Cell = row.cells[idx]
-
-			if (typ === SchemaFieldTypeEnum.Script) {
-				return execScript(row, col, cell)
-			} else if (typ === SchemaFieldTypeEnum.AnyOf || typ === SchemaFieldTypeEnum.OneOf) {
-				return cell.values
-			}
-			return cell.value ?? cell.values
-		} catch (e) {
-			return `error getting col ${idx} : ${e}`
-		}
-	}
-
-	function execScript(row : Row, col : Column, cell : Cell) {
-		try {
-			const inputsMap = new Map<string, any>()
-
-			col?.schema?.scriptInputs?.forEach((key) => {
-				const value = valueOf(row, key)
-				inputsMap.set(key, value)
-			})
-			
-			// the script code is stored as an 'availableValues' in the column
-			const script = col.schema.availableValues?.join('') ?? ''
-			return executeCodeWithInput(script, inputsMap)
-		} catch (e) {
-			return 'execScript error: ' + e
-		}
-	}
 </script>
 
 <!-- needed for column drag -->
@@ -404,7 +308,7 @@
 			{#if spreadsheet.rows.length > 0}
 				<tr class="dark:bg-gray-800 bg-gray-200">
 					<th><Tooltip title="Add Column"><Button icon={mdiPlus} on:click={onAddColumn} /></Tooltip></th>
-					
+
 					{#each spreadsheet.columns as col, colIndex}
 						<th class="border resizable-column" style={`width: ${col.width}px;`}>
 							<div class="flex justify-between items-center">
@@ -414,7 +318,7 @@
 											hasLeft={colIndex > 0}
 											hasRight={colIndex < spreadsheet.columns.length - 1}
 											schema={col.schema}
-											columns={spreadsheet.columns.filter(c => c != col)}
+											columns={spreadsheet.columns.filter((c) => c != col)}
 											on:delete={(e) => onDeleteColumn(col, colIndex)}
 											on:moveRight={(e) => onMoveRight(col, colIndex)}
 											on:moveLeft={(e) => onMoveLeft(col, colIndex)}
@@ -472,7 +376,7 @@
 									<Checkbox on:change={(e) => onChange(cell, rowIndex)} bind:checked={cell.value} />
 								{:else if typ === SchemaFieldTypeEnum.Number}
 									<!-- <NumberStepper on:change={(e) => onChange(cell, rowIndex)} class="w-full" bind:value={cell.value} /> -->
-										<TextField
+									<TextField
 										debounceChange
 										on:change={(e) => onChange(cell, rowIndex)}
 										on:keydown={(e) => onFieldKeyDown(e, rowIndex, colIndex)}
@@ -489,11 +393,9 @@
 										class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg"
 									/>
 								{:else if typ === SchemaFieldTypeEnum.Script}
-									<div
-										class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg">
-										{execScript(row, col, cell)}
+									<div class="bg-gray-100 dark:bg-gray-800 rounded shadow-sm text-left text-lg">
+										{execScript(spreadsheet, indexByIdentifier, row, col)}
 									</div>
-									
 								{:else}
 									<TextField
 										debounceChange

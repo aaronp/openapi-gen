@@ -142,6 +142,7 @@
 			...script,
 			script: include + '\n' + script.script
 		}
+
 		callStack = await upstreamDependencies(scriptWithPrelude, sheet)
 
 		latestResult = await evaluateStack(callStack)

@@ -72,6 +72,7 @@ async function sheetsArray() {
 }
 
 /**
+ * A script can depend on another script - this function returns that stack as an array
  *
  * @param script the script to resolve
  * @returns the scripts which are required for this dependency

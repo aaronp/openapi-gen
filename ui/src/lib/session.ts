@@ -3,11 +3,11 @@ import { DefaultApi, Configuration, type Script, type Spreadsheet } from '$lib/g
 
 import { type StackElement } from '$lib/util/cache'
 
-type JsonRows = { [key: string]: any }[];
+type JsonRows = { [key: string]: any }[]
 
 export type SheetData = {
-    sheet : Spreadsheet,
-    data : JsonRows
+	sheet: Spreadsheet
+	data: JsonRows
 }
 
 // broadcasts SheetData
