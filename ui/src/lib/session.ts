@@ -1,9 +1,17 @@
 import { writable } from 'svelte/store'
-import { DefaultApi, Configuration, type Script } from '$lib/generated'
+import { DefaultApi, Configuration, type Script, type Spreadsheet } from '$lib/generated'
 
-import { EverySheet, type StackElement } from '$lib/util/cache'
+import { type StackElement } from '$lib/util/cache'
 
-export const latestSheet = writable({})
+type JsonRows = { [key: string]: any }[];
+
+export type SheetData = {
+    sheet : Spreadsheet,
+    data : JsonRows
+}
+
+// broadcasts SheetData
+export const latestSheetData = writable({})
 
 export const api = new DefaultApi(new Configuration({ basePath: '' }))
 

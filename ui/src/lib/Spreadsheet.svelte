@@ -3,7 +3,7 @@
 	import { SchemaFieldTypeEnum, SortingDirectionEnum } from '$lib/generated/index'
 	import ColHeader from '$lib/ColHeader.svelte'
 
-	import { latestSheet, api } from '$lib/session'
+	import { latestSheetData, api } from '$lib/session'
 	import {
 		Button,
 		SelectField,
@@ -17,7 +17,9 @@
 	import { mdiDelete, mdiPlus, mdiArrowDownThin, mdiArrowUpThin } from '@mdi/js'
 	import { onMount } from 'svelte'
 	import { executeCodeWithInput } from './util/execute'
-	import { asIdentifier } from './util/text'
+	import { asIdentifier, toCamelCase } from './util/text'
+	import type { SheetData } from './session'
+	import Page from '../routes/+page.svelte'
 
 	const newSchema = (label: string): SchemaField => {
 		return {
@@ -30,7 +32,7 @@
 	$: tableWidth = spreadsheet.columns.map((c) => c.width).reduce((acc, v) => acc + v, 0)
 
 	// the ID of the spreadsheet
-	export let id
+	export let id : any
 
 	// used for dragging columns
 	let isResizing = false
@@ -72,7 +74,7 @@
 	}
 
 	onMount(async () => {
-		await reloadSpreadsheet(id)
+		reloadSpreadsheet(id)
 	})
 
 	const newCell = (): Cell => {
@@ -87,11 +89,41 @@
 		return { cells: cells.length == 0 ? [...cells, newCell()] : cells }
 	}
 
+	function asRecord(sheet: Spreadsheet, row: Row) : { [key: string]: any } {
+		return sheet.columns.reduce(
+			(acc, col, i) => {
+				const key = toCamelCase(col.schema.name)
+				acc[key] = valueOfCol(row, i)
+				return acc
+			},
+			{} as { [key: string]: any }
+		)
+	}
+
+	/**
+	 * @param sheet the sheet to turn into a JSON object
+	 * @returns the JSON object
+	 */
+	function sheetAsJson(sheet: Spreadsheet): { [key: string]: any }[] {
+		const rows = sheet?.rows || []
+		return rows.map((row) => asRecord(sheet, row))
+	}
+
+	function broadcastUpdate() {
+		
+		const sheetData : SheetData = {
+			sheet : spreadsheet,
+			data : sheetAsJson(spreadsheet)
+		}
+		latestSheetData.set(sheetData)
+	}
+
 	async function reloadSpreadsheet(n: string) {
+		console.log('setting latest to ', n)
 		spreadsheet = await api.getSpreadsheet({ name: n })
 
-		console.log('setting latest to ', id)
-		latestSheet.set(spreadsheet)
+		broadcastUpdate()
+
 
 		spreadsheet.rows.forEach((row) => {
 			row.cells.forEach((cell, i) => {
@@ -158,13 +190,13 @@
 			const nonEmpty = spreadsheet.rows.filter((r) => !isEmpty(r))
 			const before = spreadsheet.rows
 
-
 			// spreadsheet.rows = nonEmpty
 			await api.saveSpreadsheet({ spreadsheet })
-			// spreadsheet.rows = before
-
+		
 			// we may be renaming columns or all sorts
 			indexByIdentifier = colIndexByIdentifier()
+
+			broadcastUpdate()
 		}
 	}
 
@@ -254,6 +286,8 @@
 		} else {
 			spreadsheet.rows = sorted
 		}
+
+		onSave()
 	}
 
 	function onMoveLeft(col: Column, colIndex: number) {

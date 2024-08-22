@@ -1,7 +1,7 @@
 import { SchemaFieldTypeEnum, type Row, type Spreadsheet } from '$lib/generated'
 import { toCamelCase } from './text'
 
-function asRecord(sheet: Spreadsheet, row: Row) {
+function asRecord(sheet: Spreadsheet, row: Row) : { [key: string]: any } {
 	return sheet.columns.reduce(
 		(acc, col, i) => {
 			const cell = row.cells[i]

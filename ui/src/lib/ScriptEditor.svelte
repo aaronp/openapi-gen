@@ -7,7 +7,7 @@
 	import { createEventDispatcher } from 'svelte'
 	import { upstreamDependencies, type StackElement } from '$lib/util/cache'
 	import { evaluateStack, type StackResult } from '$lib/util/execute'
-	import { latestSheet, api } from '$lib/session'
+	import { latestSheetData, api, type SheetData } from '$lib/session'
 	import { sheetAsJson } from '$lib/util/sheetAsJson'
 	import CallStack from '$lib/CallStack.svelte'
 
@@ -42,9 +42,10 @@
 
 	let latestSpreadsheetValue: Spreadsheet | undefined = undefined
 
-	latestSheet.subscribe(async (value) => {
-		latestSpreadsheetValue = value as Spreadsheet
-		sheet = sheetAsJson(value as Spreadsheet)
+	latestSheetData.subscribe(async (sheetData) => {
+		const d8a = sheetData as SheetData
+		latestSpreadsheetValue = d8a.sheet
+		sheet = d8a.data
 
 		refresh()
 	})

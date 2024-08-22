@@ -1,4 +1,4 @@
-import type { Script } from '$lib/generated'
+import type { Row, Script } from '$lib/generated'
 import { api } from '$lib/session'
 import { sheetAsJson } from './sheetAsJson'
 
