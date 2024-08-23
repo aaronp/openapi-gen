@@ -22,7 +22,10 @@ export function sheetAsJson(spreadsheet: Spreadsheet): { [key: string]: any }[] 
 	return calcSheetAsJson(spreadsheet, indexByIdentifier)
 }
 
-export function calcSheetAsJson(spreadsheet: Spreadsheet, indexByIdentifier : { [key: string]: number }): { [key: string]: any }[] {
+export function calcSheetAsJson(
+	spreadsheet: Spreadsheet,
+	indexByIdentifier: { [key: string]: number }
+): { [key: string]: any }[] {
 	const rows = spreadsheet?.rows || []
 	return rows.map((row) => asRecord(spreadsheet, indexByIdentifier, row))
 }

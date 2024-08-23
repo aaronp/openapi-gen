@@ -6,6 +6,19 @@ info:
 
 paths:
   /api/results:
+    get:
+      summary: List script output files
+      operationId: listOutputs
+      responses:
+        '200':
+          description: A JSON array of script results by their input
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScriptResultFilename'
+
     post:
       summary: Save a ScriptResult
       description: Endpoint to save a ScriptResult with name and content properties
@@ -52,6 +65,52 @@ paths:
                 items:
                   type: string
 
+  /api/data/{name}:
+    delete:
+      summary: Delete spreadsheet data
+      operationId: deleteSpreadsheet
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the spreadsheet
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deleted spreadsheet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  spreadsheets:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid request
+    get:
+      summary: Get spreadsheet data
+      operationId: getSpreadsheet
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the spreadsheet
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object containing spreadsheet data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Spreadsheet'
+        '400':
+          description: Invalid request
   /api/copy/{old}/{new}:
     post:
       summary: Copy spreadsheet
@@ -154,52 +213,6 @@ paths:
         '400':
           description: Invalid request body
 
-  /api/data/{name}:
-    delete:
-      summary: Delete spreadsheet data
-      operationId: deleteSpreadsheet
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: Name of the spreadsheet
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The deleted spreadsheet
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  spreadsheets:
-                    type: array
-                    items:
-                      type: string
-        '400':
-          description: Invalid request
-    get:
-      summary: Get spreadsheet data
-      operationId: getSpreadsheet
-      parameters:
-        - name: name
-          in: path
-          required: true
-          description: Name of the spreadsheet
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A JSON object containing spreadsheet data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Spreadsheet'
-        '400':
-          description: Invalid request
   /api/script-import/{name}:
     get:
       summary: Get the imported script
@@ -433,6 +446,17 @@ components:
         - script
         - input
         - autoSave
+    ScriptResultFilename:
+      type: object
+      properties:
+        sheetName:
+          type: string
+          description: The name of the spreadsheet used to create this output -- null if the output used 'AllSheets' as input
+        name:
+          type: string
+          description: Name of the file
+      required:
+        - name
     ScriptResult:
       type: object
       properties:
