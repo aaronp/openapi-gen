@@ -92,6 +92,17 @@ export function readScriptImport(filename: string): string | undefined {
 }
 
 
+export const readOutputContents = (fileName : string): string | undefined => readPath(path.join(outputDir(), fileName))
+
+export const readOutputContentsForSheet = (baseDir : string, fileName : string): string | undefined => readPath(path.join(outputDir(), baseDir, fileName))
+
+function readPath(fqpath : string): string | undefined {
+	if (fs.existsSync(fqpath)) {
+		return fs.readFileSync(fqpath, 'utf-8')
+	} 
+	return undefined
+}
+
 export function listScriptResults(): ScriptResultFilename[] {
 	try {
 		const filesAndDirs = fs.readdirSync(outputDir())

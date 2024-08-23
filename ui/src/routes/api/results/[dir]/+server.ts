@@ -1,5 +1,5 @@
 import type { ScriptResult } from '$lib/generated'
-import { saveResults, listScriptResults } from '../db'
+import { saveResults, readOutputContents } from '../../db'
 
 
 export async function DELETE({ request }: Request) {
@@ -10,11 +10,15 @@ export async function DELETE({ request }: Request) {
 }
 
 
+
 export async function GET({ request }: Request) {
-	console.log(`get output ...`)
 	const url = new URL(request?.url)
 	const name: string = url.pathname.split('/').pop()!
 	console.log(`get output for ${name}`)
-	return Response.json({todo : "TODO!", name})
+	const contents = readOutputContents(name)
+	if (contents) {
+		return new Response(contents)	
+	}
+	return Response.json({message : "not found"}, { status: 404 })
 }
 
