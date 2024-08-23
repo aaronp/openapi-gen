@@ -449,10 +449,10 @@ components:
     ScriptResultFilename:
       type: object
       properties:
-        sheetName:
+        inputSpreadsheet:
           type: string
           description: The name of the spreadsheet used to create this output -- null if the output used 'AllSheets' as input
-        name:
+        outputFilename:
           type: string
           description: Name of the file
       required:

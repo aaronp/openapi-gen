@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import type { Spreadsheet, Script, ScriptResult } from '../../lib/generated/models'
+import type { Spreadsheet, Script, ScriptResult, ScriptResultFilename } from '../../lib/generated/models'
 
 const DataDir = process.env.DATA_DIR || './data'
 const OutputDir = process.env.OUTPUT_DIR || './output'
@@ -88,6 +88,42 @@ export function readScriptImport(filename: string): string | undefined {
 	} catch (e) {
 		console.error('ERROR reading script import', e)
 		return undefined
+	}
+}
+
+
+export function listScriptResults(): ScriptResultFilename[] {
+	try {
+		const filesAndDirs = fs.readdirSync(outputDir())
+		const results : ScriptResultFilename[] = filesAndDirs
+		.flatMap((fileOrDir) => {
+			const fqpath = path.join(outputDir(), fileOrDir)
+			const stats = fs.statSync(fqpath)
+			if (stats.isDirectory()) {
+				
+				const children : ScriptResultFilename[] = fs.readdirSync(fqpath).map((file) => {
+					return {
+						inputSpreadsheet : fileOrDir.toString(),
+						outputFilename : file.toString()
+					}
+				})
+				return children
+			} else if (stats.isFile()) {
+				return [{
+					inputSpreadsheet : undefined,
+					outputFilename : fileOrDir.toString()
+				}]
+			} else {
+				return [{
+					inputSpreadsheet : `Error - ${fileOrDir} is neither a file nor a dir`,
+					outputFilename : `Error - ${fileOrDir} is neither a file nor a dir`
+				}]
+			}
+		})
+		return results
+	} catch (e) {
+		console.error('ERROR reading script outputs', e)
+		return []
 	}
 }
 

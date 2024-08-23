@@ -1,5 +1,12 @@
 import type { ScriptResult } from '$lib/generated'
-import { saveResults } from '../db'
+import { saveResults, listScriptResults } from '../db'
+
+
+export async function GET({ request }: Request) {
+	console.log('list results')
+	return Response.json(listScriptResults())
+}
+
 
 export async function POST({ request }: Request) {
 	const url = new URL(request?.url)
