@@ -553,7 +553,7 @@ components:
           type: string
           description: Name of the file
       required:
-        - name
+        - outputFilename
     ScriptResult:
       type: object
       properties:

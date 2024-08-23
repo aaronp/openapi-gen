@@ -34,6 +34,8 @@
 	import ImportData from '$lib/ImportData.svelte'
 	import EditSheet from '$lib/EditSheet.svelte'
 	import AddSheet from '$lib/AddSheet.svelte'
+	import SheetTree from '$lib/SheetTree.svelte'
+	import { SortingDirectionEnum, type ScriptResultFilename } from '$lib/generated'
 
 	let openImport = false
 	let spreadsheets: string[] = []
@@ -74,6 +76,37 @@
 		relistSpreadsheets()
 	})
 
+
+	type Node = {
+		label: string,
+		children : Node[] | undefined
+	}
+
+	var allSheetsOutputTree : Node = {
+		label : "root",
+		children: []
+	}
+	var sheetTree : Node = {
+		label: "USA", children: [
+			{label: "Florida", children: [
+				{label: "Jacksonville"},
+				{label: "Orlando", children: [
+					{label: "Disney World"},
+					{label: "Universal Studio"},
+					{label: "Sea World"},
+				]},
+				{label: "Miami"},
+			]},
+			{label: "California", children: [
+				{label: "San Francisco"},
+				{label: "Los Angeles"},
+				{label: "Sacramento"},
+			]},
+		],
+	}
+
+
+
 	let editSheet: string = ''
 	let editAction: 'copy' | 'delete' | 'rename' = 'rename'
 	let addSheet = false
@@ -90,9 +123,40 @@
 		editSheet = name
 		editAction = 'copy'
 	}
+
+
 	async function relistSpreadsheets(): Promise<string[]> {
+		const outputFuture = api.listOutputs()
 		const all = await api.listSpreadsheets()
 		spreadsheets = all.length < 1 ? ['New'] : all
+
+		const outputs = await outputFuture
+		const sheets : Node[] = spreadsheets.map((sheet) => {
+			// TODO - we can do better than O(n) ... but this is cheap and dirty (and easy!), and there will typically be only a couple outputs and a couple sheets, so who cares 🤷‍♂️
+
+			// we're creating these:
+			//{label: "Florida", children: [] }
+
+			const children : Node[] = outputs.filter((output) => output.inputSpreadsheet === sheet).map((file) => {
+				return { label : file.outputFilename, children : []}
+			})
+			return {
+				label : sheet,
+				children
+			}
+		})
+		const outputNodes : Node[] = outputs.filter((output) => !output.inputSpreadsheet).map((file) => {
+			return { label : file.outputFilename, children : []}
+		})
+
+		allSheetsOutputTree = {
+			label: "root",
+			children : outputNodes 
+		}
+		sheetTree = {
+			label: "root",
+			children : sheets
+		}
 
 		// side-effects on renaming/adding sheets
 		editSheet = ''
@@ -152,6 +216,16 @@
 			<div class="self-start ml-2 text-white">
 				<Button icon={mdiPlus} rounded target="_blank" on:click={onAddSheet}>New Sheet</Button>
 			</div>
+
+			{#key sheetTree}
+				<SheetTree tree={sheetTree} />
+			{/key}
+
+			<hr />
+
+			{#key allSheetsOutputTree}
+				<SheetTree tree={allSheetsOutputTree} />
+			{/key}
 		</div>
 	</svelte:fragment>
 
