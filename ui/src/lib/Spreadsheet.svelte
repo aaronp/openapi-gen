@@ -94,7 +94,10 @@
 
 		spreadsheet.rows.forEach((row) => {
 			row.cells.forEach((cell, i) => {
-				const fieldType = spreadsheet.columns[i].schema
+				if (spreadsheet.columns[i]?.schema) {
+					console.error(`WTF? no schema for col ${i}/${spreadsheet.columns.length} for row ${JSON.stringify(row)} and col ${JSON.stringify(spreadsheet.columns)}`)
+				}
+				const fieldType = spreadsheet.columns[i]?.schema
 				if (fieldType?.type === SchemaFieldTypeEnum.AnyOf) {
 					if (!cell.value) {
 						// ignore
