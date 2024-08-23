@@ -1,6 +1,13 @@
 import type { ScriptResult } from '$lib/generated'
 import { saveResults, listScriptResults } from '../db'
 
+export async function DELETE({ request }: Request) {
+	console.log('delete results')
+	const url = new URL(request?.url)
+	const name: string = url.pathname.split('/').pop()!
+	return Response.json("TODO", { status: 500 })
+}
+
 
 export async function GET({ request }: Request) {
 	console.log('list results')

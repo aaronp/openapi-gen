@@ -37,6 +37,103 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScriptResult'
+
+  /api/results/{dir}/{name}:
+    delete:
+      summary: Delete spreadsheet output
+      operationId: deleteSheetOutput
+      parameters:
+        - name: dir
+          in: path
+          required: true
+          description: Name of the spreadsheet dir
+          schema:
+            type: string
+        - name: name
+          in: path
+          required: true
+          description: Name of the result file
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The operation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: output not found
+    get:
+      summary: Get spreadsheet script output
+      operationId: getSheetOutput
+      parameters:
+        - name: dir
+          in: path
+          required: true
+          description: Name of the spreadsheet dir
+          schema:
+            type: string
+        - name: name
+          in: path
+          required: true
+          description: Name of the output file
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The output file contents
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Output not found
+  /api/results/{name}:
+    delete:
+      summary: Delete spreadsheet output
+      operationId: deleteOutput
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the result file
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The operation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: output not found
+    get:
+      summary: Get script output
+      operationId: getOutput
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the output file
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The output file contents
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Output not found
   /api/data:
     post:
       summary: Submit spreadsheet data
