@@ -92,12 +92,12 @@
 
 		broadcastUpdate()
 
-		spreadsheet.rows.forEach((row) => {
+		spreadsheet.rows.forEach((row, rowIndex) => {
 			row.cells.forEach((cell, i) => {
 				if (spreadsheet.columns[i]?.schema) {
-					console.error(
-						`WTF? no schema for col ${i}/${spreadsheet.columns.length} for row ${JSON.stringify(row)} and col ${JSON.stringify(spreadsheet.columns)}`
-					)
+					// console.error(
+					// 	`WTF? no schema for row ${rowIndex} col ${i}/${spreadsheet.columns.length} for row ${JSON.stringify(row)} and col ${JSON.stringify(spreadsheet.columns)}`
+					// )
 				}
 				const fieldType = spreadsheet.columns[i]?.schema
 				if (fieldType?.type === SchemaFieldTypeEnum.AnyOf) {

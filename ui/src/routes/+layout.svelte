@@ -9,7 +9,10 @@
 		Tooltip,
 		settings,
 		ThemeInit,
-		ThemeSelect
+		ThemeSelect,
+
+		Icon
+
 	} from 'svelte-ux'
 
 	import {
@@ -22,7 +25,13 @@
 		mdiPlus,
 		mdiPencil,
 		mdiDelete,
-		mdiContentDuplicate
+		mdiContentDuplicate,
+
+		mdiChevronDown,
+
+		mdiChevronRight
+
+
 	} from '@mdi/js'
 	import { onMount } from 'svelte'
 	import { api } from '$lib/session'
@@ -76,37 +85,6 @@
 		relistSpreadsheets()
 	})
 
-
-	type Node = {
-		label: string,
-		children : Node[] | undefined
-	}
-
-	var allSheetsOutputTree : Node = {
-		label : "root",
-		children: []
-	}
-	var sheetTree : Node = {
-		label: "USA", children: [
-			{label: "Florida", children: [
-				{label: "Jacksonville"},
-				{label: "Orlando", children: [
-					{label: "Disney World"},
-					{label: "Universal Studio"},
-					{label: "Sea World"},
-				]},
-				{label: "Miami"},
-			]},
-			{label: "California", children: [
-				{label: "San Francisco"},
-				{label: "Los Angeles"},
-				{label: "Sacramento"},
-			]},
-		],
-	}
-
-
-
 	let editSheet: string = ''
 	let editAction: 'copy' | 'delete' | 'rename' = 'rename'
 	let addSheet = false
@@ -126,37 +104,10 @@
 
 
 	async function relistSpreadsheets(): Promise<string[]> {
-		const outputFuture = api.listOutputs()
+		// const outputFuture = api.listOutputs()
+
 		const all = await api.listSpreadsheets()
 		spreadsheets = all.length < 1 ? ['New'] : all
-
-		const outputs = await outputFuture
-		const sheets : Node[] = spreadsheets.map((sheet) => {
-			// TODO - we can do better than O(n) ... but this is cheap and dirty (and easy!), and there will typically be only a couple outputs and a couple sheets, so who cares 🤷‍♂️
-
-			// we're creating these:
-			//{label: "Florida", children: [] }
-
-			const children : Node[] = outputs.filter((output) => output.inputSpreadsheet === sheet).map((file) => {
-				return { label : file.outputFilename, children : []}
-			})
-			return {
-				label : sheet,
-				children
-			}
-		})
-		const outputNodes : Node[] = outputs.filter((output) => !output.inputSpreadsheet).map((file) => {
-			return { label : file.outputFilename, children : []}
-		})
-
-		allSheetsOutputTree = {
-			label: "root",
-			children : outputNodes 
-		}
-		sheetTree = {
-			label: "root",
-			children : sheets
-		}
 
 		// side-effects on renaming/adding sheets
 		editSheet = ''
@@ -183,6 +134,17 @@
 	function onAddSheet() {
 		addSheet = true
 	}
+
+
+	let expansionState: Record<string, boolean> = {}
+	let outputsBySheetName: Record<string, string[]> = {}
+
+	const toggleExpansion = async (sheetName: string) => {
+		expansionState[sheetName] = !expansionState[sheetName]
+		if (expansionState[sheetName]) {
+			outputsBySheetName[sheetName] = await api.listOutputsForSheet({name : sheetName})
+		}
+	}
 </script>
 
 <ThemeInit />
@@ -192,8 +154,27 @@
 		<div class="grid">
 			{#each spreadsheets as sheetName}
 				<div class="relative border-gray-300 cursor-pointer group">
+					
 					<div class="self-start">
-						<NavItem path="/data/{sheetName}" text={sheetName} icon={mdiTable} currentUrl={$page.url} />
+
+						<NavItem path="/data/{sheetName}" currentUrl={$page.url} >
+							<span>
+								<span 
+									on:click={e => toggleExpansion(sheetName)} 
+									on:keydown={(e) => e.key === 'Enter' && toggleExpansion(sheetName)}
+									role="button" 
+									tabindex="0" class="arrow "><Icon data={expansionState[sheetName] ? mdiChevronDown : mdiChevronRight} class="inline-block mr-1" /></span>
+									<Icon data={mdiTable} class="inline-block mr-1" />
+									<span>{sheetName}</span>
+									{#if outputsBySheetName[sheetName] && expansionState[sheetName]}
+										<ul>
+											{#each outputsBySheetName[sheetName] as outputFileName}
+												<li class="pl-5"><NavItem path="/output/{outputFileName}" currentUrl={$page.url} text={outputFileName} /></li>
+											{/each}
+										</ul>
+									{/if}
+							</span>
+						</NavItem>
 					</div>
 					<Button
 						icon={mdiPencil}
@@ -217,15 +198,6 @@
 				<Button icon={mdiPlus} rounded target="_blank" on:click={onAddSheet}>New Sheet</Button>
 			</div>
 
-			{#key sheetTree}
-					<SheetTree tree={sheetTree} isRoot={true}/>
-			{/key}
-
-			<hr />
-
-			{#key allSheetsOutputTree}
-				<SheetTree tree={allSheetsOutputTree} />
-			{/key}
 		</div>
 	</svelte:fragment>
 
@@ -257,6 +229,7 @@
 	</AppBar>
 
 	<main class="p-2">
+
 		{#if stickyCode}
 			<TwoCols>
 				<slot />
@@ -300,3 +273,11 @@
 		</Drawer>
 	</main>
 </AppLayout>
+
+<style>
+	.arrow {
+		cursor: pointer;
+		display: inline-block;
+		/* transition: transform 200ms; */
+	}
+</style>

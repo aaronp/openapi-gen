@@ -91,44 +91,46 @@ export function readScriptImport(filename: string): string | undefined {
 	}
 }
 
-
 // export const readOutputContents = (fileName : string): string | undefined => readPath(path.join(outputDir(), fileName))
 
-export const readOutputContentsForSheet = (baseDir : string, fileName : string): string | undefined => readPath(path.join(outputDir(), baseDir, fileName))
+export const readOutputContentsForSheet = (baseDir: string, fileName: string): string | undefined =>
+	readPath(path.join(outputDir(), baseDir, fileName))
 
-function readPath(fqpath : string): string | undefined {
+function readPath(fqpath: string): string | undefined {
 	if (fs.existsSync(fqpath)) {
 		return fs.readFileSync(fqpath, 'utf-8')
-	} 
+	}
 	return undefined
 }
 
 export function listScriptResults(): ScriptResultFilename[] {
 	try {
 		const filesAndDirs = fs.readdirSync(outputDir())
-		const results : ScriptResultFilename[] = filesAndDirs
-		.flatMap((fileOrDir) => {
+		const results: ScriptResultFilename[] = filesAndDirs.flatMap((fileOrDir) => {
 			const fqpath = path.join(outputDir(), fileOrDir)
 			const stats = fs.statSync(fqpath)
 			if (stats.isDirectory()) {
-				
-				const children : ScriptResultFilename[] = fs.readdirSync(fqpath).map((file) => {
+				const children: ScriptResultFilename[] = fs.readdirSync(fqpath).map((file) => {
 					return {
-						inputSpreadsheet : fileOrDir.toString(),
-						outputFilename : file.toString()
+						inputSpreadsheet: fileOrDir.toString(),
+						outputFilename: file.toString()
 					}
 				})
 				return children
 			} else if (stats.isFile()) {
-				return [{
-					inputSpreadsheet : undefined,
-					outputFilename : fileOrDir.toString()
-				}]
+				return [
+					{
+						inputSpreadsheet: undefined,
+						outputFilename: fileOrDir.toString()
+					}
+				]
 			} else {
-				return [{
-					inputSpreadsheet : `Error - ${fileOrDir} is neither a file nor a dir`,
-					outputFilename : `Error - ${fileOrDir} is neither a file nor a dir`
-				}]
+				return [
+					{
+						inputSpreadsheet: `Error - ${fileOrDir} is neither a file nor a dir`,
+						outputFilename: `Error - ${fileOrDir} is neither a file nor a dir`
+					}
+				]
 			}
 		})
 		return results
@@ -138,8 +140,7 @@ export function listScriptResults(): ScriptResultFilename[] {
 	}
 }
 
-
-export function listScriptResultsForSheet(sheetName : string): string[] {
+export function listScriptResultsForSheet(sheetName: string): string[] {
 	try {
 		const fqpath = path.join(outputDir(), sheetName)
 		const stats = fs.statSync(fqpath)
