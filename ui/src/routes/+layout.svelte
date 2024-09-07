@@ -218,7 +218,7 @@
 			</div>
 
 			{#key sheetTree}
-				<SheetTree tree={sheetTree} />
+					<SheetTree tree={sheetTree} isRoot={true}/>
 			{/key}
 
 			<hr />
