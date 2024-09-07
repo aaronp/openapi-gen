@@ -92,7 +92,7 @@ export function readScriptImport(filename: string): string | undefined {
 }
 
 
-export const readOutputContents = (fileName : string): string | undefined => readPath(path.join(outputDir(), fileName))
+// export const readOutputContents = (fileName : string): string | undefined => readPath(path.join(outputDir(), fileName))
 
 export const readOutputContentsForSheet = (baseDir : string, fileName : string): string | undefined => readPath(path.join(outputDir(), baseDir, fileName))
 
@@ -138,6 +138,21 @@ export function listScriptResults(): ScriptResultFilename[] {
 	}
 }
 
+
+export function listScriptResultsForSheet(sheetName : string): string[] {
+	try {
+		const fqpath = path.join(outputDir(), sheetName)
+		const stats = fs.statSync(fqpath)
+		return stats.isDirectory() ? fs.readdirSync(fqpath).map((file) => file.toString()) : []
+	} catch (e) {
+		console.error('ERROR reading script outputs for ' + sheetName, e)
+		return []
+	}
+}
+
+/**
+ * @returns all the scripts which are available
+ */
 export function listScripts(): string[] {
 	try {
 		const files = fs.readdirSync(scriptsDir())

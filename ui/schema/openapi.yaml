@@ -116,24 +116,26 @@ paths:
         '404':
           description: output not found
     get:
-      summary: Get script output
-      operationId: getOutput
+      summary: list output files for the sheet name
+      operationId: listOutputsForSheet
       parameters:
         - name: name
           in: path
           required: true
-          description: Name of the output file
+          description: Name of the spreadsheet
           schema:
             type: string
       responses:
         '200':
           description: The output file contents
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: array
+                items:
+                  type: string
         '404':
-          description: Output not found
+          description: Sheet not found
   /api/data:
     post:
       summary: Submit spreadsheet data
